@@ -1,0 +1,84 @@
+﻿@model FixConnect.PL.ViewModels.RegisterViewModel
+@using FixConnect.DAL.Data.Enums
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FixConnect — Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100">
+
+    <div class="card shadow-sm p-4 my-4" style="width:100%;max-width:480px">
+        <h4 class="mb-4 text-center fw-bold">Create Account</h4>
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label">Full Name</label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Password</label>
+                <input asp-for="Password" class="form-control" type="password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Phone" class="form-label">Phone</label>
+                <input asp-for="Phone" class="form-control" placeholder="01xxxxxxxxx" />
+                <span asp-validation-for="Phone" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Role" class="form-label">I am a</label>
+                <select asp-for="Role" class="form-select" id="roleSelect">
+                    <option value="">— Select Role —</option>
+                    <option value="@((int)RoleType.Customer)">Customer</option>
+                    <option value="@((int)RoleType.Worker)">Worker</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3 d-none" id="specialtyGroup">
+                <label asp-for="Specialty" class="form-label">Specialty</label>
+                <input asp-for="Specialty" class="form-control" placeholder="e.g. Plumbing, Electrical" />
+                <span asp-validation-for="Specialty" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100">Register</button>
+
+            <p class="text-center mt-3 mb-0 small">
+                Already have an account?
+                <a asp-action="Login">Login</a>
+            </p>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('roleSelect').addEventListener('change', function () {
+            const workerValue = '@((int)RoleType.Worker)';
+            const group = document.getElementById('specialtyGroup');
+            group.classList.toggle('d-none', this.value !== workerValue);
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+</body>
+</html>
