@@ -18,9 +18,18 @@ namespace FixConnect.PL.ViewModels
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters.")]
         public string Password { get; set; } = null!;
 
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string? ConfirmPassword { get; set; }
+
+
+
         [Required]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "Phone must be 11 digits.")]
         public string Phone { get; set; } = null!;
+
+
+
+
 
         [Required]
         public RoleType Role { get; set; }
