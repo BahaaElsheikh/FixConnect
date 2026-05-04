@@ -1,0 +1,40 @@
+UserId,Specialty,Bio,IsVerified,AvailabilityStatus,AvgRating
+work-id-001,Pest Control (إبادة حشرات),Expert professional with years of experience in the field.,True,True,4.62
+work-id-002,Cleaning (تنظيف),Expert professional with years of experience in the field.,True,True,3.59
+work-id-003,Electrical (كهرباء),Expert professional with years of experience in the field.,True,True,4.51
+work-id-004,Gardening (تنسيق حدائق),Expert professional with years of experience in the field.,True,True,4.37
+work-id-005,Blacksmithing (حدادة),Expert professional with years of experience in the field.,False,True,4.9
+work-id-006,Air Conditioning (تكييف),Expert professional with years of experience in the field.,False,True,3.7
+work-id-007,Electrical (كهرباء),Expert professional with years of experience in the field.,True,True,4.19
+work-id-008,Pest Control (إبادة حشرات),Expert professional with years of experience in the field.,True,True,4.26
+work-id-009,Painting (نقاشة),Expert professional with years of experience in the field.,False,True,3.93
+work-id-010,Gardening (تنسيق حدائق),Expert professional with years of experience in the field.,True,True,4.5
+work-id-011,Electrical (كهرباء),Expert professional with years of experience in the field.,True,True,3.9
+work-id-012,Air Conditioning (تكييف),Expert professional with years of experience in the field.,False,True,4.41
+work-id-013,Air Conditioning (تكييف),Expert professional with years of experience in the field.,False,True,3.88
+work-id-014,Blacksmithing (حدادة),Expert professional with years of experience in the field.,False,True,3.57
+work-id-015,Air Conditioning (تكييف),Expert professional with years of experience in the field.,True,True,4.61
+work-id-016,Plumbing (سباكة),Expert professional with years of experience in the field.,True,True,3.61
+work-id-017,Tiling (سيراميك),Expert professional with years of experience in the field.,True,True,4.14
+work-id-018,Plumbing (سباكة),Expert professional with years of experience in the field.,False,True,3.82
+work-id-019,Pest Control (إبادة حشرات),Expert professional with years of experience in the field.,False,True,4.96
+work-id-020,Carpentry (نجارة),Expert professional with years of experience in the field.,False,True,3.54
+work-id-021,Painting (نقاشة),Expert professional with years of experience in the field.,False,True,3.74
+work-id-022,Cleaning (تنظيف),Expert professional with years of experience in the field.,True,True,3.8
+work-id-023,Painting (نقاشة),Expert professional with years of experience in the field.,True,True,3.54
+work-id-024,Air Conditioning (تكييف),Expert professional with years of experience in the field.,True,True,4.95
+work-id-025,Pest Control (إبادة حشرات),Expert professional with years of experience in the field.,False,True,4.52
+work-id-026,Electrical (كهرباء),Expert professional with years of experience in the field.,False,True,3.77
+work-id-027,Gardening (تنسيق حدائق),Expert professional with years of experience in the field.,False,True,4.02
+work-id-028,Pest Control (إبادة حشرات),Expert professional with years of experience in the field.,True,True,4.08
+work-id-029,Plumbing (سباكة),Expert professional with years of experience in the field.,False,True,3.5
+work-id-030,Blacksmithing (حدادة),Expert professional with years of experience in the field.,True,True,4.92
+work-id-031,Electrical (كهرباء),Expert professional with years of experience in the field.,False,True,4.26
+work-id-032,Air Conditioning (تكييف),Expert professional with years of experience in the field.,True,True,3.79
+work-id-033,Gardening (تنسيق حدائق),Expert professional with years of experience in the field.,False,True,4.11
+work-id-034,Painting (نقاشة),Expert professional with years of experience in the field.,False,True,4.68
+work-id-035,Cleaning (تنظيف),Expert professional with years of experience in the field.,False,True,4.51
+work-id-036,Electrical (كهرباء),Expert professional with years of experience in the field.,False,True,4.27
+work-id-037,Painting (نقاشة),Expert professional with years of experience in the field.,False,True,3.84
+work-id-038,Plumbing (سباكة),Expert professional with years of experience in the field.,True,True,4.98
+work-id-039,Blacksmithing (حدادة),Expert professional with years of experience in the field.,True,True,4.58

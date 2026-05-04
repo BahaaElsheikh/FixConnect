@@ -53,13 +53,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// ✅ Seed
-//using (var scope = app.Services.CreateScope())
-//{
-//    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-//    context.Database.Migrate();
-//    DbSeeder.Seed(context);
-//}
+
 
 if (!app.Environment.IsDevelopment())
 {

@@ -16,6 +16,9 @@ namespace FixConnect.DAL.Models
 
         public string? GoogleId { get; set; }           // ← ADD THIS
 
+        public bool IsActive { get; set; } /// For Admin
+
+
         public string Phone { get; set; } = null!;
         public RoleType RoleType { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;

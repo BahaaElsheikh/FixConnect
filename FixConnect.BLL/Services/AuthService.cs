@@ -85,6 +85,7 @@ namespace FixConnect.BLL.Services
             if (string.IsNullOrEmpty(user.PasswordHash)) return null; // Google-only account
 
             bool valid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+
             return valid ? user : null;
         }
 

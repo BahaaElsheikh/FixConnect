@@ -39,6 +39,11 @@ namespace FixConnect.PL.Controllers
                 ModelState.AddModelError("", "Invalid email or password.");
                 return View(model);
             }
+            if (user.IsActive == false)
+            {
+                ModelState.AddModelError("", "Account DeActivated Call The Admins ");
+                return View(model);
+            }
 
             await SignInUser(user.UserId.ToString(), user.FullName, user.Email, user.RoleType.ToString());
             return RedirectByRole(user.RoleType);

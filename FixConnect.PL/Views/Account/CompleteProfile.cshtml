@@ -21,7 +21,7 @@
         <p class="text-muted small mb-4">Complete your profile to continue.</p>
 
         <form asp-action="CompleteProfile" method="post">
-            <div asp-validation-summary="All" class="alert alert-danger"></div>
+           
 
             @* Hidden fields passed from Google *@
             <input type="hidden" asp-for="FullName" />
