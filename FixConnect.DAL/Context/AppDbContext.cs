@@ -28,6 +28,7 @@ namespace FixConnect.DAL.Context
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
 
+        public DbSet<WorkerVerification> WorkerVerifications { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -246,6 +247,21 @@ namespace FixConnect.DAL.Context
                       .HasForeignKey(t => t.WalletId)
                       .OnDelete(DeleteBehavior.NoAction);
             });
+
+
+            modelBuilder.Entity<WorkerVerification>(entity =>
+            {
+                entity.HasKey(v => v.VerificationId);
+                entity.Property(v => v.Status).HasDefaultValue("Pending");
+                entity.Property(v => v.SubmittedAt).HasDefaultValueSql("GETDATE()");
+
+                entity.HasOne(v => v.Worker)
+                      .WithOne(w => w.Verification)
+                      .HasForeignKey<WorkerVerification>(v => v.WorkerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
         }
     }
 }

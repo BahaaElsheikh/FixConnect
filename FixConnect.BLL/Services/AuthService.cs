@@ -38,7 +38,8 @@ namespace FixConnect.BLL.Services
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
                 Phone = phone,
                 RoleType = role,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                IsActive = true
             };
 
             _context.Users.Add(user);
@@ -128,7 +129,8 @@ namespace FixConnect.BLL.Services
                 Phone = phone,
                 RoleType = role,
                 GoogleId = googleId,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                IsActive = true
             };
 
             _context.Users.Add(user);

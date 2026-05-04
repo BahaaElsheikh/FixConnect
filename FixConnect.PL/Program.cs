@@ -23,6 +23,10 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     options.Secure = CookieSecurePolicy.Always;
 });
 
+// ✅ DI: Worker Phase Services
+builder.Services.AddScoped<WorkerService>();
+builder.Services.AddScoped<PortfolioService>();
+
 // ✅ Authentication
 builder.Services.AddAuthentication(options =>
 {

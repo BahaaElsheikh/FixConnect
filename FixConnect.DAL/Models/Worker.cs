@@ -17,6 +17,7 @@ namespace FixConnect.DAL.Models
         public decimal AvgRating { get; set; } = 0;
         public AvailabilityStatus AvailabilityStatus { get; set; }
 
+        public string? PhotoUrl { get; set; }
         // Navigation
         public User User { get; set; } = null!;
         public ICollection<WorksAt> WorksAt { get; set; } = new List<WorksAt>();
@@ -25,5 +26,8 @@ namespace FixConnect.DAL.Models
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public Wallet? Wallet { get; set; }
         public ICollection<Request> TargetedRequests { get; set; } = new List<Request>();
+
+        public WorkerVerification? Verification { get; set; }  // ← NEW
+
     }
 }

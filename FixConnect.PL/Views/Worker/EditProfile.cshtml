@@ -1,0 +1,110 @@
+﻿@model FixConnect.PL.ViewModels.EditWorkerProfileViewModel
+@using FixConnect.DAL.Data.Enums
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container py-4" style="max-width:680px">
+    <h5 class="fw-bold mb-4">Edit Profile</h5>
+
+    <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
+
+        {{!-- Basic Info --}}
+        <div class="card shadow-sm p-4 mb-4">
+            <h6 class="fw-semibold mb-3">Basic Information</h6>
+
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input asp-for="Phone" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Specialty</label>
+                <input asp-for="Specialty" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Bio</label>
+                <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
+            </div>
+
+            {{!-- Profile Photo --}}
+            <div class="mb-3">
+                <label class="form-label">Profile Photo</label>
+                @if (!string.IsNullOrEmpty(Model.CurrentPhotoUrl))
+                {
+                    <div class="mb-2">
+                        <img src="@Model.CurrentPhotoUrl"
+                             style="width:80px;height:80px;object-fit:cover;border-radius:50%;" />
+                    </div>
+                }
+                <input asp-for="PhotoFile" type="file" class="form-control" accept="image/*" />
+            </div>
+        </div>
+
+        {{!-- Availability --}}
+        <div class="card shadow-sm p-4 mb-4">
+            <h6 class="fw-semibold mb-3">Availability</h6>
+            <select asp-for="AvailabilityStatus" class="form-select">
+                <option value="@((int)AvailabilityStatus.Available)">Available</option>
+                <option value="@((int)AvailabilityStatus.Busy)">Busy</option>
+                <option value="@((int)AvailabilityStatus.Offline)">Offline</option>
+            </select>
+        </div>
+
+        {{!-- Working Regions --}}
+        <div class="card shadow-sm p-4 mb-4">
+            <h6 class="fw-semibold mb-3">Working Areas</h6>
+            <div class="row">
+                @foreach (var region in Model.AllRegions)
+                {
+                    <div class="col-6 col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="SelectedRegionIds" value="@region.RegionId"
+                                   @(Model.SelectedRegionIds.Contains(region.RegionId) ? "checked" : "") />
+                            <label class="form-check-label small">@region.RegionName</label>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        {{!-- Verification --}}
+        @if (!Model.HasPendingVerification)
+        {
+            <div class="card shadow-sm p-4 mb-4">
+                <h6 class="fw-semibold mb-1">ID Verification</h6>
+                <p class="text-muted small mb-3">
+                    Upload your national ID to get a Verified badge.
+                </p>
+
+                <div class="mb-3">
+                    <label class="form-label">ID Front</label>
+                    <input asp-for="IdFrontImage" type="file" class="form-control" accept="image/*" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">ID Back</label>
+                    <input asp-for="IdBackImage" type="file" class="form-control" accept="image/*" />
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                ⏳ Verification is under review. You cannot re-submit until it is processed.
+            </div>
+        }
+
+        <button type="submit" class="btn btn-dark w-100">Save Changes</button>
+        <a asp-action="Profile" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+    </form>
+</div>
+
+<partial name="_ValidationScriptsPartial" />
