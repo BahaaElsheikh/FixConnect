@@ -11,38 +11,55 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ✅ DI: Register Repositories
+// ✅ DI: Register Repositories & Services
 builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.AddScoped<UserRepository>();
-
-// ✅ DI: Register BLL Services
 builder.Services.AddScoped<AuthService>();
 
-// ✅ Cookie Authentication (Manual — no Identity)
+// ✅ Fix Correlation failed
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always;
+});
+
+// ✅ Authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme          = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
 .AddCookie(options =>
 {
-    options.LoginPath        = "/Account/Login";
-    options.LogoutPath       = "/Account/Logout";
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Account/Login";
-    options.ExpireTimeSpan   = TimeSpan.FromDays(7);
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    // ✅ Fix SameSite for Google OAuth callback
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 })
 .AddGoogle(options =>
 {
-    options.ClientId     = builder.Configuration["Authentication:Google:ClientId"]!;
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-    options.SaveTokens   = true;
+    options.SaveTokens = true;
+    // ✅ Fix Correlation — store state in cookie not session
+    options.CorrelationCookie.SameSite = SameSiteMode.None;
+    options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Seed
+// ✅ Seed
+//using (var scope = app.Services.CreateScope())
+//{
+//    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//    context.Database.Migrate();
+//    DbSeeder.Seed(context);
+//}
 
 if (!app.Environment.IsDevelopment())
 {
@@ -50,21 +67,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-//    context.Database.Migrate();
-//    DbSeeder.Seed(context);
-//}
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
-app.UseAuthentication();   // ← must be before UseAuthorization
+app.UseCookiePolicy();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");  // default = Login page
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

@@ -89,7 +89,8 @@ namespace FixConnect.PL.Controllers
         {
             var props = new AuthenticationProperties
             {
-                RedirectUri = Url.Action("GoogleCallback")
+                RedirectUri = Url.Action("GoogleCallback", "Account", null, Request.Scheme)
+
             };
             return Challenge(props, GoogleDefaults.AuthenticationScheme);
         }

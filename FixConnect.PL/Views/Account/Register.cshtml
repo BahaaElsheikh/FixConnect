@@ -205,13 +205,29 @@
                             <span asp-validation-for="Phone" class="text-red-500 text-[11px]"></span>
                         </div>
 
+                      <!-- Specialty (Visible only for Workers) -->
                         <!-- Specialty (Visible only for Workers) -->
                         <div class="flex flex-col gap-xs hidden" id="specialtyGroup">
                             <label class="text-label-sm text-on-surface-variant uppercase" asp-for="Specialty">Specialty</label>
-                            <input asp-for="Specialty" class="w-full px-md py-sm border border-outline-variant rounded font-body-md form-input-focus transition-all" placeholder="e.g. Plumbing, Electrical" />
+                            <div class="relative group">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">search</span>
+                                <input asp-for="Specialty" list="specialtyOptions" class="w-full pl-10 pr-4 py-3 bg-white border border-outline-variant rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="Search or select specialty..." />
+
+                                <datalist id="specialtyOptions">
+                                    <option value="Plumbing (سباكة)"></option>
+                                    <option value="Electrical (كهرباء)"></option>
+                                    <option value="Carpentry (نجارة)"></option>
+                                    <option value="Painting (نقاشة)"></option>
+                                    <option value="Air Conditioning (تكييف)"></option>
+                                    <option value="Tiling (سيراميك)"></option>
+                                    <option value="Blacksmithing (حدادة)"></option>
+                                    <option value="Cleaning (تنظيف)"></option>
+                                    <option value="Pest Control (إبادة حشرات)"></option>
+                                    <option value="Gardening (تنسيق حدائق)"></option>
+                                </datalist>
+                            </div>
                             <span asp-validation-for="Specialty" class="text-red-500 text-[11px]"></span>
                         </div>
-
                         <!-- Password -->
                         <div class="flex flex-col gap-xs">
                             <label class="text-label-sm text-on-surface-variant uppercase" asp-for="Password">Password</label>

@@ -8,49 +8,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FixConnect — Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>@ViewData["Title"] - FixConnect</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#006d3d",
+                        "secondary-fixed": "#94f7b6",
+                        "primary-container": "#0052cc",
+                        "surface-container-low": "#f1f3ff",
+                        "inverse-primary": "#b2c5ff",
+                        "on-secondary-fixed-variant": "#00522d",
+                        "on-primary-fixed": "#001848",
+                        "on-primary": "#ffffff",
+                        "outline": "#737685",
+                        "surface-dim": "#ccdaff",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "background": "#faf9ff",
+                        "primary": "#003d9b",
+                        "surface-bright": "#faf9ff",
+                        "on-surface": "#051a3e",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#e9edff",
+                        "surface-container-high": "#e1e8ff",
+                        "tertiary-fixed": "#ffdbcf",
+                        "inverse-on-surface": "#edf0ff",
+                        "outline-variant": "#c3c6d6",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#1d3054",
+                        "surface-tint": "#0c56d0",
+                        "surface-container-highest": "#d8e2ff",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#faf9ff",
+                        "tertiary-container": "#a33500",
+                        "primary-fixed": "#dae2ff",
+                        "on-tertiary-container": "#ffc6b2",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "on-tertiary-fixed": "#380d00",
+                        "secondary-container": "#94f7b6",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-secondary-fixed": "#00210f",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#c4d2ff",
+                        "on-background": "#051a3e",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-secondary-container": "#007442",
+                        "surface-variant": "#d8e2ff",
+                        "on-surface-variant": "#434654",
+                        "tertiary": "#7b2600",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#78da9c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px", "xl": "48px", "lg": "24px", "xs": "4px", "max-width": "1200px", "gutter": "24px", "md": "16px", "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Manrope"], "h2": ["Manrope"], "h1": ["Manrope"], "h3": ["Manrope"], "label-sm": ["Manrope"], "body-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                        "h2": ["32px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h3": ["24px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}],
+                        "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center min-vh-100">
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+    <main class="flex-grow flex items-center justify-center px-lg py-xl relative overflow-hidden">
+        <!-- Background Decorations -->
+        <div class="absolute inset-0 z-0 opacity-10">
+            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-container rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary-container rounded-full blur-[120px]"></div>
+        </div>
 
-    <div class="card shadow-sm p-4" style="width:100%;max-width:420px">
-        <h4 class="mb-4 text-center fw-bold">FixConnect Login</h4>
+        <div class="w-full max-w-[440px] z-10">
+            <div class="bg-surface-container-lowest border border-outline-variant rounded shadow-sm overflow-hidden">
+                <div class="p-lg md:p-xl">
+                    <div class="text-center mb-xl">
+                        <div class="inline-flex items-center justify-center w-12 h-12 bg-primary rounded-lg mb-md">
+                            <span class="material-symbols-outlined text-white text-3xl">handyman</span>
+                        </div>
+                        <h1 class="font-h2 text-h2 text-on-surface mb-xs tracking-tight">FixConnect</h1>
+                        <p class="font-body-md text-on-surface-variant">Maintenance Portal Login</p>
+                    </div>
 
-        <form asp-action="Login" method="post">
-            <div asp-validation-summary="All" class="alert alert-danger d-none" id="valSummary"></div>
+                    <form asp-action="Login" class="space-y-lg" method="post">
+                        @* Error Summary *@
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div asp-validation-summary="All" class="p-3 bg-red-50 border border-red-200 text-red-600 rounded text-sm mb-4"></div>
+                        }
 
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label">Email</label>
-                <input asp-for="Email" class="form-control" placeholder="you@example.com" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
+                        <!-- Email Address -->
+                        <div class="space-y-xs">
+                            <label class="font-label-sm text-label-sm text-outline uppercase tracking-wider" asp-for="Email">Email Address</label>
+                            <div class="relative group">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">mail</span>
+                                <input asp-for="Email" class="w-full pl-10 pr-4 py-3 bg-white border border-outline-variant rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="Enter your email" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-red-500 text-[11px]"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="space-y-xs">
+                            <div class="flex justify-between items-center">
+                                <label class="font-label-sm text-label-sm text-outline uppercase tracking-wider" asp-for="Password">Password</label>
+                                <a class="font-label-sm text-label-sm text-primary hover:underline transition-all" href="#">Forgot password?</a>
+                            </div>
+                            <div class="relative group">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">lock</span>
+                                <input asp-for="Password" id="passwordInput" type="password" class="w-full pl-10 pr-10 py-3 bg-white border border-outline-variant rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="Enter your password" />
+                                <button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface" type="button" onclick="togglePassword()">
+                                    <span id="eyeIcon" class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-red-500 text-[11px]"></span>
+                        </div>
+
+                        <!-- Keep me signed in (RememberMe) -->
+                        <div class="flex items-center space-x-sm pt-xs">
+                            @* لو عندك خاصية RememberMe في الـ ViewModel ضيفها هنا *@
+                            <input class="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary" id="RememberMe" type="checkbox" name="RememberMe" value="true" />
+                            <label class="font-body-md text-on-surface-variant text-sm cursor-pointer select-none" for="RememberMe">Keep me signed in</label>
+                        </div>
+
+                        <!-- Login Button -->
+                        <button class="w-full bg-primary-container hover:bg-primary text-white font-semibold py-4 px-lg rounded transition-colors flex items-center justify-center gap-sm active:scale-[0.98] duration-150" type="submit">
+                            <span>Login</span>
+                            <span class="material-symbols-outlined text-[20px]">login</span>
+                        </button>
+                    </form>
+
+                    <!-- Divider & Social Login -->
+                    <div class="mt-xl pt-lg border-t border-outline-variant">
+                        <div class="flex flex-col gap-md">
+                            <a href="/Account/GoogleLogin" class="w-full border border-outline-variant bg-white text-on-surface font-semibold py-3 px-lg rounded hover:bg-surface-container transition-colors flex items-center justify-center gap-sm">
+                                <img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGDvurwNYIswuHcu9WizauOND7gPZEcrY5ouV3qXgXEBBM02bph-BNozBCh0KgiRIBirkfaCoGkm5hY_7RytxrQjiYk7sDE5UDvqg06aK889HO1_mOWRpPw5Dx5ZYOzlwiVG5rr55HaDVS3xpnwtsY5ZwEAtT22M7vwTDXBLA-ni72Yt3VmS0A3K1I-t6d6jR4a-8BTNb8Hm_NxVZmWQ981nvk-FmLfKY9HO7CotnqaLtQeIj4_UkU6xSx5VXs_0-W_Z6-OnF4-Bg" />
+                                <span>Sign in with Google</span>
+                            </a>
+                        </div>
+                        <p class="text-center mt-lg font-body-md text-on-surface-variant text-sm">
+                            New to the portal?
+                            <a class="text-primary font-bold hover:underline" asp-action="Register">Create Account </a>
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label">Password</label>
-                <input asp-for="Password" class="form-control" placeholder="••••••••" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
-            </div>
+            <!-- Footer -->
+            <footer class="mt-xl flex justify-between items-center px-xs">
+                <p class="font-label-sm text-label-sm text-outline">© 2026 FIXCONNECT INC.</p>
+                <div class="flex gap-md">
+                    <a class="font-label-sm text-label-sm text-outline hover:text-primary" href="#">PRIVACY</a>
+                    <a class="font-label-sm text-label-sm text-outline hover:text-primary" href="#">TERMS</a>
+                </div>
+            </footer>
+        </div>
+    </main>
 
-            <button type="submit" class="btn btn-dark w-100 mb-3">Sign In</button>
-
-            <div class="text-center text-muted my-2">or</div>
-
-            <a href="/Account/GoogleLogin" class="btn btn-outline-danger w-100">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg"
-                     alt="Google" width="18" class="me-2" />
-                Sign in with Google
-            </a>
-
-            <p class="text-center mt-3 mb-0 small">
-                Don't have an account?
-                <a asp-action="Register">Register</a>
-            </p>
-        </form>
+    <!-- Decorative Construction Icon -->
+    <div class="hidden lg:block fixed bottom-lg right-lg opacity-20 pointer-events-none">
+        <span class="material-symbols-outlined text-[120px] text-primary">construction</span>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @* JavaScript for Password Toggle *@
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.innerText = "visibility_off";
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.innerText = "visibility";
+            }
+        }
+    </script>
+
     <partial name="_ValidationScriptsPartial" />
 </body>
 </html>
