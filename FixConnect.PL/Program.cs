@@ -15,7 +15,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<AuthService>();
-
+// أضف بعد WorkerService
+builder.Services.AddScoped<AdminService>();
 // ✅ Fix Correlation failed
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -55,7 +56,61 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddControllersWithViews();
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactPolicy", policy =>
+    {
+        policy
+            .WithOrigins("https://localhost:7163")  // ← عنوان الـ React
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();                    // ← مهم عشان الـ Cookies
+    });
+});
+
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // لما الـ API مش مـ Authenticated ترجع 401 مش Redirect للـ Login
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        }
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+
+    // لما الـ API مش عندها Permission ترجع 403 مش Redirect
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = 403;
+            return Task.CompletedTask;
+        }
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+});
+
+
+
+
+
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
+    DbSeeder.Seed(context);
+}
+
 
 
 
@@ -69,11 +124,15 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCookiePolicy();
+
+app.UseCors("ReactPolicy");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
+//pattern: "{controller=Admin}/{action=Users}/{id?}");
 
 app.Run();

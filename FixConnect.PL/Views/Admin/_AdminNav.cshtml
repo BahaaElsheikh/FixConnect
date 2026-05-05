@@ -1,0 +1,17 @@
+﻿<!-- Views/Admin/_AdminNav.cshtml -->
+<div class="d-flex gap-2 mb-4">
+    <a asp-controller="Admin" asp-action="Users"
+       class="btn d-inline-flex align-items-center gap-2 @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "btn-dark" : "btn-outline-dark")">
+        <i class="bi bi-people-fill"></i> Users
+    </a>
+
+    <a asp-controller="Admin" asp-action="Requests"
+       class="btn d-inline-flex align-items-center gap-2 @(ViewContext.RouteData.Values["action"]?.ToString() == "Requests" ? "btn-dark" : "btn-outline-dark")">
+        <i class="bi bi-clipboard2-check-fill"></i> Requests
+    </a>
+
+    <a asp-controller="Admin" asp-action="Proposals"
+       class="btn d-inline-flex align-items-center gap-2 @(ViewContext.RouteData.Values["action"]?.ToString() == "Proposals" ? "btn-dark" : "btn-outline-dark")">
+        <i class="bi bi-file-earmark-text-fill"></i> Proposals
+    </a>
+</div>

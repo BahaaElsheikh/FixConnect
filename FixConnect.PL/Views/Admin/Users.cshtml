@@ -1,0 +1,138 @@
+﻿@model FixConnect.PL.ViewModels.UsersListViewModel
+@{
+    ViewData["Title"] = "User Management";
+}
+<partial name="_AdminNav" />
+<div class="container-fluid py-4">
+    <h5 class="fw-bold mb-4">User Management</h5>
+
+    <!-- Filter Bar -->
+    <form method="get" asp-action="Users" class="d-flex gap-2 mb-4 flex-wrap">
+
+        <!-- Search -->
+        <input type="text"
+               name="search"
+               value="@Model.SearchQuery"
+               class="form-control"
+               style="max-width:280px"
+               placeholder="Search name, email, phone..." />
+
+        <!-- Role Filter Buttons -->
+        <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter=""
+           class="btn @(string.IsNullOrEmpty(Model.RoleFilter) ? "btn-dark" : "btn-outline-dark")">
+            All
+        </a>
+        <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Worker"
+           class="btn @(Model.RoleFilter == "Worker" ? "btn-dark" : "btn-outline-dark")">
+            Workers
+        </a>
+        <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Customer"
+           class="btn @(Model.RoleFilter == "Customer" ? "btn-dark" : "btn-outline-dark")">
+            Customers
+        </a>
+
+        <button type="submit" class="btn btn-outline-secondary">Search</button>
+    </form>
+
+    <!-- Table -->
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Verified</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr class="@(!user.IsActive ? "table-secondary text-muted" : "")">
+                            <td class="small">@user.UserId</td>
+                            <td>
+                                <span class="fw-semibold">@user.FullName</span>
+                            </td>
+                            <td class="small">@user.Email</td>
+                            <td class="small">@user.Phone</td>
+                            <td>
+                                <span class="badge @(user.Role == "Worker" ? "bg-info text-dark" : "bg-secondary")">
+                                    @user.Role
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge @(user.IsActive ? "bg-success" : "bg-danger")">
+                                    @(user.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>
+                                @if (user.Role == "Worker")
+                                {
+                                    <span class="badge @(user.IsVerified ? "bg-primary" : "bg-light text-dark border")">
+                                        @(user.IsVerified ? "✔ Verified" : "Unverified")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">—</span>
+                                }
+                            </td>
+                            <td class="small">@user.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td>
+                                <div class="d-flex gap-1 flex-wrap">
+
+                                    <!-- View Profile (Workers only) -->
+                                    @if (user.Role == "Worker")
+                                    {
+                                        <a asp-action="WorkerProfile" asp-route-id="@user.UserId"
+                                           class="btn btn-outline-dark btn-sm">
+                                            View
+                                        </a>
+
+                                        <!-- Verify (unverified workers only) -->
+                                        @if (!user.IsVerified)
+                                        {
+                                            <form asp-action="VerifyWorker" method="post">
+                                                <input type="hidden" name="workerId" value="@user.UserId" />
+                                                <button type="submit"
+                                                        class="btn btn-outline-primary btn-sm"
+                                                        onclick="return confirm('Verify this worker?')">
+                                                    Verify
+                                                </button>
+                                            </form>
+                                        }
+                                    }
+
+                                    <!-- Activate / Deactivate -->
+                                    <form asp-action="ToggleActive" method="post">
+                                        <input type="hidden" name="userId" value="@user.UserId" />
+                                        <input type="hidden" name="isActive" value="@(!user.IsActive ? 1 : 0)" />
+                                        <button type="submit"
+                                                class="btn btn-sm @(user.IsActive ? "btn-outline-danger" : "btn-outline-success")"
+                                                onclick="return confirm('@(user.IsActive ? "Deactivate" : "Activate") this user?')">
+                                            @(user.IsActive ? "Deactivate" : "Activate")
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                    @if (!Model.Users.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">No users found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

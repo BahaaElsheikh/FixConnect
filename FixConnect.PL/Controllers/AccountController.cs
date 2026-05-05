@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
+using FixConnect.BLL.DTOs;
 namespace FixConnect.PL.Controllers
 {
     public class AccountController : Controller
@@ -210,7 +211,7 @@ namespace FixConnect.PL.Controllers
         // Redirects based on role claim
         private IActionResult RedirectByRole(RoleType role) => role switch
         {
-            RoleType.Admin => RedirectToAction("Dashboard", "AdminPanel"),
+            RoleType.Admin => RedirectToAction("Dashboard", "Admin"),
             RoleType.Worker => RedirectToAction("Profile", "Worker"),
             RoleType.Customer => RedirectToAction("Index", "Home"),
             _ => RedirectToAction("Login")

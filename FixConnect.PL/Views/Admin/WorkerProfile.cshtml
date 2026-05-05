@@ -1,0 +1,252 @@
+﻿@model FixConnect.BLL.DTOs.PublicWorkerProfileViewModel
+@{
+    ViewData["Title"] = "Worker: " + Model.FullName;
+}
+<partial name="_AdminNav" />
+<div class="container py-4">
+    <div class="row g-4">
+
+        <!-- Left: Profile Card -->
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-4">
+
+                <img src="@(Model.PhotoUrl ?? "/uploads/ProfilePictures/default.png")"
+                     class="rounded-circle mx-auto mb-3"
+                     style="width:110px;height:110px;object-fit:cover;" />
+
+                <h5 class="fw-bold mb-1">
+                    @Model.FullName
+                    @if (Model.IsVerified)
+                    {
+                        <span class="badge bg-primary ms-1">✔ Verified</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary ms-1">Unverified</span>
+                    }
+                </h5>
+
+                <p class="text-muted small mb-1">@Model.Specialty</p>
+                <p class="text-muted small mb-1">@Model.Email</p>
+                <p class="text-muted small mb-2">@Model.Phone</p>
+
+                <!-- Stars -->
+                <div class="mb-3">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <span style="color:@(i <= (int)Model.AvgRating ? "#f5a623" : "#ccc");font-size:1.1rem">★</span>
+                    }
+                    <small class="text-muted ms-1">(@Model.AvgRating.ToString("0.0"))</small>
+                </div>
+
+                <span class="badge @(Model.AvailabilityStatus == "Available" ? "bg-success" :
+                                                                                  Model.AvailabilityStatus == "Busy" ? "bg-warning text-dark" :
+                                                                                                                             "bg-secondary")">
+                    @Model.AvailabilityStatus
+                </span>
+
+                <hr />
+
+                <p class="small fw-semibold mb-2">Working Areas</p>
+                <div class="d-flex flex-wrap justify-content-center gap-1">
+                    @foreach (var region in Model.WorkingRegions)
+                    {
+                        <span class="badge bg-light text-dark border">@region</span>
+                    }
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════
+                 Verification Card (Admin Only)
+            ══════════════════════════════ -->
+            @if (Model.Verification != null)
+            {
+                <div class="card shadow-sm p-4 mt-3">
+                    <h6 class="fw-bold mb-3">🪪 ID Verification</h6>
+
+                    <div class="mb-2">
+                        <p class="small fw-semibold mb-1">
+                            Status:
+                            <span class="badge @(Model.Verification.Status == "Approved" ? "bg-success" :
+                                                                                                                      Model.Verification.Status == "Rejected" ? "bg-danger" :
+                                                                                                                                                                 "bg-warning text-dark")">
+                            @Model.Verification.Status
+                        </span>
+                    </p>
+                    <p class="small text-muted">
+                        Submitted: @Model.Verification.SubmittedAt.ToString("dd MMM yyyy")
+                    </p>
+                </div>
+
+                    <!-- ID Images -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <p class="small fw-semibold mb-1">Front</p>
+                            <img src="@Model.Verification.IdFrontImagePath"
+                                 class="img-fluid rounded border"
+                                 style="cursor:pointer"
+                                 onclick="openImgModal('@Model.Verification.IdFrontImagePath', 'ID Front')" />
+                        </div>
+                        <div class="col-6">
+                            <p class="small fw-semibold mb-1">Back</p>
+                            <img src="@Model.Verification.IdBackImagePath"
+                                 class="img-fluid rounded border"
+                                 style="cursor:pointer"
+                                 onclick="openImgModal('@Model.Verification.IdBackImagePath', 'ID Back')" />
+                        </div>
+                    </div>
+
+                    <!-- Approve / Reject -->
+                @if (Model.Verification.Status == "Pending")
+                    {
+                        <div class="d-flex gap-2">
+                            <form asp-controller="Admin"
+                                  asp-action="ApproveVerification" method="post" class="flex-fill">
+                                <input type="hidden" name="workerId" value="@Model.Verification.WorkerId" />
+                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                    ✔ Approve
+                                </button>
+                            </form>
+                            <form asp-controller="Admin"
+                                  asp-action="RejectVerification" method="post" class="flex-fill">
+                                <input type="hidden" name="workerId" value="@Model.Verification.WorkerId" />
+                                <button type="submit" class="btn btn-danger btn-sm w-100">
+                                    ✖ Reject
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-secondary mt-3 small">
+                    No verification submitted yet.
+                </div>
+            }
+        </div>
+
+        <!-- Right -->
+        <div class="col-md-8">
+
+            <!-- Bio -->
+            @if (!string.IsNullOrEmpty(Model.Bio))
+            {
+                <div class="card shadow-sm p-4 mb-4">
+                    <h6 class="fw-bold mb-2">About</h6>
+                    <p class="text-muted mb-0">@Model.Bio</p>
+                </div>
+            }
+
+            <!-- Portfolio (View Only + Click to Zoom) -->
+            <div class="card shadow-sm p-4 mb-4">
+                <h6 class="fw-bold mb-3">Portfolio</h6>
+                @if (!Model.PortfolioItems.Any())
+                {
+                    <p class="text-muted small">No portfolio items.</p>
+                }
+                else
+                {
+                    <div class="row g-3">
+                        @foreach (var item in Model.PortfolioItems)
+                        {
+                            <div class="col-6 col-md-4">
+                                <div class="card border-0 shadow-sm h-100"
+                                     style="cursor:pointer"
+                                     onclick="openPortfolioModal('@item.ImageUrl', '@item.Title', '@item.Description')">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl"
+                                             class="card-img-top"
+                                             style="height:140px;object-fit:cover;" />
+                                    }
+                                    <div class="card-body p-2">
+                                        <p class="fw-semibold small mb-0">@item.Title</p>
+                                        <p class="text-muted" style="font-size:0.75rem">@item.Description</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Reviews -->
+            <div class="card shadow-sm p-4">
+                <h6 class="fw-bold mb-3">Reviews</h6>
+                @if (!Model.Reviews.Any())
+                {
+                    <p class="text-muted small">No reviews yet.</p>
+                }
+                else
+                {
+                    @foreach (var r in Model.Reviews)
+                    {
+                        <div class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between">
+                                <strong class="small">@r.CustomerName</strong>
+                                <span>
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span style="color:@(i <= r.RatingValue ? "#f5a623" : "#ccc")">★</span>
+                                    }
+                                </span>
+                            </div>
+                            <p class="text-muted small mb-0">@r.Comment</p>
+                        </div>
+                    }
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Image Zoom Modal -->
+<div class="modal fade" id="imgModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold" id="imgModalTitle"></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="imgModalSrc" src="" class="img-fluid rounded"
+                     style="max-height:500px;object-fit:contain;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Portfolio Modal -->
+<div class="modal fade" id="portfolioModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold" id="portfolioModalTitle"></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="portfolioModalImage" src=""
+                     class="img-fluid rounded mb-3"
+                     style="max-height:420px;object-fit:contain;" />
+                <p id="portfolioModalDescription" class="text-muted small mb-0"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openImgModal(src, title) {
+        document.getElementById('imgModalSrc').src       = src;
+        document.getElementById('imgModalTitle').innerText = title;
+        new bootstrap.Modal(document.getElementById('imgModal')).show();
+    }
+
+    function openPortfolioModal(imageUrl, title, description) {
+        document.getElementById('portfolioModalImage').src            = imageUrl || '';
+        document.getElementById('portfolioModalTitle').innerText      = title    || '';
+        document.getElementById('portfolioModalDescription').innerText = description || '';
+        new bootstrap.Modal(document.getElementById('portfolioModal')).show();
+    }
+</script>

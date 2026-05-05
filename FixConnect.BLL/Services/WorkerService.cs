@@ -2,6 +2,8 @@
 using FixConnect.DAL.Data.Enums;
 using FixConnect.DAL.Models;
 using Microsoft.EntityFrameworkCore;
+// أضف في الأعلى
+using FixConnect.BLL.DTOs;
 
 namespace FixConnect.BLL.Services
 {
@@ -170,6 +172,58 @@ namespace FixConnect.BLL.Services
             _context.WorksAt.Remove(entry);
             _context.SaveChanges();
         }
+
+
+        public PublicWorkerProfileViewModel? GetPublicProfile(int workerId)
+        {
+            var worker = _context.Workers
+                .Include(w => w.User)
+                .Include(w => w.WorksAt).ThenInclude(wa => wa.Region)
+                .Include(w => w.PortfolioItems)
+                .Include(w => w.Reviews).ThenInclude(r => r.Customer).ThenInclude(c => c.User)
+                .Include(w => w.Verification)
+                .FirstOrDefault(w => w.UserId == workerId);
+
+            if (worker == null) return null;
+
+            return new PublicWorkerProfileViewModel
+            {
+                UserId = worker.UserId,
+                FullName = worker.User.FullName,
+                Email = worker.User.Email,
+                Phone = worker.User.Phone,
+                Bio = worker.Bio,
+                Specialty = worker.Specialty,
+                PhotoUrl = worker.PhotoUrl,
+                IsVerified = worker.IsVerified,
+                AvailabilityStatus = worker.AvailabilityStatus.ToString(),
+                AvgRating = worker.AvgRating,
+                WorkingRegions = worker.WorksAt.Select(wa => wa.Region.RegionName).ToList(),
+                PortfolioItems = worker.PortfolioItems.Select(p => new PortfolioItemViewModel
+                {
+                    ItemId = p.ItemId,
+                    Title = p.Title ?? "",
+                    Description = p.Description,
+                    ImageUrl = p.ImageUrl
+                }).ToList(),
+                Reviews = worker.Reviews.Select(r => new ReviewItemViewModel
+                {
+                    CustomerName = r.Customer.User.FullName,
+                    RatingValue = r.RatingValue,
+                    Comment = r.Comment
+                }).ToList(),
+                Verification = worker.Verification == null ? null : new VerificationViewModel
+                {
+                    WorkerId = worker.UserId,
+                    IdFrontImagePath = worker.Verification.IdFrontImagePath,
+                    IdBackImagePath = worker.Verification.IdBackImagePath,
+                    Status = worker.Verification.Status,
+                    SubmittedAt = worker.Verification.SubmittedAt
+                }
+            };
+        }
+
+
 
     }
 
