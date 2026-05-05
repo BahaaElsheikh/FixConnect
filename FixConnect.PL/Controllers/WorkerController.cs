@@ -227,5 +227,22 @@ namespace FixConnect.PL.Controllers
         {
             public int RegionId { get; set; }
         }
+
+
+        // POST: /Worker/UpdatePortfolioItem
+        [HttpPost]
+        public async Task<IActionResult> UpdatePortfolioItem(PortfolioItemViewModel model)
+        {
+            string? imageUrl = null;
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+                imageUrl = await SaveFile(model.ImageFile, "PortfolioPictures");
+
+            _portfolioService.UpdateItem(
+                model.ItemId, GetCurrentUserId(),
+                model.Title, model.Description, imageUrl);
+
+            return RedirectToAction("Profile");
+        }
+
     }
 }

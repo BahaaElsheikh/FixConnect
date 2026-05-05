@@ -161,6 +161,7 @@
             }
 
             <!-- Portfolio -->
+            <!-- Portfolio -->
             <div class="card shadow-sm p-4 mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold mb-0">Portfolio (@Model.PortfolioItems.Count / 10)</h6>
@@ -194,14 +195,25 @@
                                     <div class="card-body p-2">
                                         <p class="fw-semibold small mb-0">@item.Title</p>
                                         <p class="text-muted" style="font-size:0.75rem">@item.Description</p>
-                                        <form asp-action="DeletePortfolioItem" method="post"
-                                              onsubmit="return confirm('Delete this item?')">
-                                            <input type="hidden" name="itemId" value="@item.ItemId" />
-                                            <button type="submit"
-                                                    class="btn btn-outline-danger btn-sm w-100">
-                                                Delete
+
+                                        <div class="d-flex gap-1 mt-1">
+                                            <!-- Edit Button -->
+                                            <button class="btn btn-outline-secondary btn-sm flex-fill"
+                                                    onclick="openEditModal(@item.ItemId, '@item.Title', '@item.Description', '@item.ImageUrl')">
+                                                Edit
                                             </button>
-                                        </form>
+
+                                            <!-- Delete Button -->
+                                            <form asp-action="DeletePortfolioItem" method="post"
+                                                  onsubmit="return confirm('Delete this item?')"
+                                                  class="flex-fill">
+                                                <input type="hidden" name="itemId" value="@item.ItemId" />
+                                                <button type="submit"
+                                                        class="btn btn-outline-danger btn-sm w-100">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -273,6 +285,71 @@
         </form>
     </div>
 </div>
+
+<!-- Edit Portfolio Modal -->
+<div class="modal fade" id="editPortfolioModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form asp-action="UpdatePortfolioItem" method="post" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title fw-bold">Edit Portfolio Item</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+
+                    <input type="hidden" name="ItemId" id="editItemId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input name="Title" id="editTitle" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="Description" id="editDescription"
+                                  class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Current Image</label>
+                        <div id="editCurrentImage" class="mb-2"></div>
+                        <label class="form-label small text-muted">
+                            Upload new image (leave empty to keep current)
+                        </label>
+                        <input name="ImageFile" type="file"
+                               class="form-control" accept="image/*" />
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-dark">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditModal(itemId, title, description, imageUrl) {
+        document.getElementById('editItemId').value      = itemId;
+        document.getElementById('editTitle').value       = title;
+        document.getElementById('editDescription').value = description ?? '';
+
+        const imgDiv = document.getElementById('editCurrentImage');
+        if (imageUrl) {
+            imgDiv.innerHTML = `<img src="${imageUrl}"
+                                     style="height:80px;object-fit:cover;border-radius:6px;" />`;
+        } else {
+            imgDiv.innerHTML = '<span class="text-muted small">No image</span>';
+        }
+
+        new bootstrap.Modal(document.getElementById('editPortfolioModal')).show();
+    }
+</script>
 
 <!-- ══════════════════════════════
      Region Search Script

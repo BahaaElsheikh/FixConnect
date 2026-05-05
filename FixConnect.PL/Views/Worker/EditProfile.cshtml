@@ -9,6 +9,23 @@
 
     <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
 
+
+        {{!-- Profile Photo --}}
+        <div class="mb-3">
+            <label class="form-label">Profile Photo</label>
+            @if (!string.IsNullOrEmpty(Model.CurrentPhotoUrl))
+            {
+                <div class="mb-2">
+                    <img src="@Model.CurrentPhotoUrl"
+                         style="width:80px;height:80px;object-fit:cover;border-radius:50%;" />
+                </div>
+            }
+            <input asp-for="PhotoFile" type="file" class="form-control" accept="image/*" />
+        </div>
+
+
+
+
         {{!-- Basic Info --}}
         <div class="card shadow-sm p-4 mb-4">
             <h6 class="fw-semibold mb-3">Basic Information</h6>
@@ -34,29 +51,9 @@
                 <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
             </div>
 
-            {{!-- Profile Photo --}}
-            <div class="mb-3">
-                <label class="form-label">Profile Photo</label>
-                @if (!string.IsNullOrEmpty(Model.CurrentPhotoUrl))
-                {
-                    <div class="mb-2">
-                        <img src="@Model.CurrentPhotoUrl"
-                             style="width:80px;height:80px;object-fit:cover;border-radius:50%;" />
-                    </div>
-                }
-                <input asp-for="PhotoFile" type="file" class="form-control" accept="image/*" />
-            </div>
-        </div>
+           
 
-        {{!-- Availability --}}
-        <div class="card shadow-sm p-4 mb-4">
-            <h6 class="fw-semibold mb-3">Availability</h6>
-            <select asp-for="AvailabilityStatus" class="form-select">
-                <option value="@((int)AvailabilityStatus.Available)">Available</option>
-                <option value="@((int)AvailabilityStatus.Busy)">Busy</option>
-                <option value="@((int)AvailabilityStatus.Offline)">Offline</option>
-            </select>
-        </div>
+       
 
         {{!-- Working Regions --}}
         <div class="card shadow-sm p-4 mb-4">
