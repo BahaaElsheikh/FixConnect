@@ -1,0 +1,71 @@
+﻿@model dynamic
+@{
+    int pageIndex = Model.PageIndex;
+    int totalPages = Model.TotalPages;
+    int totalCount = Model.TotalCount;
+    string action = ViewContext.RouteData.Values["action"]!.ToString()!;
+}
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+
+    <small class="text-muted">
+        Showing page @pageIndex of @totalPages
+        (@totalCount total records)
+    </small>
+
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+
+            <!-- Previous -->
+            <li class="page-item @(pageIndex <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="@action"
+                   asp-route-page="@(pageIndex - 1)"
+                   asp-route-search="@Context.Request.Query["search"]"
+                   asp-route-roleFilter="@Context.Request.Query["roleFilter"]">
+                    ‹
+                </a>
+            </li>
+
+            <!-- Page Numbers -->
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <!-- Show first, last, current, and neighbors only -->
+                @if (i == 1 || i == totalPages || (i >= pageIndex - 1 && i <= pageIndex + 1))
+                {
+                    <li class="page-item @(i == pageIndex ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="@action"
+                           asp-route-page="@i"
+                           asp-route-search="@Context.Request.Query["search"]"
+                           asp-route-roleFilter="@Context.Request.Query["roleFilter"]">
+                            @i
+                        </a>
+                    </li>
+                }
+                else if (i == pageIndex - 2 || i == pageIndex + 2)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+                }
+            }
+
+            <!-- Next -->
+            <li class="page-item @(pageIndex >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="@action"
+                   asp-route-page="@(pageIndex + 1)"
+                   asp-route-search="@Context.Request.Query["search"]"
+                   asp-route-roleFilter="@Context.Request.Query["roleFilter"]">
+                    ›
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+</div>@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}

@@ -250,16 +250,16 @@ namespace FixConnect.DAL.Context
 
 
             modelBuilder.Entity<WorkerVerification>(entity =>
-            {
-                entity.HasKey(v => v.VerificationId);
-                entity.Property(v => v.Status).HasDefaultValue("Pending");
-                entity.Property(v => v.SubmittedAt).HasDefaultValueSql("GETDATE()");
+{
+    entity.HasKey(v => v.VerificationId);
+    entity.Property(v => v.Status).HasDefaultValue("Pending");
+    entity.Property(v => v.SubmittedAt).HasDefaultValueSql("GETDATE()");
 
-                entity.HasOne(v => v.Worker)
-                      .WithOne(w => w.Verification)
-                      .HasForeignKey<WorkerVerification>(v => v.WorkerId)
-                      .OnDelete(DeleteBehavior.Cascade);
-            });
+    entity.HasOne(v => v.Worker)
+          .WithOne(w => w.Verification)
+          .HasForeignKey<WorkerVerification>(v => v.WorkerId)
+          .OnDelete(DeleteBehavior.Cascade);
+});
 
 
         }

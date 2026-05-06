@@ -16,9 +16,12 @@ namespace FixConnect.DAL.Models
         public bool IsVerified { get; set; } = false;
         public decimal AvgRating { get; set; } = 0;
         public AvailabilityStatus AvailabilityStatus { get; set; }
+        
 
         public string? PhotoUrl { get; set; }
         // Navigation
+
+
         public User User { get; set; } = null!;
         public ICollection<WorksAt> WorksAt { get; set; } = new List<WorksAt>();
         public ICollection<Proposal> Proposals { get; set; } = new List<Proposal>();

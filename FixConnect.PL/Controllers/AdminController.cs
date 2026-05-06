@@ -14,6 +14,10 @@ namespace FixConnect.PL.Controllers
         private readonly WorkerService _workerService;
         private readonly AppDbContext _context;
 
+
+        private const int PageSize = 10;   
+
+
         public AdminController(AdminService adminService,
             WorkerService workerService,
             AppDbContext context)
@@ -33,30 +37,31 @@ namespace FixConnect.PL.Controllers
         // GET: /Admin/Users
         // ─────────────────────────────
         [HttpGet]
-        public IActionResult Users(string? search, string? roleFilter)
+        public IActionResult Users(string? search, string? roleFilter, int page = 1)
         {
             var users = _adminService.GetUsers(search, roleFilter);
+
+            var rows = users.Select(u => new UserRowViewModel
+            {
+                UserId = u.UserId,
+                FullName = u.FullName,
+                Email = u.Email,
+                Phone = u.Phone,
+                Role = u.Role,
+                IsActive = u.IsActive,
+                IsVerified = u.IsVerified,
+                CreatedAt = u.CreatedAt
+            }).ToList();
 
             var vm = new UsersListViewModel
             {
                 SearchQuery = search,
                 RoleFilter = roleFilter,
-                Users = users.Select(u => new UserRowViewModel
-                {
-                    UserId = u.UserId,
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    Phone = u.Phone,
-                    Role = u.Role,
-                    IsActive = u.IsActive,
-                    IsVerified = u.IsVerified,
-                    CreatedAt = u.CreatedAt
-                }).ToList()
+                Users = PaginatedList<UserRowViewModel>.Create(rows, page, PageSize)
             };
 
             return View(vm);
         }
-
         // ─────────────────────────────
         // POST: /Admin/ToggleActive
         // ─────────────────────────────
@@ -134,22 +139,24 @@ namespace FixConnect.PL.Controllers
         // GET: /Admin/Requests
         // ─────────────────────────────
         [HttpGet]
-        public IActionResult Requests()
+        public IActionResult Requests(int page = 1)
         {
             var requests = _adminService.GetAllRequests();
 
+            var rows = requests.Select(r => new RequestRowViewModel
+            {
+                RequestId = r.RequestId,
+                Title = r.Title,
+                CustomerName = r.CustomerName,
+                RegionName = r.RegionName,
+                Status = r.Status,
+                RequestType = r.RequestType,
+                CreatedAt = r.CreatedAt
+            }).ToList();
+
             var vm = new RequestsListViewModel
             {
-                Requests = requests.Select(r => new RequestRowViewModel
-                {
-                    RequestId = r.RequestId,
-                    Title = r.Title,
-                    CustomerName = r.CustomerName,
-                    RegionName = r.RegionName,
-                    Status = r.Status,
-                    RequestType = r.RequestType,
-                    CreatedAt = r.CreatedAt
-                }).ToList()
+                Requests = PaginatedList<RequestRowViewModel>.Create(rows, page, PageSize)
             };
 
             return View(vm);
@@ -169,23 +176,25 @@ namespace FixConnect.PL.Controllers
         // GET: /Admin/Proposals
         // ─────────────────────────────
         [HttpGet]
-        public IActionResult Proposals()
+        public IActionResult Proposals(int page = 1)
         {
             var proposals = _adminService.GetAllProposals();
 
+            var rows = proposals.Select(p => new ProposalRowViewModel
+            {
+                ProposalId = p.ProposalId,
+                WorkerName = p.WorkerName,
+                CustomerName = p.CustomerName,
+                RequestTitle = p.RequestTitle,
+                LaborCost = p.LaborCost,
+                MaterialCost = p.MaterialCost,
+                DurationEstimate = p.DurationEstimate,
+                Status = p.Status
+            }).ToList();
+
             var vm = new ProposalsListViewModel
             {
-                Proposals = proposals.Select(p => new ProposalRowViewModel
-                {
-                    ProposalId = p.ProposalId,
-                    WorkerName = p.WorkerName,
-                    CustomerName = p.CustomerName,
-                    RequestTitle = p.RequestTitle,
-                    LaborCost = p.LaborCost,
-                    MaterialCost = p.MaterialCost,
-                    DurationEstimate = p.DurationEstimate,
-                    Status = p.Status
-                }).ToList()
+                Proposals = PaginatedList<ProposalRowViewModel>.Create(rows, page, PageSize)
             };
 
             return View(vm);

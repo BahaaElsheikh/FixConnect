@@ -52,7 +52,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var user in Model.Users)
+                    @foreach (var user in Model.Users.Items)
                     {
                         <tr class="@(!user.IsActive ? "table-secondary text-muted" : "")">
                             <td class="small">@user.UserId</td>
@@ -123,9 +123,10 @@
                                 </div>
                             </td>
                         </tr>
+
                     }
 
-                    @if (!Model.Users.Any())
+                    @if (!Model.Users.Items.Any())
                     {
                         <tr>
                             <td colspan="9" class="text-center text-muted py-4">No users found.</td>
@@ -134,5 +135,8 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="px-3 pb-3">
+        <partial name="_Pagination" model="Model.Users" />
     </div>
 </div>

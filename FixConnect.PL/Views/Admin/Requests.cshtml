@@ -22,7 +22,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var r in Model.Requests)
+                   @foreach (var r in Model.Requests.Items)  
+
                     {
                         <tr>
                             <td class="small">@r.RequestId</td>
@@ -53,7 +54,7 @@
                     </tr>
                                         }
 
-                    @if (!Model.Requests.Any())
+                    @if (!Model.Requests.Items.Any())
                     {
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">No requests found.</td>
@@ -63,4 +64,8 @@
             </table>
         </div>
     </div>
+    <div class="px-3 pb-3">
+        <partial name="_Pagination" model="Model.Requests" />
+    </div>
+
 </div>

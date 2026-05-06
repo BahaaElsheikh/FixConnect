@@ -5,7 +5,7 @@
     // ─────────────────────────────
     public class UsersListViewModel
     {
-        public List<UserRowViewModel> Users { get; set; } = new();
+        public PaginatedList<UserRowViewModel> Users { get; set; } = null!;
         public string? SearchQuery { get; set; }
         public string? RoleFilter { get; set; }   // "Worker" | "Customer" | null
     }
@@ -27,7 +27,7 @@
     // ─────────────────────────────
     public class RequestsListViewModel
     {
-        public List<RequestRowViewModel> Requests { get; set; } = new();
+        public PaginatedList<RequestRowViewModel> Requests { get; set; } = null!;
     }
 
     public class RequestRowViewModel
@@ -46,7 +46,7 @@
     // ─────────────────────────────
     public class ProposalsListViewModel
     {
-        public List<ProposalRowViewModel> Proposals { get; set; } = new();
+        public PaginatedList<ProposalRowViewModel> Proposals { get; set; } = null!;
     }
 
     public class ProposalRowViewModel

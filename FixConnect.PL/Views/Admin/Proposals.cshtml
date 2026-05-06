@@ -26,7 +26,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var p in Model.Proposals)
+                @foreach (var p in Model.Proposals.Items)
                     {
                         <tr>
                             <td class="small">@p.ProposalId</td>
@@ -56,7 +56,7 @@
                     </tr>
                                         }
 
-                    @if (!Model.Proposals.Any())
+                    @if (!Model.Proposals.Items.Any())
                     {
                         <tr>
                             <td colspan="9" class="text-center text-muted py-4">No proposals found.</td>
@@ -65,5 +65,8 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="px-3 pb-3">
+        <partial name="_Pagination" model="Model.Proposals" />
     </div>
 </div>
