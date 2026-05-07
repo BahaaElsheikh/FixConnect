@@ -1,7 +1,6 @@
 ﻿using FixConnect.DAL.Context;
 using FixConnect.DAL.Data.Enums;
 using FixConnect.DAL.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace FixConnect.DAL.Data.Seed
 {
@@ -9,12 +8,33 @@ namespace FixConnect.DAL.Data.Seed
     {
         public static void Seed(AppDbContext context)
         {
-            // لو التيست يوزرز موجودين خالص، متضيفش تاني
-            if (context.Users.Any(u => u.Email == "admin@test.com")) return;
+            // ============================
+            // Seed Specialties
+            // ============================
+            if (!context.Specialties.Any())
+            {
+                var specialties = new List<Specialty>
+                {
+                    new Specialty { SpecialtyName = "Plumbing" },
+                    new Specialty { SpecialtyName = "Electrical" },
+                    new Specialty { SpecialtyName = "Carpentry" },
+                    new Specialty { SpecialtyName = "Painting" },
+                    new Specialty { SpecialtyName = "HVAC" },
+                    new Specialty { SpecialtyName = "Cleaning" },
+                    new Specialty { SpecialtyName = "Gardening" },
+                    new Specialty { SpecialtyName = "Tiling" },
+                    new Specialty { SpecialtyName = "حدادة" }
+                };
+                context.Specialties.AddRange(specialties);
+                context.SaveChanges();
+            }
 
             // ============================
-            // Test Admin
+            // Test Users
             // ============================
+            if (context.Users.Any(u => u.Email == "admin@test.com")) return;
+
+            // Admin
             var adminUser = new User
             {
                 FullName = "Test Admin",
@@ -35,9 +55,10 @@ namespace FixConnect.DAL.Data.Seed
             });
             context.SaveChanges();
 
-            // ============================
-            // Test Worker
-            // ============================
+            // Worker
+            var plumbingId = context.Specialties
+                .First(s => s.SpecialtyName == "Plumbing").SpecialtyId;
+
             var workerUser = new User
             {
                 FullName = "Test Worker",
@@ -54,7 +75,7 @@ namespace FixConnect.DAL.Data.Seed
             context.Workers.Add(new Worker
             {
                 UserId = workerUser.UserId,
-                Specialty = "Plumbing",
+                SpecialtyId = plumbingId,
                 Bio = "Test worker account.",
                 IsVerified = false,
                 AvailabilityStatus = AvailabilityStatus.Available,
@@ -66,12 +87,9 @@ namespace FixConnect.DAL.Data.Seed
                 WorkerId = workerUser.UserId,
                 Balance = 0
             });
-
             context.SaveChanges();
 
-            // ============================
-            // Test Customer
-            // ============================
+            // Customer
             var customerUser = new User
             {
                 FullName = "Test Customer",
@@ -91,7 +109,6 @@ namespace FixConnect.DAL.Data.Seed
                 Address = "Test Address, Cairo",
                 TotalRequests = 0
             });
-
             context.SaveChanges();
         }
     }

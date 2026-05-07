@@ -5,7 +5,6 @@
         public int SpecialtyId { get; set; }
         public string SpecialtyName { get; set; } = null!;
 
-        // Navigation
         public ICollection<Worker> Workers { get; set; } = new List<Worker>();
         public ICollection<Request> Requests { get; set; } = new List<Request>();
     }

@@ -42,10 +42,18 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Specialty</label>
-                <input asp-for="Specialty" class="form-control" />
-            </div>
-
+    <label class="form-label">Specialty</label>
+    <select asp-for="SpecialtyId" class="form-select">
+        <option value="">— Select Specialty —</option>
+        @foreach (var s in Model.AllSpecialties)
+        {
+                        <option value="@s.SpecialtyId" 
+                    selected="@(Model.SpecialtyId == s.SpecialtyId)">
+                @s.SpecialtyName  
+            </option>
+        }
+    </select>
+</div>
             <div class="mb-3">
                 <label class="form-label">Bio</label>
                 <textarea asp-for="Bio" class="form-control" rows="3"></textarea>

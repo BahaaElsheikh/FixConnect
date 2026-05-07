@@ -29,6 +29,9 @@ namespace FixConnect.DAL.Context
         public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<WorkerVerification> WorkerVerifications { get; set; }
+
+        public DbSet<Specialty> Specialties { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -250,18 +253,47 @@ namespace FixConnect.DAL.Context
 
 
             modelBuilder.Entity<WorkerVerification>(entity =>
-{
-    entity.HasKey(v => v.VerificationId);
-    entity.Property(v => v.Status).HasDefaultValue("Pending");
-    entity.Property(v => v.SubmittedAt).HasDefaultValueSql("GETDATE()");
+             {
+                 entity.HasKey(v => v.VerificationId);
+                 entity.Property(v => v.Status).HasDefaultValue("Pending");
+                 entity.Property(v => v.SubmittedAt).HasDefaultValueSql("GETDATE()");
 
-    entity.HasOne(v => v.Worker)
-          .WithOne(w => w.Verification)
-          .HasForeignKey<WorkerVerification>(v => v.WorkerId)
-          .OnDelete(DeleteBehavior.Cascade);
-});
+                 entity.HasOne(v => v.Worker)
+                     .WithOne(w => w.Verification)
+                     .HasForeignKey<WorkerVerification>(v => v.WorkerId)
+                     .OnDelete(DeleteBehavior.Cascade);
+             });
 
 
+            // ============================
+            // Specialty
+            // ============================
+            modelBuilder.Entity<Specialty>(entity =>
+            {
+                entity.HasKey(s => s.SpecialtyId);
+                entity.Property(s => s.SpecialtyName).IsRequired().HasMaxLength(100);
+                entity.HasIndex(s => s.SpecialtyName).IsUnique();
+            });
+
+            // Worker → Specialty
+            modelBuilder.Entity<Worker>(entity =>
+            {
+                entity.HasOne(w => w.Specialty)
+                      .WithMany(s => s.Workers)
+                      .HasForeignKey(w => w.SpecialtyId)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Request → Specialty
+            modelBuilder.Entity<Request>(entity =>
+            {
+                entity.HasOne(r => r.Specialty)
+                      .WithMany(s => s.Requests)
+                      .HasForeignKey(r => r.SpecialtyId)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
         }
     }
 }

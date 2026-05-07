@@ -43,7 +43,8 @@ namespace FixConnect.PL.Controllers
                 Email = worker.User.Email,
                 Phone = worker.User.Phone,
                 Bio = worker.Bio,
-                Specialty = worker.Specialty,
+                SpecialtyName = worker.Specialty?.SpecialtyName,
+
                 PhotoUrl = worker.PhotoUrl,
                 IsVerified = worker.IsVerified,
                 AvailabilityStatus = worker.AvailabilityStatus.ToString(),
@@ -82,7 +83,13 @@ namespace FixConnect.PL.Controllers
                 FullName = worker.User.FullName,
                 Phone = worker.User.Phone,
                 Bio = worker.Bio,
-                Specialty = worker.Specialty,
+                SpecialtyId = worker.SpecialtyId,       // ← int?
+                AllSpecialties = _workerService.GetAllSpecialties()
+                    .Select(s => new SpecialtyOption
+                    {
+                        SpecialtyId = s.SpecialtyId,
+                        SpecialtyName = s.SpecialtyName
+                    }).ToList(),
                 AvailabilityStatus = worker.AvailabilityStatus,
                 CurrentPhotoUrl = worker.PhotoUrl,
                 SelectedRegionIds = worker.WorksAt.Select(wa => wa.RegionId).ToList(),
@@ -106,24 +113,20 @@ namespace FixConnect.PL.Controllers
         {
             int userId = GetCurrentUserId();
 
-            // Handle Photo Upload
             string? photoUrl = null;
             if (model.PhotoFile != null && model.PhotoFile.Length > 0)
-            {
                 photoUrl = await SaveFile(model.PhotoFile, "ProfilePictures");
-            }
 
             _workerService.UpdateProfile(
                 userId,
                 model.FullName,
                 model.Phone,
                 model.Bio,
-                model.Specialty,
+                model.SpecialtyId,            // ← int? بدل string
                 model.AvailabilityStatus,
                 model.SelectedRegionIds,
                 photoUrl);
 
-            // Handle Verification Upload
             if (model.IdFrontImage != null && model.IdBackImage != null)
             {
                 var frontPath = await SaveFile(model.IdFrontImage, "VerificationDocs");

@@ -55,11 +55,15 @@
             </div>
 
             <div class="mb-3 d-none" id="specialtyGroup">
-                <label asp-for="Specialty" class="form-label">Specialty</label>
-                <input asp-for="Specialty" class="form-control" />
-                <span asp-validation-for="Specialty" class="text-danger small"></span>
+                <label class="form-label">Specialty</label>
+                <select name="SpecialtyId" class="form-select">
+                    <option value="">— Select Specialty —</option>
+                    @foreach (var s in Model.Specialties)
+                    {
+                        <option value="@s.SpecialtyId">@s.SpecialtyName</option>
+                    }
+                </select>
             </div>
-
             <button type="submit" class="btn btn-dark w-100">Complete Registration</button>
         </form>
     </div>

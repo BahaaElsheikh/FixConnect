@@ -24,6 +24,7 @@ namespace FixConnect.BLL.Services
         {
             return _context.Workers
                 .Include(w => w.User)
+                .Include(w => w.Specialty)
                 .Include(w => w.WorksAt).ThenInclude(wa => wa.Region)
                 .Include(w => w.PortfolioItems)
                 .Include(w => w.Reviews).ThenInclude(r => r.Customer).ThenInclude(c => c.User)
@@ -34,7 +35,10 @@ namespace FixConnect.BLL.Services
         // ─────────────────────────────
         // Update Profile Info
         // ─────────────────────────────
-        public void UpdateProfile(int userId, string fullName, string phone, string? bio, string? specialty, AvailabilityStatus status, List<int> regionIds, string? photoUrl)
+        public void UpdateProfile(int userId, string fullName, string phone,
+     string? bio, int? specialtyId,              // ← بدل string? specialty
+     AvailabilityStatus status,
+     List<int> regionIds, string? photoUrl)
         {
             var worker = _context.Workers
                 .Include(w => w.User)
@@ -43,19 +47,15 @@ namespace FixConnect.BLL.Services
 
             if (worker == null) return;
 
-            // Update User base info
             worker.User.FullName = fullName;
             worker.User.Phone = phone;
-
-            // Update Worker info
             worker.Bio = bio;
-            worker.Specialty = specialty;
+            worker.SpecialtyId = specialtyId;        // ← int? بدل string
             worker.AvailabilityStatus = status;
 
             if (photoUrl != null)
                 worker.PhotoUrl = photoUrl;
 
-            // Update Regions
             var existing = _context.WorksAt.Where(wa => wa.UserId == userId).ToList();
             _context.WorksAt.RemoveRange(existing);
 
@@ -178,6 +178,7 @@ namespace FixConnect.BLL.Services
         {
             var worker = _context.Workers
                 .Include(w => w.User)
+                .Include(w => w.Specialty)
                 .Include(w => w.WorksAt).ThenInclude(wa => wa.Region)
                 .Include(w => w.PortfolioItems)
                 .Include(w => w.Reviews).ThenInclude(r => r.Customer).ThenInclude(c => c.User)
@@ -193,7 +194,7 @@ namespace FixConnect.BLL.Services
                 Email = worker.User.Email,
                 Phone = worker.User.Phone,
                 Bio = worker.Bio,
-                Specialty = worker.Specialty,
+                SpecialtyName = worker.Specialty?.SpecialtyName,
                 PhotoUrl = worker.PhotoUrl,
                 IsVerified = worker.IsVerified,
                 AvailabilityStatus = worker.AvailabilityStatus.ToString(),
@@ -223,7 +224,8 @@ namespace FixConnect.BLL.Services
             };
         }
 
-
+        public List<Specialty> GetAllSpecialties()
+    => _context.Specialties.OrderBy(s => s.SpecialtyName).ToList();
 
     }
 

@@ -1,14 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-using FixConnect.DAL.Data.Enums;
+﻿using FixConnect.DAL.Data.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace FixConnect.PL.ViewModels
 {
-    // Used for Google OAuth new users (Case B)
     public class CompleteProfileViewModel
     {
-        public string FullName { get; set; } = null!;   // pre-filled from Google
-        public string Email { get; set; } = null!;       // pre-filled from Google
-        public string GoogleId { get; set; } = null!;    // hidden field
+        public string FullName { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string GoogleId { get; set; } = null!;
 
         [Required]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "Phone must be 11 digits.")]
@@ -17,6 +16,8 @@ namespace FixConnect.PL.ViewModels
         [Required]
         public RoleType Role { get; set; }
 
-        public string? Specialty { get; set; }
+        // Worker Only
+        public int? SpecialtyId { get; set; }
+        public List<SpecialtyOption> Specialties { get; set; } = new();
     }
 }

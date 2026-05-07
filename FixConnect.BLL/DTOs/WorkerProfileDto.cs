@@ -7,7 +7,7 @@
         public string Email { get; set; } = null!;
         public string Phone { get; set; } = null!;
         public string? Bio { get; set; }
-        public string? Specialty { get; set; }
+        public string? SpecialtyName { get; set; }
         public string? PhotoUrl { get; set; }
         public bool IsVerified { get; set; }
         public string AvailabilityStatus { get; set; } = null!;

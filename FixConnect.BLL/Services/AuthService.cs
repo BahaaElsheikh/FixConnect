@@ -21,12 +21,12 @@ namespace FixConnect.BLL.Services
         // REGISTER (Manual)
         // ─────────────────────────────
         public (bool Success, string Message) Register(
-            string fullName,
-            string email,
-            string password,
-            string phone,
-            RoleType role,
-            string? specialty = null)
+    string fullName,
+    string email,
+    string password,
+    string phone,
+    RoleType role,
+    int? specialtyId = null)    // ← بدل string? specialty
         {
             if (_userRepo.EmailExists(email))
                 return (false, "Email is already registered.");
@@ -39,13 +39,12 @@ namespace FixConnect.BLL.Services
                 Phone = phone,
                 RoleType = role,
                 CreatedAt = DateTime.Now,
-                IsActive = true
+                IsActive = true 
             };
 
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            // Save to sub-type table based on role
             if (role == RoleType.Customer)
             {
                 _context.Customers.Add(new Customer
@@ -59,12 +58,11 @@ namespace FixConnect.BLL.Services
                 _context.Workers.Add(new Worker
                 {
                     UserId = user.UserId,
-                    Specialty = specialty,
+                    SpecialtyId = specialtyId,    // ← int? بدل string
                     IsVerified = false,
                     AvailabilityStatus = AvailabilityStatus.Available
                 });
 
-                // Create wallet immediately for the worker
                 _context.Wallets.Add(new Wallet
                 {
                     WorkerId = user.UserId,
@@ -75,7 +73,6 @@ namespace FixConnect.BLL.Services
             _context.SaveChanges();
             return (true, "Registration successful.");
         }
-
         // ─────────────────────────────
         // LOGIN (Manual)
         // ─────────────────────────────
@@ -111,12 +108,12 @@ namespace FixConnect.BLL.Services
 
         // Case B: brand new user from Google — complete profile step
         public (bool Success, string Message) RegisterGoogleUser(
-            string fullName,
-            string email,
-            string googleId,
-            string phone,
-            RoleType role,
-            string? specialty = null)
+     string fullName,
+     string email,
+     string googleId,
+     string phone,
+     RoleType role,
+     int? specialtyId = null)    // ← بدل string? specialty
         {
             if (_userRepo.EmailExists(email))
                 return (false, "Email already registered.");
@@ -125,12 +122,12 @@ namespace FixConnect.BLL.Services
             {
                 FullName = fullName,
                 Email = email,
-                PasswordHash = string.Empty,        // no password for Google users
+                PasswordHash = string.Empty,
                 Phone = phone,
                 RoleType = role,
                 GoogleId = googleId,
                 CreatedAt = DateTime.Now,
-                IsActive = true
+                 IsActive = true
             };
 
             _context.Users.Add(user);
@@ -149,7 +146,7 @@ namespace FixConnect.BLL.Services
                 _context.Workers.Add(new Worker
                 {
                     UserId = user.UserId,
-                    Specialty = specialty,
+                    SpecialtyId = specialtyId,    // ← int? بدل string
                     IsVerified = false,
                     AvailabilityStatus = AvailabilityStatus.Available
                 });
@@ -163,5 +160,8 @@ namespace FixConnect.BLL.Services
             _context.SaveChanges();
             return (true, "Google registration successful.");
         }
+
+        public List<DAL.Models.Specialty> GetSpecialties()
+    => _context.Specialties.OrderBy(s => s.SpecialtyName).ToList();
     }
 }

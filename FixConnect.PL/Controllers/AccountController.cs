@@ -54,7 +54,20 @@ namespace FixConnect.PL.Controllers
         // GET: /Account/Register
         // ─────────────────────────────
         [HttpGet]
-        public IActionResult Register() => View();
+        [HttpGet]
+        public IActionResult Register()
+        {
+            var vm = new RegisterViewModel
+            {
+                Specialties = _authService.GetSpecialties()
+                    .Select(s => new SpecialtyOption
+                    {
+                        SpecialtyId = s.SpecialtyId,
+                        SpecialtyName = s.SpecialtyName
+                    }).ToList()
+            };
+            return View(vm);
+        }
 
         // ─────────────────────────────
         // POST: /Account/Register
@@ -62,18 +75,25 @@ namespace FixConnect.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            // أعد تحميل Specialties لو رجعت للـ View
+            model.Specialties = _authService.GetSpecialties()
+                .Select(s => new SpecialtyOption
+                {
+                    SpecialtyId = s.SpecialtyId,
+                    SpecialtyName = s.SpecialtyName
+                }).ToList();
+
             if (!ModelState.IsValid) return View(model);
 
-            // Validate specialty if Worker
-            if (model.Role == RoleType.Worker && string.IsNullOrWhiteSpace(model.Specialty))
+            if (model.Role == RoleType.Worker && model.SpecialtyId == null)
             {
-                ModelState.AddModelError("Specialty", "Specialty is required for workers.");
+                ModelState.AddModelError("SpecialtyId", "Specialty is required for workers.");
                 return View(model);
             }
 
             var (success, message) = _authService.Register(
                 model.FullName, model.Email, model.Password,
-                model.Phone, model.Role, model.Specialty);
+                model.Phone, model.Role, model.SpecialtyId);   // ← int? بدل string
 
             if (!success)
             {
@@ -81,12 +101,10 @@ namespace FixConnect.PL.Controllers
                 return View(model);
             }
 
-            // Auto-login after register
             var user = _authService.FindByEmail(model.Email)!;
             await SignInUser(user.UserId.ToString(), user.FullName, user.Email, user.RoleType.ToString());
             return RedirectByRole(user.RoleType);
         }
-
         // ─────────────────────────────
         // GET: /Account/GoogleLogin
         // ─────────────────────────────
@@ -140,7 +158,13 @@ namespace FixConnect.PL.Controllers
             {
                 FullName = name,
                 Email = email,
-                GoogleId = googleId
+                GoogleId = googleId,
+                Specialties = _authService.GetSpecialties()
+         .Select(s => new SpecialtyOption
+         {
+             SpecialtyId = s.SpecialtyId,
+             SpecialtyName = s.SpecialtyName
+         }).ToList()
             };
             return View("CompleteProfile", vm);
         }
@@ -151,17 +175,24 @@ namespace FixConnect.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> CompleteProfile(CompleteProfileViewModel model)
         {
+            model.Specialties = _authService.GetSpecialties()
+                .Select(s => new SpecialtyOption
+                {
+                    SpecialtyId = s.SpecialtyId,
+                    SpecialtyName = s.SpecialtyName
+                }).ToList();
+
             if (!ModelState.IsValid) return View(model);
 
-            if (model.Role == RoleType.Worker && string.IsNullOrWhiteSpace(model.Specialty))
+            if (model.Role == RoleType.Worker && model.SpecialtyId == null)
             {
-                ModelState.AddModelError("Specialty", "Specialty is required for workers.");
+                ModelState.AddModelError("SpecialtyId", "Specialty is required for workers.");
                 return View(model);
             }
 
             var (success, message) = _authService.RegisterGoogleUser(
                 model.FullName, model.Email, model.GoogleId,
-                model.Phone, model.Role, model.Specialty);
+                model.Phone, model.Role, model.SpecialtyId);   // ← int? بدل string
 
             if (!success)
             {
