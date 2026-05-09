@@ -1,8 +1,9 @@
 ﻿@model FixConnect.BLL.DTOs.PublicWorkerProfileViewModel
 @{
     ViewData["Title"] = "Worker: " + Model.FullName;
+    Layout = "_AdminLayout";
 }
-<partial name="_AdminNav" />
+@* <partial name="_AdminNav" /> *@
 <div class="container py-4">
     <div class="row g-4">
 

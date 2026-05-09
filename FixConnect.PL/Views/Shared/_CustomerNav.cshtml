@@ -1,0 +1,23 @@
+﻿@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<nav class="navbar navbar-expand navbar-light bg-white border-bottom shadow-sm mb-4 px-4">
+    <a class="navbar-brand fw-bold" href="#">FixConnect</a>
+    <div class="navbar-nav ms-auto gap-2">
+        <a asp-controller="Customer" asp-action="Index"
+           class="nav-link @(action == "Index" ? "fw-bold text-dark" : "text-muted")">
+            🔍 Find a Worker
+        </a>
+        <a asp-controller="Customer" asp-action="MyRequests"
+           class="nav-link @(action == "MyRequests" ? "fw-bold text-dark" : "text-muted")">
+            📋 My Requests
+        </a>
+        <a asp-controller="Customer" asp-action="ReceivedProposals"
+           class="nav-link @(action == "ReceivedProposals" ? "fw-bold text-dark" : "text-muted")">
+            📨 Proposals Received
+        </a>
+        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+            <button class="btn btn-sm btn-outline-danger">Logout</button>
+        </form>
+    </div>
+</nav>

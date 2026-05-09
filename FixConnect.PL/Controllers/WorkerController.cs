@@ -13,14 +13,20 @@ namespace FixConnect.PL.Controllers
         // ✅ DI: Services injected
         private readonly WorkerService _workerService;
         private readonly PortfolioService _portfolioService;
+        private readonly RequestService _requestService;
+        private readonly ProposalService _proposalService;
         private readonly IWebHostEnvironment _env;
 
         public WorkerController(WorkerService workerService,
             PortfolioService portfolioService,
+            RequestService requestService,
+            ProposalService proposalService,
             IWebHostEnvironment env)
         {
             _workerService = workerService;
             _portfolioService = portfolioService;
+            _requestService = requestService;
+            _proposalService = proposalService;
             _env = env;
         }
 
@@ -245,6 +251,186 @@ namespace FixConnect.PL.Controllers
                 model.Title, model.Description, imageUrl);
 
             return RedirectToAction("Profile");
+        }
+
+        [HttpGet]
+        public IActionResult Dashboard()
+        {
+            int workerId = GetCurrentUserId();
+            var requests = _requestService.GetPublicFeed(workerId);
+
+            var vm = new WorkerDashboardViewModel
+            {
+                PublicRequests = requests.Select(r => new RequestFeedItemViewModel
+                {
+                    RequestId = r.RequestId,
+                    Title = r.Title,
+                    Description = r.Description,
+                    CustomerName = r.Customer.User.FullName,
+                    RegionName = r.Region.RegionName,
+                    SpecialtyName = r.Specialty?.SpecialtyName,
+                    CreatedAt = r.CreatedAt,
+                    ImageCount = r.Images.Count,
+                    ImagePaths = r.Images.Select(i => i.ImagePath).ToList(),
+                    AlreadyBid = _proposalService
+                        .GetWorkerProposalForRequest(workerId, r.RequestId) != null
+                }).ToList()
+            };
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // GET: /Worker/DirectRequests
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult DirectRequests()
+        {
+            int workerId = GetCurrentUserId();
+            var requests = _requestService.GetDirectRequests(workerId);
+
+            var vm = new WorkerDashboardViewModel
+            {
+                PublicRequests = requests.Select(r => new RequestFeedItemViewModel
+                {
+                    RequestId = r.RequestId,
+                    Title = r.Title,
+                    Description = r.Description,
+                    CustomerName = r.Customer.User.FullName,
+                    RegionName = r.Region.RegionName,
+                    SpecialtyName = r.Specialty?.SpecialtyName,
+                    CreatedAt = r.CreatedAt,
+                    ImageCount = r.Images.Count,
+                    ImagePaths = r.Images.Select(i => i.ImagePath).ToList(),
+                    AlreadyBid = _proposalService
+                        .GetWorkerProposalForRequest(workerId, r.RequestId) != null
+                }).ToList()
+            };
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // GET: /Worker/RequestDetail/5
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult RequestDetail(int id)
+        {
+            int workerId = GetCurrentUserId();
+            var request = _requestService.GetRequest(id);
+            if (request == null) return NotFound();
+
+            var existing = _proposalService.GetWorkerProposalForRequest(workerId, id);
+
+            var vm = new RequestDetailViewModel
+            {
+                RequestId = request.RequestId,
+                Title = request.Title,
+                Description = request.Description,
+                CustomerName = request.Customer.User.FullName,
+                RegionName = request.Region.RegionName,
+                SpecialtyName = request.Specialty?.SpecialtyName,
+                CreatedAt = request.CreatedAt,
+                ImagePaths = request.Images.Select(i => i.ImagePath).ToList(),
+                AlreadyBid = existing != null,
+                ExistingProposal = existing == null ? null : new ExistingProposalViewModel
+                {
+                    ProposalId = existing.ProposalId,
+                    LaborCost = existing.LaborCost,
+                    MaterialCost = existing.MaterialCost,
+                    DurationEstimate = existing.DurationEstimate,
+                    Status = existing.Status.ToString()
+                }
+            };
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // GET: /Worker/SubmitProposal/5
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult SubmitProposal(int requestId, int? proposalId)
+        {
+            var request = _requestService.GetRequest(requestId);
+            if (request == null) return NotFound();
+
+            var vm = new SubmitProposalViewModel
+            {
+                RequestId = requestId,
+                RequestTitle = request.Title,
+                ProposalId = proposalId
+            };
+
+            if (proposalId.HasValue)
+            {
+                var existing = _proposalService
+                    .GetWorkerProposalForRequest(GetCurrentUserId(), requestId);
+                if (existing != null)
+                {
+                    vm.LaborCost = existing.LaborCost ?? 0;
+                    vm.MaterialCost = existing.MaterialCost ?? 0;
+                    vm.DurationEstimate = existing.DurationEstimate ?? 0;
+                }
+            }
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // POST: /Worker/SubmitProposal
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult SubmitProposal(SubmitProposalViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            int workerId = GetCurrentUserId();
+
+            if (model.ProposalId.HasValue)
+            {
+                var (success, message) = _proposalService.EditProposal(
+                    model.ProposalId.Value, workerId,
+                    model.LaborCost, model.MaterialCost, model.DurationEstimate);
+
+                if (!success) TempData["Error"] = message;
+            }
+            else
+            {
+                var (success, message) = _proposalService.SubmitProposal(
+                    workerId, model.RequestId,
+                    model.LaborCost, model.MaterialCost, model.DurationEstimate,model.Notes);
+
+                if (!success) TempData["Error"] = message;
+            }
+
+            return RedirectToAction("MyProposals");
+        }
+
+        // ─────────────────────────────
+        // GET: /Worker/MyProposals
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult MyProposals()
+        {
+            var proposals = _proposalService.GetWorkerProposals(GetCurrentUserId());
+
+            var vm = new MyProposalsViewModel
+            {
+                Proposals = proposals.Select(p => new WorkerProposalRowViewModel
+                {
+                    ProposalId = p.ProposalId,
+                    RequestId = p.RequestId,
+                    RequestTitle = p.Request.Title,
+                    CustomerName = p.Customer.User.FullName,
+                    LaborCost = p.LaborCost,
+                    MaterialCost = p.MaterialCost,
+                    DurationEstimate = p.DurationEstimate,
+                    Status = p.Status.ToString()
+                }).ToList()
+            };
+
+            return View(vm);
         }
 
     }

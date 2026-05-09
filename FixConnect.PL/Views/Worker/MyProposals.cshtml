@@ -1,0 +1,66 @@
+﻿@model FixConnect.PL.ViewModels.MyProposalsViewModel
+@{
+    ViewData["Title"] = "My Proposals";
+    Layout = "_WorkerLayout";
+}
+
+
+<div class="container py-4">
+    <h5 class="fw-bold mb-4">My Proposals</h5>
+
+    @if (!Model.Proposals.Any())
+    {
+        <div class="text-center text-muted py-5">No proposals sent yet.</div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Request</th>
+                            <th>Customer</th>
+                            <th>Labor</th>
+                            <th>Material</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Proposals)
+                        {
+                            <tr>
+                                <td class="fw-semibold small">@p.RequestTitle</td>
+                                <td class="small">@p.CustomerName</td>
+                                <td class="small">@(p.LaborCost?.ToString("0.00") ?? "—")</td>
+                                <td class="small">@(p.MaterialCost?.ToString("0.00") ?? "—")</td>
+                                <td class="small">@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")</td>
+                                <td>
+                                    <span class="badge @(p.Status == "Pending"  ? "bg-warning text-dark" :
+                                                                                                   p.Status == "Accepted" ? "bg-success" :
+                                                                                                   p.Status == "Rejected" ? "bg-danger" :
+                                                                                                                             "bg-secondary")">
+                                @p.Status
+                            </span>
+                        </td>
+                        <td>
+                            @if (p.Status == "Pending")
+                                    {
+                                        <a asp-action="SubmitProposal"
+                                           asp-route-requestId="@p.RequestId"
+                                           asp-route-proposalId="@p.ProposalId"
+                                           class="btn btn-outline-secondary btn-sm">
+                                            Edit
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

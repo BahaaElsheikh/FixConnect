@@ -1,8 +1,9 @@
 ﻿@model FixConnect.PL.ViewModels.UsersListViewModel
 @{
     ViewData["Title"] = "User Management";
+    Layout = "_AdminLayout";
 }
-<partial name="_AdminNav" />
+@* <partial name="_AdminNav" /> *@
 <div class="container-fluid py-4">
     <h5 class="fw-bold mb-4">User Management</h5>
 
@@ -18,21 +19,24 @@
                placeholder="Search name, email, phone..." />
 
         <!-- Role Filter Buttons -->
-        <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter=""
-           class="btn @(string.IsNullOrEmpty(Model.RoleFilter) ? "btn-dark" : "btn-outline-dark")">
-            All
-        </a>
-        <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Worker"
-           class="btn @(Model.RoleFilter == "Worker" ? "btn-dark" : "btn-outline-dark")">
-            Workers
-        </a>
-        <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Customer"
-           class="btn @(Model.RoleFilter == "Customer" ? "btn-dark" : "btn-outline-dark")">
-            Customers
-        </a>
-
         <button type="submit" class="btn btn-outline-secondary">Search</button>
+
+       <div class="ms-auto d-flex gap-2">
+            <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter=""
+               class="btn @(string.IsNullOrEmpty(Model.RoleFilter) ? "btn-dark" : "btn-outline-dark")">
+                All
+            </a>
+            <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Worker"
+               class="btn @(Model.RoleFilter == "Worker" ? "btn-dark" : "btn-outline-dark")">
+                Workers
+            </a>
+            <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Customer"
+               class="btn @(Model.RoleFilter == "Customer" ? "btn-dark" : "btn-outline-dark")">
+                Customers
+            </a>
+        </div>
     </form>
+
 
     <!-- Table -->
     <div class="card shadow-sm">

@@ -1,0 +1,61 @@
+﻿@model FixConnect.PL.ViewModels.WorkerDashboardViewModel
+@{
+    ViewData["Title"] = "Job Feed";
+    Layout = "_WorkerLayout";
+}
+
+
+<div class="container py-4">
+    <h5 class="fw-bold mb-4">Public Job Feed</h5>
+
+    @if (!Model.PublicRequests.Any())
+    {
+        <div class="text-center text-muted py-5">No public requests available.</div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var r in Model.PublicRequests)
+            {
+                <div class="col-md-6">
+                    <div class="card shadow-sm p-3 h-100 @(r.AlreadyBid ? "border-success" : "")">
+                        <div class="d-flex justify-content-between mb-1">
+                            <h6 class="fw-bold mb-0">@r.Title</h6>
+                            @if (r.AlreadyBid)
+                            {
+                                <span class="badge bg-success">Bid Sent</span>
+                            }
+                        </div>
+                        <p class="text-muted small mb-2">@r.Description</p>
+
+                        <div class="d-flex gap-1 flex-wrap mb-2">
+                            <span class="badge bg-light text-dark border">📍 @r.RegionName</span>
+                            @if (!string.IsNullOrEmpty(r.SpecialtyName))
+                            {
+                                <span class="badge bg-light text-dark border">🔧 @r.SpecialtyName</span>
+                            }
+                        </div>
+
+                        @if (r.ImagePaths.Any())
+                        {
+                            <div class="d-flex gap-1 mb-2">
+                                @foreach (var img in r.ImagePaths.Take(3))
+                                {
+                                    <img src="@img" style="width:50px;height:50px;object-fit:cover;border-radius:4px;" />
+                                }
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <small class="text-muted">@r.CreatedAt.ToString("dd MMM yyyy")</small>
+                            <a asp-action="RequestDetail" asp-route-id="@r.RequestId"
+                               class="btn btn-dark btn-sm">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,79 @@
+﻿@model FixConnect.PL.ViewModels.RequestDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "_WorkerLayout";
+}
+
+
+<div class="container py-4" style="max-width:720px">
+    <div class="card shadow-sm p-4 mb-4">
+        <h5 class="fw-bold mb-1">@Model.Title</h5>
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+            <span class="badge bg-light text-dark border">📍 @Model.RegionName</span>
+            @if (!string.IsNullOrEmpty(Model.SpecialtyName))
+            {
+                <span class="badge bg-light text-dark border">🔧 @Model.SpecialtyName</span>
+            }
+            <small class="text-muted">by @Model.CustomerName</small>
+        </div>
+
+        <p class="text-muted">@Model.Description</p>
+
+        @if (Model.ImagePaths.Any())
+        {
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                @foreach (var img in Model.ImagePaths)
+                {
+                    <img src="@img"
+                         style="width:100px;height:100px;object-fit:cover;border-radius:6px;cursor:pointer"
+                         onclick="openImg('@img')" />
+                }
+            </div>
+        }
+
+        @if (Model.AlreadyBid && Model.ExistingProposal != null)
+        {
+            <div class="alert alert-success">
+                <strong>Your Proposal:</strong>
+                Labor: @Model.ExistingProposal.LaborCost EGP |
+                Material: @Model.ExistingProposal.MaterialCost EGP |
+                Duration: @Model.ExistingProposal.DurationEstimate days |
+                Status: <span class="badge bg-success">@Model.ExistingProposal.Status</span>
+                <div class="mt-2">
+                    <a asp-action="SubmitProposal"
+                       asp-route-requestId="@Model.RequestId"
+                       asp-route-proposalId="@Model.ExistingProposal.ProposalId"
+                       class="btn btn-outline-success btn-sm">
+                        Edit Proposal
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <a asp-action="SubmitProposal" asp-route-requestId="@Model.RequestId"
+               class="btn btn-dark w-100">
+                Send Proposal
+            </a>
+        }
+    </div>
+</div>
+
+<!-- Image Zoom Modal -->
+<div class="modal fade" id="imgModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-body text-center p-2">
+                <img id="imgSrc" src="" class="img-fluid rounded"
+                     style="max-height:500px;object-fit:contain;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openImg(src) {
+        document.getElementById('imgSrc').src = src;
+        new bootstrap.Modal(document.getElementById('imgModal')).show();
+    }
+</script>

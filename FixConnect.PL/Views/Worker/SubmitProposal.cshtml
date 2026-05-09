@@ -1,0 +1,52 @@
+﻿@model FixConnect.PL.ViewModels.SubmitProposalViewModel
+@{
+    ViewData["Title"] = Model.ProposalId.HasValue ? "Edit Proposal" : "Send Proposal";
+    Layout = "_WorkerLayout";
+}
+
+
+<div class="container py-4" style="max-width:520px">
+    <h5 class="fw-bold mb-1">
+        @(Model.ProposalId.HasValue ? "Edit Proposal" : "Send Proposal")
+    </h5>
+    <p class="text-muted small mb-4">For: <strong>@Model.RequestTitle</strong></p>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form asp-action="SubmitProposal" method="post">
+        <input type="hidden" asp-for="RequestId" />
+        <input type="hidden" asp-for="ProposalId" />
+        <input type="hidden" asp-for="RequestTitle" />
+
+        <div class="card shadow-sm p-4">
+            <div class="mb-3">
+                <label class="form-label">Labor Cost (EGP)</label>
+                <input asp-for="LaborCost" class="form-control" type="number" min="0" />
+                <span asp-validation-for="LaborCost" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Material Cost (EGP)</label>
+                <input asp-for="MaterialCost" class="form-control" type="number" min="0" />
+                <span asp-validation-for="MaterialCost" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Duration Estimate (days)</label>
+                <input asp-for="DurationEstimate" class="form-control" type="number" min="1" />
+                <span asp-validation-for="DurationEstimate" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Notes (Optional)</label>
+                <textarea asp-for="Notes" class="form-control" rows="3"
+                          placeholder="Any additional notes..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100">
+                @(Model.ProposalId.HasValue ? "Update Proposal" : "Submit Proposal")
+            </button>
+        </div>
+    </form>
+</div>

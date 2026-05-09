@@ -243,8 +243,8 @@ namespace FixConnect.PL.Controllers
         private IActionResult RedirectByRole(RoleType role) => role switch
         {
             RoleType.Admin => RedirectToAction("Dashboard", "Admin"),
-            RoleType.Worker => RedirectToAction("Profile", "Worker"),
-            RoleType.Customer => RedirectToAction("Index", "Home"),
+            RoleType.Worker => RedirectToAction("Dashboard", "Worker"),
+            RoleType.Customer => RedirectToAction("Index", "Customer"),
             _ => RedirectToAction("Login")
         };
     }

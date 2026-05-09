@@ -32,6 +32,8 @@ namespace FixConnect.DAL.Context
 
         public DbSet<Specialty> Specialties { get; set; }
 
+        public DbSet<RequestImage> RequestImages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -294,6 +296,20 @@ namespace FixConnect.DAL.Context
                       .IsRequired(false)
                       .OnDelete(DeleteBehavior.SetNull);
             });
+
+
+        //Request Image 
+            modelBuilder.Entity<RequestImage>(entity =>
+            {
+                entity.HasKey(r => r.ImageId);
+                entity.Property(r => r.UploadedAt).HasDefaultValueSql("GETDATE()");
+
+                entity.HasOne(r => r.Request)
+                      .WithMany(req => req.Images)
+                      .HasForeignKey(r => r.RequestId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
         }
     }
 }

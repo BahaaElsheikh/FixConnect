@@ -13,11 +13,14 @@ namespace FixConnect.DAL.Models
         public decimal? LaborCost { get; set; }
         public decimal? MaterialCost { get; set; }
         public int? DurationEstimate { get; set; }   // days
+
+
         public ProposalStatus Status { get; set; }
         public int UserId { get; set; }      // Customer
         public int RequestId { get; set; }
         public int WorkerId { get; set; }
 
+        public string? Notes { get; set; }
         // Navigation
         public Customer Customer { get; set; } = null!;
         public Request Request { get; set; } = null!;

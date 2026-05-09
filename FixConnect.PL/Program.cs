@@ -17,6 +17,8 @@ builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<AuthService>();
 // أضف بعد WorkerService
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<RequestService>();
+builder.Services.AddScoped<ProposalService>();
 // ✅ Fix Correlation failed
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {

@@ -1,0 +1,27 @@
+﻿@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<nav class="navbar navbar-expand navbar-light bg-white border-bottom shadow-sm mb-4 px-4">
+    <a class="navbar-brand fw-bold" href="#">FixConnect</a>
+    <div class="navbar-nav ms-auto gap-2">
+        <a asp-controller="Worker" asp-action="Dashboard"
+           class="nav-link @(action == "Dashboard" ? "fw-bold text-dark" : "text-muted")">
+            🏠 Job Feed
+        </a>
+        <a asp-controller="Worker" asp-action="DirectRequests"
+           class="nav-link @(action == "DirectRequests" ? "fw-bold text-dark" : "text-muted")">
+            📩 Direct Requests
+        </a>
+        <a asp-controller="Worker" asp-action="MyProposals"
+           class="nav-link @(action == "MyProposals" ? "fw-bold text-dark" : "text-muted")">
+            📝 My Proposals
+        </a>
+        <a asp-controller="Worker" asp-action="Profile"
+           class="nav-link @(action == "Profile" ? "fw-bold text-dark" : "text-muted")">
+            👤 My Profile
+        </a>
+        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+            <button class="btn btn-sm btn-outline-danger">Logout</button>
+        </form>
+    </div>
+</nav>

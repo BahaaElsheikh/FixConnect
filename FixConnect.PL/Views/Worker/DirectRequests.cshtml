@@ -1,0 +1,111 @@
+﻿@model FixConnect.PL.ViewModels.WorkerDashboardViewModel
+@{
+    ViewData["Title"] = "Direct Requests";
+    Layout = "_WorkerLayout";
+}
+
+<div class="container py-4">
+    <h5 class="fw-bold mb-4">Direct Requests</h5>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (!Model.PublicRequests.Any())
+    {
+        <div class="text-center py-5">
+            <p class="text-muted">No direct requests yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var r in Model.PublicRequests)
+            {
+                <div class="col-md-6">
+                    <div class="card shadow-sm p-3 h-100 @(r.AlreadyBid ? "border-success" : "border-warning")">
+
+                        <div class="d-flex justify-content-between mb-1">
+                            <h6 class="fw-bold mb-0">@r.Title</h6>
+                            @if (r.AlreadyBid)
+                            {
+                                <span class="badge bg-success">Bid Sent</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Awaiting Bid</span>
+                            }
+                        </div>
+
+                        <p class="text-muted small mb-2">@r.Description</p>
+
+                        <div class="d-flex gap-1 flex-wrap mb-2">
+                            <span class="badge bg-light text-dark border">
+                                📍 @r.RegionName
+                            </span>
+                            @if (!string.IsNullOrEmpty(r.SpecialtyName))
+                            {
+                                <span class="badge bg-light text-dark border">
+                                    🔧 @r.SpecialtyName
+                                </span>
+                            }
+                            <span class="badge bg-info text-dark">
+                                👤 From: @r.CustomerName
+                            </span>
+                        </div>
+
+                        @if (r.ImagePaths.Any())
+                        {
+                            <div class="d-flex gap-1 flex-wrap mb-2">
+                                @foreach (var img in r.ImagePaths.Take(3))
+                                {
+                                    <img src="@img"
+                                         style="width:55px;height:55px;object-fit:cover;border-radius:4px;cursor:pointer"
+                                         onclick="openImg('@img')" />
+                                }
+                                @if (r.ImagePaths.Count > 3)
+                                {
+                                    <span class="badge bg-secondary align-self-center">
+                                        +@(r.ImagePaths.Count - 3) more
+                                    </span>
+                                }
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+                            <small class="text-muted">
+                                @r.CreatedAt.ToString("dd MMM yyyy")
+                            </small>
+                            <a asp-action="RequestDetail" asp-route-id="@r.RequestId"
+                               class="btn btn-dark btn-sm">
+                                View Details
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Image Zoom Modal -->
+<div class="modal fade" id="imgModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-body text-center p-2">
+                <img id="imgSrc" src=""
+                     class="img-fluid rounded"
+                     style="max-height:500px;object-fit:contain;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openImg(src) {
+        document.getElementById('imgSrc').src = src;
+        new bootstrap.Modal(document.getElementById('imgModal')).show();
+    }
+</script>
