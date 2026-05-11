@@ -1,0 +1,121 @@
+﻿@model FixConnect.PL.ViewModels.WalletViewModel
+@{
+    ViewData["Title"] = "My Wallet";
+    Layout = "_WorkerLayout";
+}
+
+<div class="container py-4" style="max-width:680px">
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <!-- Balance Card -->
+    <div class="card shadow-sm p-4 mb-4 text-center"
+         style="background:linear-gradient(135deg,#1a1a1a,#333);color:#fff;border-radius:16px">
+        <p class="small mb-1 opacity-75">Current Balance</p>
+        <h2 class="fw-bold mb-3"
+            style="color:@(Model.Balance >= 0 ? "#4ade80" : "#f87171")">
+            @Model.Balance.ToString("0.00") EGP
+        </h2>
+        @if (Model.Balance < 0)
+        {
+            <p class="small" style="color:#fca5a5">
+                ⚠ Negative balance — please recharge.
+            </p>
+        }
+        <button class="btn btn-sm mt-2"
+                style="background:#c8a96e;color:#fff;border-radius:20px;padding:8px 24px;font-weight:600"
+                data-bs-toggle="modal" data-bs-target="#rechargeModal">
+            + Recharge Wallet
+        </button>
+    </div>
+
+    <!-- Transactions -->
+    <div class="card shadow-sm p-4">
+        <h6 class="fw-bold mb-3">Transaction History</h6>
+
+        @if (!Model.Transactions.Any())
+        {
+            <p class="text-muted small text-center py-3">No transactions yet.</p>
+        }
+        else
+        {
+            <table class="table table-sm align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Type</th>
+                        <th class="text-end">Amount (EGP)</th>
+                        <th class="text-end">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.Transactions)
+                    {
+                        <tr>
+                            <td class="small text-muted">@t.TransactionId</td>
+                            <td>
+                                <span class="badge @(t.Type == "Credit" ? "bg-success" : "bg-danger")">
+                                    @(t.Type == "Credit" ? "↑ Credit" : "↓ Debit")
+                                </span>
+                            </td>
+                            <td class="text-end fw-semibold
+                                        @(t.Type == "Credit" ? "text-success" : "text-danger")">
+                                @(t.Type == "Credit" ? "+" : "-")@t.Amount.ToString("0.00")
+                            </td>
+                            <td class="text-end small text-muted">
+                                @t.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<!-- Recharge Modal -->
+<div class="modal fade" id="rechargeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form asp-action="Recharge" method="post">
+            <div class="modal-content shadow">
+                <div class="modal-header border-0">
+                    <h6 class="modal-title fw-bold">💳 Recharge Wallet</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Amount (EGP)</label>
+                        <input name="Amount" type="number" min="1" step="0.01"
+                               class="form-control" placeholder="0.00" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Payment Method</label>
+                        <select name="PaymentMethod" class="form-select" required>
+                            <option value="">— Select —</option>
+                            <option value="Vodafone Cash">📱 Vodafone Cash</option>
+                            <option value="Instapay">🏦 Instapay</option>
+                            <option value="Credit Card">💳 Credit Card</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-warning small mb-0">
+                        ⚠ Payment integration coming soon. This will record the transaction only.
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-dark fw-bold">Confirm Recharge</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

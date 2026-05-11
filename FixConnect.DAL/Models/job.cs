@@ -17,10 +17,12 @@ namespace FixConnect.DAL.Models
         public int ProposalId { get; set; }
 
 
+
         public string? CustomerExactAddress { get; set; }
         public string? CustomerContactNumber { get; set; }
         public DateTime? EstimatedStartTime { get; set; }
         public DateTime? ActualStartDate { get; set; }
+        public decimal? LaborCost { get; set; }   // ← سعر الخدمة (مختلف عن الخامات)
 
         // Navigation
         public Proposal Proposal { get; set; } = null!;

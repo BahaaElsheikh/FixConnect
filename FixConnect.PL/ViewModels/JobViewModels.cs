@@ -40,6 +40,7 @@ namespace FixConnect.PL.ViewModels
         public DateTime? EstimatedStartTime { get; set; }
         public DateTime? ActualStartDate { get; set; }
         public bool WorkerMarkedFinished { get; set; }
+        public decimal? LaborCost { get; set; }
     }
 
     // ─────────────────────────────
@@ -83,6 +84,8 @@ namespace FixConnect.PL.ViewModels
         public bool CanStart { get; set; }
         public bool CanCancel { get; set; }
         public bool CanMarkFinished { get; set; }
+
+        public decimal? LaborCost { get; set; }
         public List<InvoiceItemViewModel> InvoiceItems { get; set; } = new();
     }
 

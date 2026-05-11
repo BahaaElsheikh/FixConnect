@@ -14,8 +14,12 @@
         public decimal AvgRating { get; set; }
         public List<string> WorkingRegions { get; set; } = new();
         public List<PortfolioItemViewModel> PortfolioItems { get; set; } = new();
-        public List<ReviewItemViewModel> Reviews { get; set; } = new();
+        public List<ReviewDisplayViewModel> Reviews { get; set; } = new();
         public bool HasPendingVerification { get; set; }
+
+        public int CompletedJobsCount { get; set; }
+
+
     }
 
     public class ReviewItemViewModel

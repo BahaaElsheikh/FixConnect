@@ -26,6 +26,12 @@
            class="nav-link @(action == "Profile" ? "fw-bold text-dark" : "text-muted")">
             👤 My Profile
         </a>
+
+        <a asp-controller="Worker" asp-action="Wallet"
+           class="nav-item @(action == "Wallet" ?  "fw-bold text-dark" : "text-muted")">
+            💰 My Wallet
+        </a>
+
         <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
             <button class="btn btn-sm btn-outline-danger">Logout</button>
         </form>

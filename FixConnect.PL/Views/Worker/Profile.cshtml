@@ -40,6 +40,9 @@
 
                 <p class="text-muted small mb-1">@Model.SpecialtyName</p>       
                 <p class="text-muted small mb-2">@Model.Email</p>
+                <p class="small text-muted mb-2">
+                    🔨 @Model.CompletedJobsCount completed jobs
+                </p>
 
                 <!-- Star Rating -->
                 <div class="mb-3">
@@ -224,8 +227,13 @@
             </div>
 
             <!-- Reviews -->
+            <!-- Reviews -->
             <div class="card shadow-sm p-4">
-                <h6 class="fw-bold mb-3">Reviews</h6>
+                <h6 class="fw-bold mb-3">
+                    Reviews
+                    <small class="text-muted fw-normal">(@Model.Reviews.Count)</small>
+                </h6>
+
                 @if (!Model.Reviews.Any())
                 {
                     <p class="text-muted small">No reviews yet.</p>
@@ -235,16 +243,51 @@
                     @foreach (var r in Model.Reviews)
                     {
                         <div class="border-bottom pb-3 mb-3">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between mb-1">
                                 <strong class="small">@r.CustomerName</strong>
-                                <span>
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        <span style="color:@(i <= r.RatingValue ? "#f5a623" : "#ccc")">★</span>
-                                    }
+                                <span class="small fw-bold" style="color:#f5a623">
+                                    ★ @r.AvgRating.ToString("0.0")
                                 </span>
                             </div>
-                            <p class="text-muted small mb-0">@r.Comment</p>
+
+                            <!-- 3 Rating Bars -->
+                            <div class="mb-2">
+                                @{
+                                    void RatingBar(string label, int val)
+                                    {
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="small text-muted" style="width:90px">@label</span>
+                                            <div class="flex-fill bg-light rounded"
+                                                 style="height:6px;overflow:hidden">
+                                                <div style="width:@(val * 20)%;height:100%;
+                                                                background:#f5a623;border-radius:4px"></div>
+                                            </div>
+                                            <span class="small text-muted">@val/5</span>
+                                        </div>
+                                    }
+                                }
+                                @{
+                                    RatingBar("🎯 Accuracy", r.AccuracyRating);
+                                }
+                                @{
+                                    RatingBar("📅 Commitment", r.CommitmentRating);
+                                }
+                                @{
+                                    RatingBar("💰 Price", r.PriceRating);
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(r.Comment))
+                            {
+                                <p class="text-muted small mb-1">"@r.Comment"</p>
+                            }
+
+                            @if (r.SuggestWorker)
+                            {
+                                <span class="badge bg-success" style="font-size:0.7rem">
+                                    👍 Recommends this worker
+                                </span>
+                            }
                         </div>
                     }
                 }

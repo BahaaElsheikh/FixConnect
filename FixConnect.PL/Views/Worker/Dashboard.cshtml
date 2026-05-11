@@ -332,11 +332,22 @@
         /* ═══════════════════════
            RIGHT COLUMN
         ═══════════════════════ */
-        .right-col {
+        /* .right-col {
             width: var(--right-w);
             min-height: 100vh;
             padding: 20px 16px;
             flex-shrink: 0;
+        } */
+
+        .right-col {
+            /* غيرنا العرض من القيمة الثابتة لـ 25% */
+            width: 25%;
+            min-height: 100vh;
+            padding: 20px 16px;
+            /* ضيفنا دي عشان نضمن إنه ميصغرش عن الـ 25% */
+            flex-shrink: 0;
+            /* اختيارى: لو عايز تحط حد أدنى للعرض عشان ميبقاش رفيع زيادة في الشاشات الصغيرة */
+            min-width: 260px;
         }
 
         .right-card {
@@ -435,6 +446,11 @@
         <a asp-controller="Worker" asp-action="Profile"
            class="nav-item">
             <span class="nav-icon">👤</span> My Profile
+        </a>
+
+        <a asp-controller="Worker" asp-action="Wallet"
+           class="nav-item">
+            <span class="nav-icon">💰</span> My Wallet
         </a>
 
         <div class="sidebar-footer">

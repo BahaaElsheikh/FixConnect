@@ -17,12 +17,15 @@ namespace FixConnect.PL.Controllers
         private readonly ProposalService _proposalService;
         private readonly JobService _jobService;
         private readonly WalletService _walletService;
+        private readonly ReviewService _reviewService;
+
 
         public CustomerController(RequestService requestService,
             WorkerService workerService,
             ProposalService proposalService,
              JobService jobService,
              WalletService walletService,
+              ReviewService reviewService,
             IWebHostEnvironment env)
         {
             _requestService = requestService;
@@ -30,7 +33,7 @@ namespace FixConnect.PL.Controllers
             _proposalService = proposalService;
             _jobService = jobService;
             _walletService = walletService;
-
+            _reviewService = reviewService;
             _env = env;
         }
 
@@ -378,6 +381,7 @@ namespace FixConnect.PL.Controllers
                     Status = ((JobStatus)j.Status).ToString(),
                     EstimatedStartTime = j.EstimatedStartTime,
                     ActualStartDate = j.ActualStartDate,
+                    LaborCost = j.LaborCost,
                     WorkerMarkedFinished = j.Status == JobStatus.Disputed
                                         && j.ActualStartDate.HasValue
                 }).ToList()
@@ -395,7 +399,10 @@ namespace FixConnect.PL.Controllers
             var (success, message) = _jobService.ConfirmCompletion(
                 jobId, GetCurrentUserId(), _walletService);
 
-            TempData[success ? "Success" : "Error"] = message;
+            if (success)
+                return RedirectToAction("SubmitReview", new { jobId });
+
+            TempData["Error"] = message;
             return RedirectToAction("Jobs");
         }
 
@@ -409,57 +416,55 @@ namespace FixConnect.PL.Controllers
             if (job == null || job.Proposal.UserId != GetCurrentUserId())
                 return Content("<p class='text-danger'>Job not found.</p>", "text/html");
 
+            var invoiceTotal = job.InvoiceItems.Sum(i => i.Cost);
+            var laborCost = job.LaborCost ?? 0;
+            var grandTotal = laborCost + invoiceTotal;
+
             var html = new System.Text.StringBuilder();
 
             html.Append($@"
-        <div class='mb-3'>
-            <p class='small text-muted mb-1'>Request: <strong>{job.Proposal.Request.Title}</strong></p>
-            <p class='small text-muted mb-0'>Worker: <strong>{job.Proposal.Worker.User.FullName}</strong></p>
-        </div>
-        <table class='table table-sm'>
-            <thead class='table-light'>
-                <tr>
-                    <th>Description</th>
-                    <th class='text-end'>Cost (EGP)</th>
-                    <th class='text-end'>Date</th>
-                </tr>
-            </thead>
-            <tbody>");
+    <table class='table table-sm'>
+        <thead class='table-light'>
+            <tr>
+                <th>Description</th>
+                <th class='text-end'>Cost (EGP)</th>
+                <th class='text-end'>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class='table-warning'>
+                <td class='fw-semibold'>🔧 Service Cost</td>
+                <td class='text-end fw-semibold'>{laborCost:0.00}</td>
+                <td></td>
+            </tr>");
 
-            if (!job.InvoiceItems.Any())
+            foreach (var item in job.InvoiceItems.OrderBy(i => i.AddedAt))
             {
-                html.Append("<tr><td colspan='3' class='text-center text-muted'>No items yet.</td></tr>");
+                html.Append($@"
+        <tr>
+            <td class='small'>{item.Description}</td>
+            <td class='text-end'>{item.Cost:0.00}</td>
+            <td class='text-end text-muted' style='font-size:0.72rem;white-space:nowrap'>
+                {item.AddedAt:dd MMM yyyy}
+            </td>
+        </tr>");
             }
-            else
-            {
-                foreach (var item in job.InvoiceItems.OrderBy(i => i.AddedAt))
-                {
-                    html.Append($@"
-                <tr>
-                    <td>{item.Description}</td>
-                    <td class='text-end'>{item.Cost:0.00}</td>
-                    <td class='text-end text-muted' style='font-size:0.78rem'>
-                        {item.AddedAt:dd MMM yyyy}
-                    </td>
-                </tr>");
-                }
-            }
-
             html.Append($@"
             </tbody>
             <tfoot>
+                <tr class='border-top'>
+                    <td class='small text-muted'>Materials Subtotal</td>
+                    <td class='text-end small text-muted'>{invoiceTotal:0.00}</td>
+                </tr>
                 <tr class='table-dark'>
                     <td class='fw-bold'>Total</td>
-                    <td class='text-end fw-bold'>{job.LiveInvoiceTotal ?? 0:0.00} EGP</td>
-                    <td></td>
+                    <td class='text-end fw-bold'>{grandTotal:0.00} EGP</td>
                 </tr>
             </tfoot>
         </table>");
 
             return Content(html.ToString(), "text/html");
         }
-
-
 
         [HttpPost]
         public IActionResult DeleteRequest(int requestId)
@@ -520,6 +525,51 @@ namespace FixConnect.PL.Controllers
             ViewBag.RequestTitle = request.Title;
             return View(vm);
         }
+
+
+
+        [HttpGet]
+        public IActionResult SubmitReview(int jobId)
+        {
+            var job = _jobService.GetJob(jobId);
+            if (job == null || job.Proposal.UserId != GetCurrentUserId())
+                return NotFound();
+
+            if (_reviewService.JobHasReview(jobId))
+            {
+                TempData["Error"] = "You already reviewed this job.";
+                return RedirectToAction("Jobs");
+            }
+
+            var vm = new SubmitReviewViewModel
+            {
+                JobId = jobId,
+                WorkerId = job.Proposal.WorkerId,
+                WorkerName = job.Proposal.Worker.User.FullName,
+                WorkerPhoto = job.Proposal.Worker.PhotoUrl,
+                RequestTitle = job.Proposal.Request.Title
+            };
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // POST: /Customer/SubmitReview
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult SubmitReview(SubmitReviewViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var (success, message) = _reviewService.SubmitReview(
+                model.JobId, GetCurrentUserId(),
+                model.AccuracyRating, model.CommitmentRating, model.PriceRating,
+                model.SuggestWorker, model.Comment);
+
+            TempData[success ? "Success" : "Error"] = message;
+            return RedirectToAction("Jobs");
+        }
+
 
     }
 }

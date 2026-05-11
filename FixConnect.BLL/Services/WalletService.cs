@@ -1,5 +1,6 @@
 ﻿using FixConnect.DAL.Context;
 using FixConnect.DAL.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FixConnect.BLL.Services
 {
@@ -16,14 +17,17 @@ namespace FixConnect.BLL.Services
         // ─────────────────────────────
         // Deduct Commission after Job
         // ─────────────────────────────
-        public void DeductCommission(int workerId, decimal jobTotal)
+        // Commission = 10% من LaborCost في الـ Job (مش الـ Proposal)
+        public void DeductCommission(int workerId, decimal jobLaborCost)
         {
             var wallet = _context.Wallets
                 .FirstOrDefault(w => w.WorkerId == workerId);
 
             if (wallet == null) return;
 
-            var commission = jobTotal * CommissionRate;
+            var commission = Math.Round(jobLaborCost * CommissionRate, 2);
+
+            // Negative balance allowed
             wallet.Balance -= commission;
 
             _context.Transactions.Add(new Transaction
@@ -38,14 +42,41 @@ namespace FixConnect.BLL.Services
         }
 
         // ─────────────────────────────
-        // Get Wallet Balance
+        // Recharge Wallet
         // ─────────────────────────────
-        public decimal GetBalance(int workerId)
+        public void Recharge(int workerId, decimal amount)
         {
-            return _context.Wallets
-                .Where(w => w.WorkerId == workerId)
-                .Select(w => w.Balance)
-                .FirstOrDefault();
+            var wallet = _context.Wallets
+                .FirstOrDefault(w => w.WorkerId == workerId);
+
+            if (wallet == null) return;
+
+            wallet.Balance += amount;
+
+            _context.Transactions.Add(new Transaction
+            {
+                WalletId = wallet.WalletId,
+                Amount = amount,
+                Type = 1,  // Credit
+                CreatedAt = DateTime.Now
+            });
+
+            _context.SaveChanges();
+        }
+
+        // ─────────────────────────────
+        // Get Wallet with Transactions
+        // ─────────────────────────────
+        public (decimal Balance, List<Transaction> Transactions) GetWalletDetails(int workerId)
+        {
+            var wallet = _context.Wallets
+                .Include(w => w.Transactions)
+                .FirstOrDefault(w => w.WorkerId == workerId);
+
+            if (wallet == null) return (0, new());
+
+            return (wallet.Balance,
+                    wallet.Transactions.OrderByDescending(t => t.CreatedAt).ToList());
         }
     }
 }

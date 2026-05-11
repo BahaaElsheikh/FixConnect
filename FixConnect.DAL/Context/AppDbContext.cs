@@ -204,10 +204,6 @@ namespace FixConnect.DAL.Context
             modelBuilder.Entity<Review>(entity =>
             {
                 entity.HasKey(r => r.ReviewId);
-                entity.Property(r => r.RatingValue)
-                      .IsRequired()
-                      .HasAnnotation("Range", new[] { 1, 5 });
-
                 entity.HasIndex(r => r.JobId).IsUnique();
 
                 entity.HasOne(r => r.Customer)

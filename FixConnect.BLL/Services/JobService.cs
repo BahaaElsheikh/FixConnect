@@ -162,7 +162,8 @@ namespace FixConnect.BLL.Services
         // Confirm Completion (Customer)
         // ─────────────────────────────
         public (bool Success, string Message) ConfirmCompletion(
-            int jobId, int customerId, WalletService walletService)
+    int jobId, int customerId,
+    WalletService walletService)
         {
             var job = GetJob(jobId);
             if (job == null || job.Proposal.UserId != customerId)
@@ -170,10 +171,16 @@ namespace FixConnect.BLL.Services
 
             job.Status = JobStatus.Completed;
             job.Proposal.Request.Status = (int)RequestStatus.Completed;
+
+            // Update Worker CompletedJobsCount
+            var worker = _context.Workers.Find(job.Proposal.WorkerId);
+            if (worker != null) worker.CompletedJobsCount++;
+
             _context.SaveChanges();
 
-            // Deduct commission from worker wallet
-            walletService.DeductCommission(job.Proposal.WorkerId, job.LiveInvoiceTotal?? 0);
+            // Deduct 10% from Job LaborCost (not Proposal)
+            if (job.LaborCost.HasValue && job.LaborCost > 0)
+                walletService.DeductCommission(job.Proposal.WorkerId, job.LaborCost.Value);
 
             return (true, "Job confirmed as completed.");
         }
@@ -219,5 +226,19 @@ namespace FixConnect.BLL.Services
             _context.SaveChanges();
             return (true, "Item deleted.");
         }
+
+        public (bool Success, string Message) SetJobLaborCost(
+    int jobId, int workerId, decimal laborCost)
+        {
+            var job = GetJob(jobId);
+            if (job == null || job.Proposal.WorkerId != workerId)
+                return (false, "Job not found.");
+
+            job.LaborCost = laborCost;
+            _context.SaveChanges();
+            return (true, "Labor cost updated.");
+        }
+
+
     }
 }

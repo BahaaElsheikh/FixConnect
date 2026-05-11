@@ -22,6 +22,8 @@ builder.Services.AddScoped<ProposalService>();
 
 builder.Services.AddScoped<JobService>();
 builder.Services.AddScoped<WalletService>();
+builder.Services.AddScoped<ReviewService>();
+
 // ✅ Fix Correlation failed
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {

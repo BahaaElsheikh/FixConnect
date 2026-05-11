@@ -17,6 +17,7 @@ namespace FixConnect.PL.Controllers
         private readonly ProposalService _proposalService;
         private readonly JobService _jobService;
         private readonly WalletService _walletService;
+        private readonly ReviewService _reviewService;
 
         private readonly IWebHostEnvironment _env;
 
@@ -26,6 +27,7 @@ namespace FixConnect.PL.Controllers
             ProposalService proposalService,
             JobService jobService,
             WalletService walletService,
+             ReviewService reviewService,
 
             IWebHostEnvironment env)
         {
@@ -35,6 +37,7 @@ namespace FixConnect.PL.Controllers
             _proposalService = proposalService;
             _jobService = jobService;
             _walletService = walletService;
+            _reviewService = reviewService;
             _env = env;
         }
 
@@ -65,6 +68,9 @@ namespace FixConnect.PL.Controllers
                 AvgRating = worker.AvgRating,
                 WorkingRegions = worker.WorksAt.Select(wa => wa.Region.RegionName).ToList(),
                 HasPendingVerification = worker.Verification?.Status == "Pending",
+
+                CompletedJobsCount = worker.CompletedJobsCount,
+
                 PortfolioItems = worker.PortfolioItems.Select(p => new PortfolioItemViewModel
                 {
                     ItemId = p.ItemId,
@@ -72,10 +78,15 @@ namespace FixConnect.PL.Controllers
                     Description = p.Description,
                     ImageUrl = p.ImageUrl
                 }).ToList(),
-                Reviews = worker.Reviews.Select(r => new ReviewItemViewModel
+
+                Reviews = worker.Reviews.Select(r => new ReviewDisplayViewModel
                 {
                     CustomerName = r.Customer.User.FullName,
-                    RatingValue = r.RatingValue,
+                    AccuracyRating = r.AccuracyRating,
+                    CommitmentRating = r.CommitmentRating,
+                    PriceRating = r.PriceRating,
+                    AvgRating = Math.Round((r.AccuracyRating + r.CommitmentRating + r.PriceRating) / 3m, 1),
+                    SuggestWorker = r.SuggestWorker,
                     Comment = r.Comment
                 }).ToList()
             };
@@ -526,6 +537,9 @@ namespace FixConnect.PL.Controllers
                                      && job.Status == JobStatus.Active,
                 CanMarkFinished = job.ActualStartDate.HasValue
                                      && job.Status == JobStatus.Active,
+
+                LaborCost = job.LaborCost,
+
                 InvoiceItems = job.InvoiceItems.Select(i => new InvoiceItemViewModel
                 {
                     ItemId = i.ItemId,
@@ -533,6 +547,9 @@ namespace FixConnect.PL.Controllers
                     Cost = i.Cost,
                     AddedAt = i.AddedAt
                 }).ToList()
+
+
+
             };
 
             return View(vm);
@@ -608,5 +625,56 @@ namespace FixConnect.PL.Controllers
             return RedirectToAction("JobDetail", new { id = jobId });
         }
 
+
+
+        [HttpGet]
+        public IActionResult Wallet()
+        {
+            int workerId = GetCurrentUserId();
+            var (balance, transactions) = _walletService.GetWalletDetails(workerId);
+
+            var vm = new WalletViewModel
+            {
+                Balance = balance,
+                Transactions = transactions.Select(t => new TransactionRowViewModel
+                {
+                    TransactionId = t.TransactionId,
+                    Amount = t.Amount ?? 0,
+                    Type = t.Type == 1 ? "Credit" : "Debit",
+                    CreatedAt = t.CreatedAt
+                }).ToList()
+            };
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // POST: /Worker/Recharge
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult Recharge(RechargeViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Invalid amount.";
+                return RedirectToAction("Wallet");
+            }
+
+            _walletService.Recharge(GetCurrentUserId(), model.Amount);
+            TempData["Success"] = $"{model.Amount:0.00} EGP added via {model.PaymentMethod}.";
+            return RedirectToAction("Wallet");
+        }
+
+        // ─────────────────────────────
+        // POST: /Worker/SetJobLaborCost
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult SetJobLaborCost(int jobId, decimal laborCost)
+        {
+            var (success, message) = _jobService.SetJobLaborCost(
+                jobId, GetCurrentUserId(), laborCost);
+            TempData[success ? "Success" : "Error"] = message;
+            return RedirectToAction("JobDetail", new { id = jobId });
+        }
     }
 }

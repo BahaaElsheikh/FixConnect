@@ -12,6 +12,7 @@ namespace FixConnect.DAL.Models
         public AvailabilityStatus AvailabilityStatus { get; set; }
         public string? PhotoUrl { get; set; }
 
+        public int CompletedJobsCount { get; set; }
         // Navigation
         public User User { get; set; } = null!;
         public Specialty? Specialty { get; set; }    // ← Navigation
