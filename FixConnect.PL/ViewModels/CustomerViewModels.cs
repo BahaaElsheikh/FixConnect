@@ -28,7 +28,7 @@ namespace FixConnect.PL.ViewModels
         public List<SpecialtyOption> Specialties { get; set; } = new();
         public List<RegionOption> Regions { get; set; } = new();
         public int? SelectedSpecialtyId { get; set; }
-        public int? SelectedRegionId { get; set; }
+        public string? RegionSearch { get; set; }
         public string? SearchQuery { get; set; }
     }
 
@@ -124,6 +124,9 @@ namespace FixConnect.PL.ViewModels
         public decimal? MaterialCost { get; set; }
         public int? DurationEstimate { get; set; }
         public string Status { get; set; } = null!;
+        public string? Notes { get; set; }
+        public DateTime? EstimatedStartTime { get; set; }
+
 
         // Request Info
         public int RequestId { get; set; }

@@ -21,6 +21,8 @@ namespace FixConnect.DAL.Models
         public int WorkerId { get; set; }
 
         public string? Notes { get; set; }
+
+        public DateTime? EstimatedStartTime { get; set; } 
         // Navigation
         public Customer Customer { get; set; } = null!;
         public Request Request { get; set; } = null!;

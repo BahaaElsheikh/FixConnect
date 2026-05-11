@@ -34,6 +34,9 @@ namespace FixConnect.DAL.Context
 
         public DbSet<RequestImage> RequestImages { get; set; }
 
+
+        public DbSet<JobInvoiceItem> JobInvoiceItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -307,6 +310,21 @@ namespace FixConnect.DAL.Context
                 entity.HasOne(r => r.Request)
                       .WithMany(req => req.Images)
                       .HasForeignKey(r => r.RequestId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
+
+            // JobInvoiceItem
+            modelBuilder.Entity<JobInvoiceItem>(entity =>
+            {
+                entity.HasKey(j => j.ItemId);
+                entity.Property(j => j.Cost).HasColumnType("decimal(10,2)");
+                entity.Property(j => j.AddedAt).HasDefaultValueSql("GETDATE()");
+
+                entity.HasOne(j => j.Job)
+                      .WithMany(job => job.InvoiceItems)
+                      .HasForeignKey(j => j.JobId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 

@@ -14,12 +14,23 @@ namespace FixConnect.PL.Controllers
         private readonly RequestService _requestService;
         private readonly WorkerService _workerService;
         private readonly IWebHostEnvironment _env;
+        private readonly ProposalService _proposalService;
+        private readonly JobService _jobService;
+        private readonly WalletService _walletService;
 
         public CustomerController(RequestService requestService,
-            WorkerService workerService, IWebHostEnvironment env)
+            WorkerService workerService,
+            ProposalService proposalService,
+             JobService jobService,
+             WalletService walletService,
+            IWebHostEnvironment env)
         {
             _requestService = requestService;
             _workerService = workerService;
+            _proposalService = proposalService;
+            _jobService = jobService;
+            _walletService = walletService;
+
             _env = env;
         }
 
@@ -30,15 +41,15 @@ namespace FixConnect.PL.Controllers
         // GET: /Customer/Index (Find Worker)
         // ─────────────────────────────
         [HttpGet]
-        public IActionResult Index(string? search, int? specialtyId, int? regionId)
+        public IActionResult Index(string? search, int? specialtyId, string? regionSearch)
         {
-            var workers = _requestService.GetFilteredWorkers(search, specialtyId, regionId);
+            var workers = _requestService.GetFilteredWorkers(search, specialtyId, regionSearch);
 
             var vm = new CustomerHomeViewModel
             {
                 SearchQuery = search,
                 SelectedSpecialtyId = specialtyId,
-                SelectedRegionId = regionId,
+                RegionSearch = regionSearch,
                 Specialties = _workerService.GetAllSpecialties()
                     .Select(s => new SpecialtyOption
                     {
@@ -252,6 +263,10 @@ namespace FixConnect.PL.Controllers
                     WorkerPhoto = p.Worker.PhotoUrl,
                     WorkerRating = p.Worker.AvgRating,
                     WorkerIsVerified = p.Worker.IsVerified,
+
+                    Notes = p.Notes, //
+                    EstimatedStartTime = p.EstimatedStartTime, //
+
                     WorkerSpecialty = p.Worker.Specialty?.SpecialtyName,
                     Portfolio = p.Worker.PortfolioItems.Select(pi => new PortfolioItemViewModel
                     {
@@ -266,7 +281,10 @@ namespace FixConnect.PL.Controllers
                         RatingValue = r.RatingValue,
                         Comment = r.Comment
                     }).ToList()
-                }).ToList()
+                
+
+                }).ToList(),
+
             };
 
             return View(vm);
@@ -293,6 +311,216 @@ namespace FixConnect.PL.Controllers
             await file.CopyToAsync(stream);
             return $"/uploads/{folder}/{fileName}";
         }
+
+
+        // ─────────────────────────────
+        // GET: /Customer/AcceptProposal/5
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult AcceptProposal(int proposalId)
+        {
+            var proposal = _proposalService.GetProposalById(proposalId);
+            if (proposal == null) return NotFound();
+
+            var vm = new AcceptProposalViewModel
+            {
+                ProposalId = proposalId,
+                WorkerName = proposal.Worker.User.FullName,
+                RequestTitle = proposal.Request.Title,
+                LaborCost = proposal.LaborCost,
+                MaterialCost = proposal.MaterialCost,
+                DurationEstimate = proposal.DurationEstimate,
+
+            };
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // POST: /Customer/AcceptProposal
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult AcceptProposal(AcceptProposalViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var (success, message, jobId) = _proposalService.AcceptProposal(
+                model.ProposalId, GetCurrentUserId(),
+                model.CustomerExactAddress, model.CustomerContactNumber);
+
+            if (!success)
+            {
+                TempData["Error"] = message;
+                return RedirectToAction("ReceivedProposals");
+            }
+
+            TempData["Success"] = "Proposal accepted! Job has been created.";
+            return RedirectToAction("Jobs");
+        }
+
+        // ─────────────────────────────
+        // GET: /Customer/Jobs
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult Jobs()
+        {
+            var jobs = _jobService.GetCustomerJobs(GetCurrentUserId());
+
+            var vm = new CustomerJobsViewModel
+            {
+                Jobs = jobs.Select(j => new CustomerJobRowViewModel
+                {
+                    JobId = j.JobId,
+                    RequestTitle = j.Proposal.Request.Title,
+                    WorkerName = j.Proposal.Worker.User.FullName,
+                    WorkerPhoto = j.Proposal.Worker.PhotoUrl,
+                    LiveInvoiceTotal = j.LiveInvoiceTotal ?? 0,
+                    Status = ((JobStatus)j.Status).ToString(),
+                    EstimatedStartTime = j.EstimatedStartTime,
+                    ActualStartDate = j.ActualStartDate,
+                    WorkerMarkedFinished = j.Status == JobStatus.Disputed
+                                        && j.ActualStartDate.HasValue
+                }).ToList()
+            };
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // POST: /Customer/ConfirmCompletion
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult ConfirmCompletion(int jobId)
+        {
+            var (success, message) = _jobService.ConfirmCompletion(
+                jobId, GetCurrentUserId(), _walletService);
+
+            TempData[success ? "Success" : "Error"] = message;
+            return RedirectToAction("Jobs");
+        }
+
+
+
+        // GET: /Customer/JobInvoice?jobId=5
+        [HttpGet]
+        public IActionResult JobInvoice(int jobId)
+        {
+            var job = _jobService.GetJob(jobId);
+            if (job == null || job.Proposal.UserId != GetCurrentUserId())
+                return Content("<p class='text-danger'>Job not found.</p>", "text/html");
+
+            var html = new System.Text.StringBuilder();
+
+            html.Append($@"
+        <div class='mb-3'>
+            <p class='small text-muted mb-1'>Request: <strong>{job.Proposal.Request.Title}</strong></p>
+            <p class='small text-muted mb-0'>Worker: <strong>{job.Proposal.Worker.User.FullName}</strong></p>
+        </div>
+        <table class='table table-sm'>
+            <thead class='table-light'>
+                <tr>
+                    <th>Description</th>
+                    <th class='text-end'>Cost (EGP)</th>
+                    <th class='text-end'>Date</th>
+                </tr>
+            </thead>
+            <tbody>");
+
+            if (!job.InvoiceItems.Any())
+            {
+                html.Append("<tr><td colspan='3' class='text-center text-muted'>No items yet.</td></tr>");
+            }
+            else
+            {
+                foreach (var item in job.InvoiceItems.OrderBy(i => i.AddedAt))
+                {
+                    html.Append($@"
+                <tr>
+                    <td>{item.Description}</td>
+                    <td class='text-end'>{item.Cost:0.00}</td>
+                    <td class='text-end text-muted' style='font-size:0.78rem'>
+                        {item.AddedAt:dd MMM yyyy}
+                    </td>
+                </tr>");
+                }
+            }
+
+            html.Append($@"
+            </tbody>
+            <tfoot>
+                <tr class='table-dark'>
+                    <td class='fw-bold'>Total</td>
+                    <td class='text-end fw-bold'>{job.LiveInvoiceTotal ?? 0:0.00} EGP</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>");
+
+            return Content(html.ToString(), "text/html");
+        }
+
+
+
+        [HttpPost]
+        public IActionResult DeleteRequest(int requestId)
+        {
+            var request = _requestService.GetRequest(requestId);
+            if (request == null || request.UserId != GetCurrentUserId())
+                return NotFound();
+
+            _requestService.DeleteRequest(requestId);
+            TempData["Success"] = "Request deleted successfully.";
+            return RedirectToAction("MyRequests");
+        }
+
+        [HttpGet]
+        public IActionResult RequestProposals(int requestId)
+        {
+            var request = _requestService.GetRequest(requestId);
+            if (request == null || request.UserId != GetCurrentUserId())
+                return NotFound();
+
+            var proposals = _requestService.GetProposalsByRequest(requestId);
+
+            var vm = new ReceivedProposalsViewModel
+            {
+                Proposals = proposals.Select(p => new ProposalDetailViewModel
+                {
+                    ProposalId = p.ProposalId,
+                    LaborCost = p.LaborCost,
+                    MaterialCost = p.MaterialCost,
+                    DurationEstimate = p.DurationEstimate,
+                    Status = p.Status.ToString(),
+                    Notes = p.Notes,
+                    EstimatedStartTime = p.EstimatedStartTime,
+                    RequestId = p.RequestId,
+                    RequestTitle = p.Request.Title,
+                    WorkerId = p.WorkerId,
+                    WorkerName = p.Worker.User.FullName,
+                    WorkerPhoto = p.Worker.PhotoUrl,
+                    WorkerRating = p.Worker.AvgRating,
+                    WorkerIsVerified = p.Worker.IsVerified,
+                    WorkerSpecialty = p.Worker.Specialty?.SpecialtyName,
+                    Portfolio = p.Worker.PortfolioItems.Select(pi => new PortfolioItemViewModel
+                    {
+                        ItemId = pi.ItemId,
+                        Title = pi.Title ?? "",
+                        Description = pi.Description,
+                        ImageUrl = pi.ImageUrl
+                    }).ToList(),
+                    Reviews = p.Worker.Reviews.Select(r => new ReviewItemViewModel
+                    {
+                        CustomerName = r.Customer.User.FullName,
+                        RatingValue = r.RatingValue,
+                        Comment = r.Comment
+                    }).ToList()
+                }).ToList()
+            };
+
+            ViewBag.RequestTitle = request.Title;
+            return View(vm);
+        }
+
     }
 }
 //[HttpGet]
@@ -302,3 +530,4 @@ namespace FixConnect.PL.Controllers
 //    if (vm == null) return NotFound();
 //    return View(vm);
 //}
+

@@ -1,0 +1,239 @@
+﻿@model FixConnect.PL.ViewModels.JobDetailViewModel
+@{
+    ViewData["Title"] = "Job Detail";
+    Layout = "_WorkerLayout";
+}
+
+<div class="container py-4">
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="row g-4">
+
+        <!-- Left: Job Info -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 mb-3">
+                <h6 class="fw-bold mb-3">Job Info</h6>
+
+                <p class="small fw-semibold mb-0">Request</p>
+                <p class="mb-2">@Model.RequestTitle</p>
+
+                <p class="small fw-semibold mb-0">Customer</p>
+                <p class="mb-2">@Model.CustomerName</p>
+
+                <p class="small fw-semibold mb-0">📍 Address</p>
+                <p class="mb-2">@Model.CustomerExactAddress</p>
+
+                <p class="small fw-semibold mb-0">📞 Contact</p>
+                <p class="mb-2">@Model.CustomerContactNumber</p>
+
+                <p class="small fw-semibold mb-0">Estimated Start</p>
+                <p class="mb-2">
+                    @(Model.EstimatedStartTime.HasValue
+                                        ? Model.EstimatedStartTime.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                        : "—")
+                </p>
+
+                <p class="small fw-semibold mb-0">Actual Start</p>
+                <p class="mb-3">
+                    @(Model.ActualStartDate.HasValue
+                                        ? Model.ActualStartDate.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                        : "Not started yet")
+                </p>
+
+                <span class="badge @(Model.Status == "Active"    ? "bg-info text-dark"    :
+                                                                                 Model.Status == "Completed" ? "bg-success" :
+                                                                                 Model.Status == "Disputed" ? "bg-warning text-dark" :
+                                                                                                                "bg-secondary") mb-3">
+                    @Model.Status
+                </span>
+
+                <!-- Action Buttons -->
+                @if (Model.CanStart)
+                {
+                    <form asp-action="StartJob" method="post" class="mb-2">
+                        <input type="hidden" name="jobId" value="@Model.JobId" />
+                        <button type="submit" class="btn btn-success w-100"
+                                onclick="return confirm('Start this job now?')">
+                            ▶ Start Job
+                        </button>
+                    </form>
+                }
+
+                @if (Model.CanCancel)
+                {
+                    <form asp-action="CancelJob" method="post" class="mb-2">
+                        <input type="hidden" name="jobId" value="@Model.JobId" />
+                        <button type="submit" class="btn btn-outline-danger w-100"
+                                onclick="return confirm('Cancel this job?')">
+                            ✖ Cancel Job
+                        </button>
+                    </form>
+                }
+
+                @if (Model.CanMarkFinished)
+                {
+                    <form asp-action="MarkAsFinished" method="post">
+                        <input type="hidden" name="jobId" value="@Model.JobId" />
+                        <button type="submit" class="btn btn-warning w-100"
+                                onclick="return confirm('Mark as finished?')">
+                            ✔ Mark As Finished
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+
+        <!-- Right: Invoice -->
+        <div class="col-md-8">
+            <div class="card shadow-sm p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0">Live Invoice</h6>
+                    <span class="fw-bold fs-5">
+                        Total: @Model.LiveInvoiceTotal.ToString("0.00") EGP
+                    </span>
+                </div>
+
+                <!-- Invoice Items -->
+                @if (!Model.InvoiceItems.Any())
+                {
+                    <p class="text-muted small">No invoice items yet.</p>
+                }
+                else
+                {
+                    <table class="table table-sm mb-3">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-end">Cost (EGP)</th>
+                                <th class="text-end">Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.InvoiceItems)
+                            {
+                                <tr id="row-@item.ItemId">
+                                    <td>
+                                        <span id="desc-@item.ItemId">@item.Description</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span id="cost-@item.ItemId">@item.Cost.ToString("0.00")</span>
+                                    </td>
+                                    <td class="text-end text-muted" style="font-size:0.78rem">
+                                        @item.AddedAt.ToString("dd MMM")
+                                    </td>
+                                    <td class="text-end">
+                                        <!-- أضف الشرط هنا -->
+                                        @if (Model.CanMarkFinished)
+                                        {
+                                            <div class="d-flex gap-1 justify-content-end">
+                                                <button class="btn btn-outline-secondary btn-sm"
+                                                        onclick="openEdit(@item.ItemId, '@Html.Raw(item.Description)', @item.Cost)">
+                                                    ✏
+                                                </button>
+                                                <form asp-action="DeleteInvoiceItem" method="post"
+                                                      onsubmit="return confirm('Delete this item?')">
+                                                    <input type="hidden" name="itemId" value="@item.ItemId" />
+                                                    <input type="hidden" name="jobId" value="@Model.JobId" />
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm">🗑</button>
+                                                </form>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-dark">
+                                <td class="fw-bold">Total</td>
+                                <td class="text-end fw-bold">@Model.LiveInvoiceTotal.ToString("0.00") EGP</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                }
+
+                <!-- Add Invoice Item -->
+                @if (Model.Status == "Active" && Model.ActualStartDate.HasValue)
+                {
+                    <hr />
+                    <h6 class="fw-semibold mb-3">+ Add Invoice Item</h6>
+                    <form asp-action="AddInvoiceItem" method="post">
+                        <input type="hidden" name="JobId" value="@Model.JobId" />
+                        <div class="row g-2">
+                            <div class="col-7">
+                                <input name="Description" class="form-control"
+                                       placeholder="e.g. 3kg of Cement" required />
+                            </div>
+                            <div class="col-3">
+                                <input name="Cost" type="number" step="0.01" min="0"
+                                       class="form-control" placeholder="Cost" required />
+                            </div>
+                            <div class="col-2">
+                                <button type="submit" class="btn btn-dark w-100">+</button>
+                            </div>
+                        </div>
+                    </form>
+                }
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Invoice Item Modal -->
+<div class="modal fade" id="editInvoiceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form asp-action="EditInvoiceItem" method="post">
+            <div class="modal-content shadow">
+                <div class="modal-header border-0">
+                    <h6 class="modal-title fw-bold">Edit Invoice Item</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="ItemId" id="editItemId" />
+                    <input type="hidden" name="JobId" value="@Model.JobId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <input name="Description" id="editDesc"
+                               class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cost (EGP)</label>
+                        <input name="Cost" id="editCost" type="number"
+                               step="0.01" min="0" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-dark">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEdit(itemId, description, cost) {
+        document.getElementById('editItemId').value = itemId;
+        document.getElementById('editDesc').value   = description;
+        document.getElementById('editCost').value   = cost;
+        new bootstrap.Modal(document.getElementById('editInvoiceModal')).show();
+    }
+</script>

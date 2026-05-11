@@ -7,6 +7,12 @@ namespace FixConnect.PL.ViewModels
         public List<RequestFeedItemViewModel> PublicRequests { get; set; } = new();
         public List<SpecialtyOption> Specialties { get; set; } = new();
         public List<RegionOption> Regions { get; set; } = new();
+
+        public string? SearchQuery { get; set; }
+        public string? RegionSearch { get; set; }
+
+        public WorkerJobRowViewModel? LatestJob { get; set; }
+        public RequestFeedItemViewModel? LatestDirectRequest { get; set; }
     }
 
     public class RequestFeedItemViewModel
@@ -56,20 +62,20 @@ namespace FixConnect.PL.ViewModels
     {
         public int RequestId { get; set; }
         public string RequestTitle { get; set; } = null!;
-        public int? ProposalId { get; set; }   // null = new, has value = edit
+        public int? ProposalId { get; set; }
 
         [Required]
         public decimal LaborCost { get; set; }
 
-        //[Required]
         public decimal MaterialCost { get; set; }
 
         public int DurationEstimate { get; set; }
 
-        [Required]
-        public string? Notes { get; set; }
-    }
+        public string? Notes { get; set; }        // ← شيل [Required]
 
+        [Required]
+        public DateTime EstimatedStartTime { get; set; }
+    }
     // ─────────────────────────────
     // My Proposals (Worker)
     // ─────────────────────────────

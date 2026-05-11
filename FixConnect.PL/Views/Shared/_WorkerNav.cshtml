@@ -16,6 +16,12 @@
            class="nav-link @(action == "MyProposals" ? "fw-bold text-dark" : "text-muted")">
             📝 My Proposals
         </a>
+
+        <a asp-controller="Worker" asp-action="Jobs"
+           class="nav-link @(action == "Jobs" ? "fw-bold text-dark" : "text-muted")">
+            🔨 My Jobs
+        </a>
+
         <a asp-controller="Worker" asp-action="Profile"
            class="nav-link @(action == "Profile" ? "fw-bold text-dark" : "text-muted")">
             👤 My Profile

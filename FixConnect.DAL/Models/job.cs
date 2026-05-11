@@ -25,5 +25,7 @@ namespace FixConnect.DAL.Models
         // Navigation
         public Proposal Proposal { get; set; } = null!;
         public Review? Review { get; set; }
+        public ICollection<JobInvoiceItem> InvoiceItems { get; set; } = new List<JobInvoiceItem>();
+
     }
 }

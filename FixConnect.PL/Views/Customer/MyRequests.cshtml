@@ -53,9 +53,25 @@
                         <div class="d-flex justify-content-between align-items-center mt-auto">
                             <small class="text-muted">@r.CreatedAt.ToString("dd MMM yyyy")</small>
                             <div class="d-flex gap-1">
-                                <span class="badge bg-dark">@r.ProposalCount proposals</span>
+
+                                <!-- Proposals Count Button -->
+                                <a asp-action="RequestProposals"
+                                   asp-route-requestId="@r.RequestId"
+                                   class="btn btn-sm btn-dark">
+                                    📨 @r.ProposalCount proposals
+                                </a>
+
+                                <!-- Edit Button -->
                                 <a asp-action="EditRequest" asp-route-id="@r.RequestId"
                                    class="btn btn-outline-secondary btn-sm">Edit</a>
+
+                                <!-- Delete Button -->
+                                <form asp-action="DeleteRequest" method="post"
+                                      onsubmit="return confirm('Delete this request?')">
+                                    <input type="hidden" name="requestId" value="@r.RequestId" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">🗑</button>
+                                </form>
+
                             </div>
                         </div>
                     </div>

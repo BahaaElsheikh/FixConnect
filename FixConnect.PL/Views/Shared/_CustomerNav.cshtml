@@ -16,6 +16,12 @@
            class="nav-link @(action == "ReceivedProposals" ? "fw-bold text-dark" : "text-muted")">
             📨 Proposals Received
         </a>
+
+        <a asp-controller="Customer" asp-action="Jobs"
+           class="nav-link @(action == "Jobs" ? "fw-bold text-dark" : "text-muted")">
+            🔨 My Jobs
+        </a>
+
         <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
             <button class="btn btn-sm btn-outline-danger">Logout</button>
         </form>

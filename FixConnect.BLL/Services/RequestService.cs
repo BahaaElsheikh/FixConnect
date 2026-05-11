@@ -130,7 +130,7 @@ namespace FixConnect.BLL.Services
         // ─────────────────────────────
         // Get Public Feed for Worker
         // ─────────────────────────────
-        public List<Request> GetPublicFeed(int workerId)
+        public List<Request> GetPublicFeed(int workerId, string? search = null, string? regionSearch = null)
         {
             var worker = _context.Workers
                 .Include(w => w.WorksAt)
@@ -138,16 +138,25 @@ namespace FixConnect.BLL.Services
 
             if (worker == null) return new();
 
-            var workerRegionIds = worker.WorksAt
-                .Select(wa => wa.RegionId).ToList();
+            var workerRegionIds = worker.WorksAt.Select(wa => wa.RegionId).ToList();
 
-            return _context.Requests
+            var query = _context.Requests
                 .Include(r => r.Region)
                 .Include(r => r.Specialty)
                 .Include(r => r.Customer).ThenInclude(c => c.User)
                 .Include(r => r.Images)
                 .Where(r => r.RequestType == (int)RequestType.Open
                          && r.Status == (int)RequestStatus.Pending)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(r => r.Title.Contains(search)
+                                      || r.Description!.Contains(search));
+
+            if (!string.IsNullOrWhiteSpace(regionSearch))
+                query = query.Where(r => r.Region.RegionName.Contains(regionSearch));
+
+            return query
                 .OrderByDescending(r => workerRegionIds.Contains(r.RegionId))
                 .ThenByDescending(r => r.SpecialtyId == worker.SpecialtyId)
                 .ThenByDescending(r => r.CreatedAt)
@@ -196,7 +205,7 @@ namespace FixConnect.BLL.Services
         // Get Workers (Home Filter)
         // ─────────────────────────────
         public List<Worker> GetFilteredWorkers(
-            string? search, int? specialtyId, int? regionId)
+            string? search, int? specialtyId, string? regionSearch)
         {
             var query = _context.Workers
                 .Include(w => w.User)
@@ -208,9 +217,9 @@ namespace FixConnect.BLL.Services
             if (specialtyId.HasValue)
                 query = query.Where(w => w.SpecialtyId == specialtyId);
 
-            if (regionId.HasValue)
+            if (!string.IsNullOrWhiteSpace(regionSearch))
                 query = query.Where(w =>
-                    w.WorksAt.Any(wa => wa.RegionId == regionId));
+                    w.WorksAt.Any(wa => wa.Region.RegionName.Contains(regionSearch)));
 
             if (!string.IsNullOrWhiteSpace(search))
                 query = query.Where(w =>
@@ -220,5 +229,33 @@ namespace FixConnect.BLL.Services
                 .OrderByDescending(w => w.AvgRating)
                 .ToList();
         }
+
+        public void DeleteRequest(int requestId)
+        {
+            var request = _context.Requests.Find(requestId);
+            if (request == null) return;
+            _context.Requests.Remove(request);
+            _context.SaveChanges();
+        }
+
+        public List<Proposal> GetProposalsByRequest(int requestId)
+        {
+            return _context.Proposals
+                .Include(p => p.Request)
+                .Include(p => p.Worker)
+                    .ThenInclude(w => w.User)
+                .Include(p => p.Worker)
+                    .ThenInclude(w => w.Specialty)
+                .Include(p => p.Worker)
+                    .ThenInclude(w => w.PortfolioItems)
+                .Include(p => p.Worker)
+                    .ThenInclude(w => w.Reviews)
+                        .ThenInclude(r => r.Customer)
+                            .ThenInclude(c => c.User)
+                .Where(p => p.RequestId == requestId)
+                .OrderByDescending(p => p.ProposalId)
+                .ToList();
+        }
+
     }
 }

@@ -1,0 +1,82 @@
+﻿@model FixConnect.PL.ViewModels.WorkerJobsViewModel
+@{
+    ViewData["Title"] = "My Jobs";
+    Layout = "_WorkerLayout";
+}
+
+<div class="container py-4">
+    <h5 class="fw-bold mb-4">My Jobs</h5>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (!Model.Jobs.Any())
+    {
+        <div class="text-center text-muted py-5">No jobs yet.</div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var j in Model.Jobs)
+            {
+                <div class="col-md-6">
+                    <div class="card shadow-sm p-3 h-100">
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <h6 class="fw-bold mb-0">@j.RequestTitle</h6>
+                            <span class="badge @(j.Status == "Active"    ? "bg-info text-dark"    :
+                                                                                   j.Status == "Completed" ? "bg-success" :
+                                                                                   j.Status == "Disputed" ? "bg-warning text-dark" :
+                                                                                                              "bg-secondary")">
+                                                                                                                           @j.Status
+                                                                                                                       </span>
+                                                                                                                   </div>
+
+                        <p class="small text-muted mb-1">👤 @j.CustomerName</p>
+                        <p class="small mb-1">📍 @j.CustomerExactAddress</p>
+                        <p class="small mb-2">📞 @j.CustomerContactNumber</p>
+
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <p class="small text-muted mb-0">Invoice Total</p>
+                                <p class="fw-bold mb-0">@j.LiveInvoiceTotal.ToString("0.00") EGP</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="small text-muted mb-0">Started</p>
+                                <p class="fw-bold mb-0">
+                                    @(j.ActualStartDate.HasValue
+                                                                ? j.ActualStartDate.Value.ToString("dd MMM yyyy")
+                                                                : "Not started")
+                        </p>
+                    </div>
+                </div>
+
+                        <div class="d-flex gap-2 mt-auto">
+                            <a asp-action="JobDetail" asp-route-id="@j.JobId"
+                               class="btn btn-dark btn-sm flex-fill">
+                                View Details
+                            </a>
+                    @if (j.CanCancel)
+                            {
+                                <form asp-action="CancelJob" method="post">
+                                    <input type="hidden" name="jobId" value="@j.JobId" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                                            onclick="return confirm('Cancel this job?')">
+                                        Cancel
+                                    </button>
+                                </form>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

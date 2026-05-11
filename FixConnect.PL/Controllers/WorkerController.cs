@@ -15,18 +15,26 @@ namespace FixConnect.PL.Controllers
         private readonly PortfolioService _portfolioService;
         private readonly RequestService _requestService;
         private readonly ProposalService _proposalService;
+        private readonly JobService _jobService;
+        private readonly WalletService _walletService;
+
         private readonly IWebHostEnvironment _env;
 
         public WorkerController(WorkerService workerService,
             PortfolioService portfolioService,
             RequestService requestService,
             ProposalService proposalService,
+            JobService jobService,
+            WalletService walletService,
+
             IWebHostEnvironment env)
         {
             _workerService = workerService;
             _portfolioService = portfolioService;
             _requestService = requestService;
             _proposalService = proposalService;
+            _jobService = jobService;
+            _walletService = walletService;
             _env = env;
         }
 
@@ -254,13 +262,26 @@ namespace FixConnect.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Dashboard()
+        public IActionResult Dashboard(string? search, string? regionSearch)
         {
             int workerId = GetCurrentUserId();
-            var requests = _requestService.GetPublicFeed(workerId);
+            var requests = _requestService.GetPublicFeed(workerId, search, regionSearch);
+            var jobs = _jobService.GetWorkerJobs(workerId);
+            var directs = _requestService.GetDirectRequests(workerId);
+
+            var latestJob = jobs.FirstOrDefault(j =>
+                j.Status == JobStatus.Active || j.Status == JobStatus.Disputed);
 
             var vm = new WorkerDashboardViewModel
             {
+                SearchQuery = search,
+                RegionSearch = regionSearch,
+                Regions = _workerService.GetAllRegions()
+                    .Select(r => new RegionOption
+                    {
+                        RegionId = r.RegionId,
+                        RegionName = r.RegionName
+                    }).ToList(),
                 PublicRequests = requests.Select(r => new RequestFeedItemViewModel
                 {
                     RequestId = r.RequestId,
@@ -270,11 +291,25 @@ namespace FixConnect.PL.Controllers
                     RegionName = r.Region.RegionName,
                     SpecialtyName = r.Specialty?.SpecialtyName,
                     CreatedAt = r.CreatedAt,
-                    ImageCount = r.Images.Count,
                     ImagePaths = r.Images.Select(i => i.ImagePath).ToList(),
                     AlreadyBid = _proposalService
                         .GetWorkerProposalForRequest(workerId, r.RequestId) != null
-                }).ToList()
+                }).ToList(),
+                LatestJob = latestJob == null ? null : new WorkerJobRowViewModel
+                {
+                    JobId = latestJob.JobId,
+                    RequestTitle = latestJob.Proposal.Request.Title,
+                    CustomerName = latestJob.Proposal.Customer.User.FullName,
+                    LiveInvoiceTotal = latestJob.LiveInvoiceTotal ?? 0,
+                    Status = ((JobStatus)latestJob.Status).ToString()
+                },
+                LatestDirectRequest = directs.Select(r => new RequestFeedItemViewModel
+                {
+                    RequestId = r.RequestId,
+                    Title = r.Title,
+                    CustomerName = r.Customer.User.FullName,
+                    RegionName = r.Region.RegionName,
+                }).FirstOrDefault()
             };
 
             return View(vm);
@@ -391,7 +426,7 @@ namespace FixConnect.PL.Controllers
             {
                 var (success, message) = _proposalService.EditProposal(
                     model.ProposalId.Value, workerId,
-                    model.LaborCost, model.MaterialCost, model.DurationEstimate);
+                    model.LaborCost, model.MaterialCost, model.DurationEstimate, model.Notes, model.EstimatedStartTime);  // ← أضف);
 
                 if (!success) TempData["Error"] = message;
             }
@@ -399,7 +434,7 @@ namespace FixConnect.PL.Controllers
             {
                 var (success, message) = _proposalService.SubmitProposal(
                     workerId, model.RequestId,
-                    model.LaborCost, model.MaterialCost, model.DurationEstimate,model.Notes);
+                    model.LaborCost, model.MaterialCost, model.DurationEstimate,model.Notes, model.EstimatedStartTime);
 
                 if (!success) TempData["Error"] = message;
             }
@@ -431,6 +466,146 @@ namespace FixConnect.PL.Controllers
             };
 
             return View(vm);
+        }
+
+
+        [HttpGet]
+        public IActionResult Jobs()
+        {
+            var jobs = _jobService.GetWorkerJobs(GetCurrentUserId());
+
+            var vm = new WorkerJobsViewModel
+            {
+                Jobs = jobs.Select(j => new WorkerJobRowViewModel
+                {
+                    JobId = j.JobId,
+                    RequestTitle = j.Proposal.Request.Title,
+                    CustomerName = j.Proposal.Customer.User.FullName,
+                    CustomerExactAddress = j.CustomerExactAddress ?? "—",
+                    CustomerContactNumber = j.CustomerContactNumber ?? "—",
+                    EstimatedStartTime = j.EstimatedStartTime,
+                    ActualStartDate = j.ActualStartDate,
+                    LiveInvoiceTotal = j.LiveInvoiceTotal ?? 0,
+                    Status = ((JobStatus)j.Status).ToString(),
+                    CanStart = !j.ActualStartDate.HasValue
+                                         && j.Status ==JobStatus.Active,
+                    CanCancel = !j.ActualStartDate.HasValue
+                                         && j.Status == JobStatus.Active,
+                    CanMarkFinished = j.ActualStartDate.HasValue
+                                         && j.Status == JobStatus.Active
+                }).ToList()
+            };
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // GET: /Worker/JobDetail/5
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult JobDetail(int id)
+        {
+            var job = _jobService.GetJob(id);
+            if (job == null || job.Proposal.WorkerId != GetCurrentUserId())
+                return NotFound();
+
+            var vm = new JobDetailViewModel
+            {
+                JobId = job.JobId,
+                RequestTitle = job.Proposal.Request.Title,
+                CustomerName = job.Proposal.Customer.User.FullName,
+                CustomerExactAddress = job.CustomerExactAddress ?? "—",
+                CustomerContactNumber = job.CustomerContactNumber ?? "—",
+                EstimatedStartTime = job.EstimatedStartTime,
+                ActualStartDate = job.ActualStartDate,
+                LiveInvoiceTotal = job.LiveInvoiceTotal ?? 0,
+                Status = ((JobStatus)job.Status).ToString(),
+                CanStart = !job.ActualStartDate.HasValue
+                                     && job.Status == JobStatus.Active,
+                CanCancel = !job.ActualStartDate.HasValue
+                                     && job.Status == JobStatus.Active,
+                CanMarkFinished = job.ActualStartDate.HasValue
+                                     && job.Status == JobStatus.Active,
+                InvoiceItems = job.InvoiceItems.Select(i => new InvoiceItemViewModel
+                {
+                    ItemId = i.ItemId,
+                    Description = i.Description,
+                    Cost = i.Cost,
+                    AddedAt = i.AddedAt
+                }).ToList()
+            };
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────
+        // POST: /Worker/StartJob
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult StartJob(int jobId)
+        {
+            var (success, message) = _jobService.StartJob(jobId, GetCurrentUserId());
+            TempData[success ? "Success" : "Error"] = message;
+            return RedirectToAction("JobDetail", new { id = jobId });
+        }
+
+        // ─────────────────────────────
+        // POST: /Worker/CancelJob
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult CancelJob(int jobId)
+        {
+            var (success, message) = _jobService.CancelJob(jobId, GetCurrentUserId());
+            TempData[success ? "Success" : "Error"] = message;
+            return RedirectToAction("Jobs");
+        }
+
+        // ─────────────────────────────
+        // POST: /Worker/AddInvoiceItem
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult AddInvoiceItem(AddInvoiceItemViewModel model)
+        {
+            var (success, message) = _jobService.AddInvoiceItem(
+                model.JobId, GetCurrentUserId(),
+                model.Description, model.Cost);
+
+            TempData[success ? "Success" : "Error"] = message;
+            return RedirectToAction("JobDetail", new { id = model.JobId });
+        }
+
+        // ─────────────────────────────
+        // POST: /Worker/MarkAsFinished
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult MarkAsFinished(int jobId)
+        {
+            var (success, message) = _jobService.MarkAsFinished(jobId, GetCurrentUserId());
+            TempData[success ? "Success" : "Error"] = message;
+            return RedirectToAction("JobDetail", new { id = jobId });
+        }
+
+
+
+        // POST: /Worker/EditInvoiceItem
+        [HttpPost]
+        public IActionResult EditInvoiceItem(int itemId, int jobId,
+            string description, decimal cost)
+        {
+            var (success, message) = _jobService.EditInvoiceItem(
+                itemId, jobId, GetCurrentUserId(), description, cost);
+            TempData[success ? "Success" : "Error"] = message;
+            return RedirectToAction("JobDetail", new { id = jobId });
+        }
+
+        // POST: /Worker/DeleteInvoiceItem
+        [HttpPost]
+        public IActionResult DeleteInvoiceItem(int itemId, int jobId)
+        {
+            var (success, message) = _jobService.DeleteInvoiceItem(
+                itemId, jobId, GetCurrentUserId());
+            TempData[success ? "Success" : "Error"] = message;
+            return RedirectToAction("JobDetail", new { id = jobId });
         }
 
     }
