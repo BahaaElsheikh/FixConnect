@@ -1,39 +1,50 @@
-﻿@{
-    var action = ViewContext.RouteData.Values["action"]?.ToString();
-}
-<nav class="navbar navbar-expand navbar-light bg-white border-bottom shadow-sm mb-4 px-4">
-    <a class="navbar-brand fw-bold" href="#">FixConnect</a>
-    <div class="navbar-nav ms-auto gap-2">
-        <a asp-controller="Worker" asp-action="Dashboard"
-           class="nav-link @(action == "Dashboard" ? "fw-bold text-dark" : "text-muted")">
-            🏠 Job Feed
-        </a>
-        <a asp-controller="Worker" asp-action="DirectRequests"
-           class="nav-link @(action == "DirectRequests" ? "fw-bold text-dark" : "text-muted")">
-            📩 Direct Requests
-        </a>
-        <a asp-controller="Worker" asp-action="MyProposals"
-           class="nav-link @(action == "MyProposals" ? "fw-bold text-dark" : "text-muted")">
-            📝 My Proposals
-        </a>
+﻿<div class="d-flex">
+    <nav class="d-flex flex-column flex-shrink-0 p-3 bg-white border-end shadow-sm" style="width: 250px; min-height: 100vh; position: fixed;">
+        <a class="navbar-brand fw-bold mb-4 fs-4 text-center" href="#">FixConnect</a>
 
-        <a asp-controller="Worker" asp-action="Jobs"
-           class="nav-link @(action == "Jobs" ? "fw-bold text-dark" : "text-muted")">
-            🔨 My Jobs
-        </a>
+        <div class="nav nav-pills flex-column mb-auto gap-2">
+            @{
+                var action = ViewContext.RouteData.Values["action"]?.ToString();
+            }
 
-        <a asp-controller="Worker" asp-action="Profile"
-           class="nav-link @(action == "Profile" ? "fw-bold text-dark" : "text-muted")">
-            👤 My Profile
-        </a>
+            <a asp-controller="Worker" asp-action="Dashboard"
+               class="nav-link @(action == "Dashboard" ? "active bg-dark text-white" : "text-muted")">
+                🏠 Job Feed
+            </a>
 
-        <a asp-controller="Worker" asp-action="Wallet"
-           class="nav-item @(action == "Wallet" ?  "fw-bold text-dark" : "text-muted")">
-            💰 My Wallet
-        </a>
+            <a asp-controller="Worker" asp-action="DirectRequests"
+               class="nav-link @(action == "DirectRequests" ? "active bg-dark text-white" : "text-muted")">
+                📩 Direct Requests
+            </a>
 
-        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-            <button class="btn btn-sm btn-outline-danger">Logout</button>
+            <a asp-controller="Worker" asp-action="MyProposals"
+               class="nav-link @(action == "MyProposals" ? "active bg-dark text-white" : "text-muted")">
+                📝 My Proposals
+            </a>
+
+            <a asp-controller="Worker" asp-action="Jobs"
+               class="nav-link @(action == "Jobs" ? "active bg-dark text-white" : "text-muted")">
+                🔨 My Jobs
+            </a>
+
+            <a asp-controller="Worker" asp-action="Profile"
+               class="nav-link @(action == "Profile" ? "active bg-dark text-white" : "text-muted")">
+                👤 My Profile
+            </a>
+
+            <a asp-controller="Worker" asp-action="Wallet"
+               class="nav-link @(action == "Wallet" ? "active bg-dark text-white" : "text-muted")">
+                💰 My Wallet
+            </a>
+        </div>
+
+        <hr>
+
+        <form asp-controller="Account" asp-action="Logout" method="post" class="w-100">
+            <button class="btn btn-outline-danger w-100">Logout</button>
         </form>
-    </div>
-</nav>
+    </nav>
+
+    <main style="margin-left: 250px; width: 100%; padding: 20px;">
+    </main>
+</div>

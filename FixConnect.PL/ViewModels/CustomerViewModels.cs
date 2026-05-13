@@ -30,6 +30,9 @@ namespace FixConnect.PL.ViewModels
         public int? SelectedSpecialtyId { get; set; }
         public string? RegionSearch { get; set; }
         public string? SearchQuery { get; set; }
+
+        public CustomerJobRowViewModel? LatestActiveJob { get; set; }
+        public List<MyRequestRowViewModel> PendingRequests { get; set; } = new();
     }
 
     // ─────────────────────────────

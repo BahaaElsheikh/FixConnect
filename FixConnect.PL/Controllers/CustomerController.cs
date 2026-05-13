@@ -20,6 +20,7 @@ namespace FixConnect.PL.Controllers
         private readonly ReviewService _reviewService;
 
 
+
         public CustomerController(RequestService requestService,
             WorkerService workerService,
             ProposalService proposalService,
@@ -46,7 +47,17 @@ namespace FixConnect.PL.Controllers
         [HttpGet]
         public IActionResult Index(string? search, int? specialtyId, string? regionSearch)
         {
+            int customerId = GetCurrentUserId();
             var workers = _requestService.GetFilteredWorkers(search, specialtyId, regionSearch);
+            var jobs = _jobService.GetCustomerJobs(customerId);
+            var requests = _requestService.GetCustomerRequests(customerId);
+
+            var latestJob = jobs.FirstOrDefault(j =>
+                j.Status == JobStatus.Active || j.Status == JobStatus.Disputed);
+
+            var pendingRequests = requests
+                .Where(r => r.Status == (int)RequestStatus.Pending)
+                .ToList();
 
             var vm = new CustomerHomeViewModel
             {
@@ -75,6 +86,24 @@ namespace FixConnect.PL.Controllers
                     IsVerified = w.IsVerified,
                     AvailabilityStatus = w.AvailabilityStatus.ToString(),
                     Regions = w.WorksAt.Select(wa => wa.Region.RegionName).ToList()
+                }).ToList(),
+                LatestActiveJob = latestJob == null ? null : new CustomerJobRowViewModel
+                {
+                    JobId = latestJob.JobId,
+                    RequestTitle = latestJob.Proposal.Request.Title,
+                    WorkerName = latestJob.Proposal.Worker.User.FullName,
+                    WorkerPhoto = latestJob.Proposal.Worker.PhotoUrl,
+                    LiveInvoiceTotal = latestJob.LiveInvoiceTotal ?? 0,
+                    Status = ((JobStatus)latestJob.Status).ToString()
+                },
+                PendingRequests = pendingRequests.Select(r => new MyRequestRowViewModel
+                {
+                    RequestId = r.RequestId,
+                    Title = r.Title,
+                    RegionName = r.Region.RegionName,
+                    SpecialtyName = r.Specialty?.SpecialtyName,
+                    CreatedAt = r.CreatedAt,
+                    ProposalCount = r.Proposals.Count
                 }).ToList()
             };
 
