@@ -1,82 +1,185 @@
 ﻿@model FixConnect.PL.ViewModels.WorkerJobsViewModel
 @{
-    ViewData["Title"] = "My Jobs";
     Layout = "_WorkerLayout";
 }
 
-<div class="container py-4">
-    <h5 class="fw-bold mb-4">My Jobs</h5>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
+<style>
+    /* Layout styling */
+    .kanban-board {
+        padding: 1rem 0;
     }
 
-    @if (!Model.Jobs.Any())
-    {
-        <div class="text-center text-muted py-5">No jobs yet.</div>
+    .kanban-column {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        min-height: 500px;
     }
-    else
-    {
-        <div class="row g-3">
-            @foreach (var j in Model.Jobs)
+
+    .column-header {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #495057;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .dot {
+        height: 8px;
+        width: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .dot.accepted {
+        background-color: #4361ee;
+    }
+
+    /* NEW: This grid forces the 2x2 side-by-side layout */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        /* ─── CRUCIAL FIX 1: Stops rows from forcing height synchronization ─── */
+        align-items: start;
+    }
+
+    /* Card Styling */
+    .job-card {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        /* ─── FIX: Forces every card to be identical in size ─── */
+        display: flex;
+        flex-direction: column;
+        height: 230px; /* This sets the exact fixed height for all cards */
+        box-sizing: border-box;
+    }
+
+    .job-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .status-badge {
+        background-color: #e0e7ff;
+        color: #4361ee;
+        padding: 0.25rem 0.6rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .text-truncate {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+
+    .job-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #212529;
+    }
+
+    .job-details {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .card-footer-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f0f0f0;
+        /* ─── FIX: Keeps the footer perfectly pinned to the bottom ─── */
+        margin-top: auto;
+    }
+
+    .invoice-total {
+        font-weight: 700;
+        color: #212529;
+    }
+
+    .btn-primary-action {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary-action:hover {
+        background-color: #0056b3;
+    }
+
+    /* Mobile responsiveness: stacks cards 1-by-1 on smaller screens */
+    /* media (max-width: 900px) {
+        .cards-grid {
+            grid-template-columns: 1fr;
+        }
+    } */
+</style>
+
+<div class="kanban-board">
+    <div class="kanban-column">
+        <div class="column-header">
+            <span class="dot accepted"></span> ACTIVE / ACCEPTED
+        </div>
+
+        <div class="cards-grid">
+            @foreach (var job in Model.Jobs.Where(j => j.Status == "Active"))
             {
-                <div class="col-md-6">
-                    <div class="card shadow-sm p-3 h-100">
-
-                        <div class="d-flex justify-content-between mb-2">
-                            <h6 class="fw-bold mb-0">@j.RequestTitle</h6>
-                            <span class="badge @(j.Status == "Active"    ? "bg-info text-dark"    :
-                                                                                   j.Status == "Completed" ? "bg-success" :
-                                                                                   j.Status == "Disputed" ? "bg-warning text-dark" :
-                                                                                                              "bg-secondary")">
-                                                                                                                           @j.Status
-                                                                                                                       </span>
-                                                                                                                   </div>
-
-                        <p class="small text-muted mb-1">👤 @j.CustomerName</p>
-                        <p class="small mb-1">📍 @j.CustomerExactAddress</p>
-                        <p class="small mb-2">📞 @j.CustomerContactNumber</p>
-
-                        <div class="row text-center mb-3">
-                            <div class="col-6">
-                                <p class="small text-muted mb-0">Invoice Total</p>
-                                <p class="fw-bold mb-0">@j.LiveInvoiceTotal.ToString("0.00") EGP</p>
-                            </div>
-                            <div class="col-6">
-                                <p class="small text-muted mb-0">Started</p>
-                                <p class="fw-bold mb-0">
-                                    @(j.ActualStartDate.HasValue
-                                                                ? j.ActualStartDate.Value.ToString("dd MMM yyyy")
-                                                                : "Not started")
-                        </p>
+                <div class="job-card">
+                    <div class="job-header">
+                        <span class="status-badge">@job.Status</span>
+                        <span class="text-muted">ID: #FC-@job.JobId</span>
                     </div>
-                </div>
 
-                        <div class="d-flex gap-2 mt-auto">
-                            <a asp-action="JobDetail" asp-route-id="@j.JobId"
-                               class="btn btn-dark btn-sm flex-fill">
-                                View Details
-                            </a>
-                    @if (j.CanCancel)
-                            {
-                                <form asp-action="CancelJob" method="post">
-                                    <input type="hidden" name="jobId" value="@j.JobId" />
-                                    <button type="submit" class="btn btn-outline-danger btn-sm"
-                                            onclick="return confirm('Cancel this job?')">
-                                        Cancel
-                                    </button>
-                                </form>
-                            }
-                        </div>
+                    <h4 class="job-title text-truncate break-words" title="@job.RequestTitle">@job.RequestTitle</h4>
 
+                    <div class="job-details">
+                        <span class="text-truncate break-words" title="@job.CustomerName">
+                            <i class="icon-user"></i> @job.CustomerName
+                        </span>
+                        <span class="text-truncate" title="@job.CustomerExactAddress">
+                            <i class="icon-location"></i> @job.CustomerExactAddress
+                        </span>
+                        <span>
+                            <i class="icon-calendar"></i> @(job.EstimatedStartTime?.ToString("dd MMM yyyy") ?? "TBD")
+                        </span>
+                    </div>
+
+                    <div class="card-footer-actions">
+                        <span class="invoice-total">@job.LiveInvoiceTotal.ToString("0.00") EGP</span>
+                        <a href="/Worker/JobDetail/@job.JobId" class="btn-primary-action">View Details</a>
                     </div>
                 </div>
             }
         </div>
-    }
+    </div>
 </div>

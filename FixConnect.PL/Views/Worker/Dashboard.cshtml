@@ -1,710 +1,229 @@
 ﻿@model FixConnect.PL.ViewModels.WorkerDashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
-    Layout = null;
+    Layout = "_WorkerLayout";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FixConnect — Worker Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <style>
-        :root {
-            --sidebar-w: 240px;
-            --right-w:   300px;
-            --bg:        #f4f2ee;
-            --surface:   #ffffff;
-            --border:    #e5e2db;
-            --accent:    #1a1a1a;
-            --accent2:   #c8a96e;
-            --text:      #1a1a1a;
-            --muted:     #7a7570;
-            --green:     #2d8a4e;
-            --warning:   #b45309;
-        }
+<div class="flex-1 p-gutter md:p-container-margin max-w-7xl mx-auto w-full pt-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-stack-lg gap-4">
+        <div>
+            <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Available Requests</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-2">Browse and apply to public jobs matching your skills.</p>
+        </div>
+    </div>
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-        }
-
-        /* ═══════════════════════
-           VERTICAL SIDEBAR
-        ═══════════════════════ */
-        .sidebar {
-            width: var(--sidebar-w);
-            min-height: 100vh;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 28px 16px;
-            position: fixed;
-            top: 0; left: 0;
-            z-index: 100;
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 8px 28px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-
-        .sidebar-brand .icon {
-            width: 36px; height: 36px;
-            background: var(--accent);
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
-        }
-
-        .sidebar-brand span {
-            font-weight: 700;
-            font-size: 1rem;
-            letter-spacing: -0.3px;
-        }
-
-        .sidebar-brand .badge-admin {
-            font-size: 0.55rem;
-            background: var(--accent2);
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            color: var(--muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.15s ease;
-            margin-bottom: 4px;
-        }
-
-        .nav-item:hover {
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        .nav-item.active {
-            background: var(--accent);
-            color: #fff;
-        }
-
-        .nav-item .nav-icon {
-            font-size: 1.1rem;
-            width: 20px;
-            text-align: center;
-        }
-
-        .sidebar-footer {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-        }
-
-        .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            color: #c0392b;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            width: 100%;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .logout-btn:hover { background: #fef2f2; }
-
-        /* ═══════════════════════
-           MAIN LAYOUT
-        ═══════════════════════ */
-        .main-wrapper {
-            margin-left: var(--sidebar-w);
-            flex: 1;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Feed Column */
-        .feed-col {
-            flex: 1;
-            border-right: 1px solid var(--border);
-            min-height: 100vh;
-        }
-
-        .feed-header {
-            position: sticky;
-            top: 0;
-            background: rgba(244, 242, 238, 0.92);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 24px;
-            z-index: 50;
-        }
-
-        .feed-header h5 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-        }
-
-        /* Search Bar */
-        .search-row {
-            display: flex;
-            gap: 8px;
-            padding: 12px 24px;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface);
-        }
-
-        .search-input {
-            flex: 1;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            font-family: 'DM Sans', sans-serif;
-            outline: none;
-            transition: border 0.15s;
-        }
-
-        .search-input:focus { border-color: var(--accent); }
-
-        .filter-select {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 8px 14px;
-            font-size: 0.85rem;
-            font-family: 'DM Sans', sans-serif;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .search-btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 18px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            transition: opacity 0.15s;
-        }
-
-        .search-btn:hover { opacity: 0.85; }
-
-        /* Request Card */
-        .request-card {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface);
-            transition: background 0.12s;
-        }
-
-        .request-card:hover { background: #faf9f6; }
-
-        .request-card .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-
-        .request-card h6 {
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: -0.2px;
-            margin-bottom: 4px;
-        }
-
-        .request-card p {
-            font-size: 0.83rem;
-            color: var(--muted);
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-
-        .tag {
-            display: inline-block;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 2px 10px;
-            font-size: 0.73rem;
-            font-weight: 500;
-            color: var(--muted);
-            margin-right: 4px;
-            margin-bottom: 4px;
-        }
-
-        .bid-badge {
-            background: #dcfce7;
-            color: var(--green);
-            border: 1px solid #bbf7d0;
-            border-radius: 20px;
-            padding: 3px 10px;
-            font-size: 0.73rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .card-images {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin: 10px 0;
-        }
-
-        .card-images img {
-            width: 90px;
-            height: 90px;
-            object-fit: contain;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
-
-        .card-images img:hover { transform: scale(1.03); }
-
-        .card-footer-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-        }
-
-        .view-btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 7px 16px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-decoration: none;
-            font-family: 'DM Sans', sans-serif;
-            transition: opacity 0.15s;
-        }
-
-        .view-btn:hover { opacity: 0.85; color: #fff; }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 24px;
-            color: var(--muted);
-            font-size: 0.88rem;
-        }
-
-        /* ═══════════════════════
-           RIGHT COLUMN
-        ═══════════════════════ */
-        /* .right-col {
-            width: var(--right-w);
-            min-height: 100vh;
-            padding: 20px 16px;
-            flex-shrink: 0;
-        } */
-
-        .right-col {
-            /* غيرنا العرض من القيمة الثابتة لـ 25% */
-            width: 25%;
-            min-height: 100vh;
-            padding: 20px 16px;
-            /* ضيفنا دي عشان نضمن إنه ميصغرش عن الـ 25% */
-            flex-shrink: 0;
-            /* اختيارى: لو عايز تحط حد أدنى للعرض عشان ميبقاش رفيع زيادة في الشاشات الصغيرة */
-            min-width: 260px;
-        }
-
-        .right-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 16px;
-        }
-
-        .right-card h6 {
-            font-size: 0.82rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--muted);
-            margin-bottom: 14px;
-        }
-
-        .mini-card {
-            background: var(--bg);
-            border-radius: 10px;
-            padding: 12px;
-        }
-
-        .mini-card .title {
-            font-size: 0.88rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .mini-card .meta {
-            font-size: 0.75rem;
-            color: var(--muted);
-            margin-bottom: 8px;
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 7px; height: 7px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-
-        .dot-active   { background: var(--green); }
-        .dot-progress { background: var(--warning); }
-        .dot-pending  { background: #6366f1; }
-
-        .mini-link {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        .mini-link:hover { text-decoration: underline; }
-
-        .no-item {
-            font-size: 0.8rem;
-            color: var(--muted);
-            text-align: center;
-            padding: 10px 0;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- ═══════════════════════════════
-         VERTICAL SIDEBAR
-    ═══════════════════════════════ -->
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <div class="icon">🔧</div>
-            <div>
-                <span>FixConnect</span><br />
-                <span class="badge-admin">Worker</span>
-            </div>
+    <form method="get" asp-action="Dashboard" class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 shadow-[0_4px_20px_rgba(0,62,199,0.04)] mb-stack-lg flex flex-col md:flex-row gap-4 mb-8">
+        <div class="flex-1 relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+            <input name="search" value="@Model.SearchQuery" class="w-full pl-12 pr-4 py-3 bg-[#F1F5F9] border-transparent focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-body-md text-body-md text-on-surface placeholder:text-outline transition-all outline-none" placeholder="Search by title or description..." type="text" />
         </div>
 
-        <a asp-controller="Worker" asp-action="Dashboard"
-           class="nav-item active">
-            <span class="nav-icon">🏠</span> Job Feed
-        </a>
-        <a asp-controller="Worker" asp-action="DirectRequests"
-           class="nav-item">
-            <span class="nav-icon">📩</span> Direct Requests
-        </a>
-        <a asp-controller="Worker" asp-action="MyProposals"
-           class="nav-item">
-            <span class="nav-icon">📝</span> My Proposals
-        </a>
-        <a asp-controller="Worker" asp-action="Jobs"
-           class="nav-item">
-            <span class="nav-icon">🔨</span> My Jobs
-        </a>
-        <a asp-controller="Worker" asp-action="Profile"
-           class="nav-item">
-            <span class="nav-icon">👤</span> My Profile
-        </a>
+        <div class="flex gap-4 flex-1 md:flex-none">
+            <div class="relative flex-1 md:w-64">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">location_on</span>
+                <input type="text" id="regionSearchInput" name="regionSearch" value="@Model.RegionSearch" class="w-full pl-12 pr-4 py-3 bg-[#F1F5F9] border-transparent focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-body-md text-body-md text-on-surface placeholder:text-outline transition-all outline-none" placeholder="Filter by region..." autocomplete="off" />
 
-        <a asp-controller="Worker" asp-action="Wallet"
-           class="nav-item">
-            <span class="nav-icon">💰</span> My Wallet
-        </a>
-
-        <div class="sidebar-footer">
-            <form asp-controller="Account" asp-action="Logout" method="post">
-                <button class="logout-btn">
-                    <span class="nav-icon">🚪</span> Logout
-                </button>
-            </form>
-        </div>
-    </aside>
-
-    <!-- ═══════════════════════════════
-         MAIN WRAPPER
-    ═══════════════════════════════ -->
-    <div class="main-wrapper">
-
-        <!-- ═══════════════
-             FEED COLUMN
-        ═══════════════ -->
-        <div class="feed-col">
-
-            <!-- Header -->
-            <div class="feed-header">
-                <h5>Public Job Feed</h5>
-            </div>
-
-            <!-- Search & Filter -->
-            <form method="get" asp-action="Dashboard">
-                <div class="search-row">
-                    <input type="text" name="search"
-                           value="@Model.SearchQuery"
-                           class="search-input"
-                           placeholder="Search by title or description..." />
-
-                    <!-- Region Search with Autocomplete -->
-                    <div style="position:relative">
-                        <input type="text"
-                               id="regionSearchInput"
-                               name="regionSearch"
-                               value="@Model.RegionSearch"
-                               class="search-input"
-                               placeholder="Filter by region..."
-                               autocomplete="off" />
-
-                        <div id="regionDropdown"
-                             style="position:absolute;top:100%;left:0;right:0;background:#fff;
-                border:1px solid var(--border);border-radius:10px;
-                box-shadow:0 4px 12px rgba(0,0,0,0.08);
-                z-index:999;display:none;max-height:180px;overflow-y:auto">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="search-btn">Search</button>
+                <div id="regionDropdown" class="absolute top-[110%] left-0 right-0 bg-white border border-outline-variant/30 rounded-xl shadow-lg z-[999] hidden max-h-48 overflow-y-auto">
                 </div>
-            </form>
+            </div>
+            <button type="submit" class="px-6 py-3 bg-primary text-white rounded-xl font-label-md text-label-md hover:shadow-lg hover:shadow-primary/20 transition-all font-semibold">
+                Search
+            </button>
+        </div>
+    </form>
 
-            <!-- Feed -->
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        <div class="flex-1">
             @if (!Model.PublicRequests.Any())
             {
-                <div class="empty-state">
-                    <div style="font-size:2.5rem;margin-bottom:12px">📭</div>
-                    <p>No public requests available right now.</p>
+                <div class="text-center py-16 bg-surface-container-lowest border border-slate-200 rounded-xl shadow-sm">
+                    <span class="text-6xl mb-4 block">📭</span>
+                    <p class="text-on-surface-variant font-body-md text-body-md">No public requests available right now.</p>
                 </div>
             }
             else
             {
-                @foreach (var r in Model.PublicRequests)
-                {
-                    <div class="request-card">
-                        <div class="card-top">
-                            <div>
-                                <h6>@r.Title</h6>
-                                <span class="tag">📍 @r.RegionName</span>
-                                @if (!string.IsNullOrEmpty(r.SpecialtyName))
-                                {
-                                    <span class="tag">🔧 @r.SpecialtyName</span>
-                                }
-                                <span class="tag">👤 @r.CustomerName</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    @foreach (var r in Model.PublicRequests)
+                    {
+                        <div class="bg-surface-container-lowest border border-slate-200 rounded-xl p-6 shadow-[0_4px_20px_rgba(0,62,199,0.04)] hover:shadow-[0_8px_30px_rgba(0,62,199,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                            <div class="flex justify-between items-start mb-4 gap-2 flex-wrap">
+                                <div class="flex gap-2 flex-wrap">
+                                    @if (!string.IsNullOrEmpty(r.SpecialtyName))
+                                    {
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-container/20 text-primary">@r.SpecialtyName</span>
+                                    }
+                                    @if (r.AlreadyBid)
+                                    {
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">✔ Bid Sent</span>
+                                    }
+                                </div>
+                                <span class="font-caption text-caption text-outline whitespace-nowrap">@r.CreatedAt.ToString("dd MMM yyyy")</span>
                             </div>
-                            @if (r.AlreadyBid)
+
+                            <h3 class="font-headline-md text-headline-md text-on-surface mb-2 line-clamp-2 font-bold break-words">@r.Title</h3>
+
+                            <p class="text-sm text-secondary mb-4 line-clamp-3 flex-1 text-gray-600 break-words">@r.Description</p>
+
+                            @if (r.ImagePaths.Any())
                             {
-                                <span class="bid-badge">✔ Bid Sent</span>
+                                <div class="flex gap-2 flex-wrap mb-4">
+                                    @foreach (var img in r.ImagePaths)
+                                    {
+                                        <img src="@img" onclick="openImg('@img')" class="w-16 h-16 object-cover rounded-lg border border-slate-200 bg-surface cursor-pointer hover:scale-105 transition-transform" />
+                                    }
+                                </div>
                             }
-                        </div>
 
-                        <p>@r.Description</p>
-
-                        @if (r.ImagePaths.Any())
-                        {
-                            <div class="card-images">
-                                @foreach (var img in r.ImagePaths)
-                                {
-                                    <img src="@img" onclick="openImg('@img')" />
-                                }
+                            <div class="space-y-2 mb-6 mt-auto">
+                                <div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+                                    <span class="material-symbols-outlined text-xl text-gray-500">location_on</span>
+                                    <span class="text-gray-700">@r.RegionName</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+                                    <span class="material-symbols-outlined text-xl text-gray-500">person</span>
+                                    <span class="text-gray-700">@r.CustomerName</span>
+                                </div>
                             </div>
-                        }
 
-                        <div class="card-footer-row">
-                            <small style="color:var(--muted);font-size:0.75rem">
-                                @r.CreatedAt.ToString("dd MMM yyyy")
-                            </small>
-                            <a asp-action="RequestDetail" asp-route-id="@r.RequestId"
-                               class="view-btn">
-                                View Details →
+                            <a asp-action="RequestDetail" asp-route-id="@r.RequestId" class="block text-center w-full py-3 px-4 bg-gradient-to-r from-[#003ec7] to-[#004ced] text-white rounded-xl font-label-md text-label-md hover:shadow-lg hover:shadow-primary/20 transition-all font-semibold">
+                                View Details
                             </a>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             }
         </div>
 
-        <!-- ═══════════════
-             RIGHT COLUMN
-        ═══════════════ -->
-        <div class="right-col">
-
-            <!-- Latest Active Job -->
-            <div class="right-card">
-                <h6>⚡ Latest Job</h6>
+        <div class="w-full lg:w-80 flex-shrink-0 space-y-6">
+            <div class="bg-surface-container-lowest border border-slate-200 rounded-xl p-5 shadow-sm">
+                <h6 class="text-xs font-bold uppercase tracking-wider text-secondary mb-4 text-gray-500">⚡ Latest Job</h6>
                 @if (Model.LatestJob != null)
                 {
-                    <div class="mini-card">
-                        <div class="title">@Model.LatestJob.RequestTitle</div>
-                        <div class="meta">
-                            <span class="status-dot @(Model.LatestJob.Status == "Active" ? "dot-active" : "dot-progress")"></span>
+                    <div class="bg-surface rounded-lg p-4 border border-outline-variant/20 bg-gray-50">
+                        <div class="font-semibold text-sm mb-1 text-on-surface break-words">@Model.LatestJob.RequestTitle</div>
+                        <div class="flex items-center gap-2 text-xs text-secondary mb-2 text-gray-600 break-words">
+                            <span class="w-2 h-2 rounded-full @(Model.LatestJob.Status == "Active" ? "bg-green-600" : "bg-[#b45309]")"></span>
                             @Model.LatestJob.Status — @Model.LatestJob.CustomerName
                         </div>
-                        <div class="meta">
+                        <div class="text-xs text-secondary font-medium mb-3 text-gray-700">
                             💰 @Model.LatestJob.LiveInvoiceTotal.ToString("0.00") EGP
                         </div>
-                        <a asp-action="JobDetail"
-                           asp-route-id="@Model.LatestJob.JobId"
-                           class="mini-link">
+                        <a asp-action="JobDetail" asp-route-id="@Model.LatestJob.JobId" class="text-sm font-semibold text-[#003ec7] hover:underline">
                             View Job →
                         </a>
                     </div>
                 }
                 else
                 {
-                    <div class="no-item">No active jobs.</div>
+                    <div class="text-sm text-secondary text-center py-2 text-gray-500">No active jobs.</div>
                 }
             </div>
 
-            <!-- Latest Direct Request -->
-            <div class="right-card">
-                <h6>📩 Latest Direct Request</h6>
+            <div class="bg-surface-container-lowest border border-slate-200 rounded-xl p-5 shadow-sm">
+                <h6 class="text-xs font-bold uppercase tracking-wider text-secondary mb-4 text-gray-500">📩 Latest Direct Request</h6>
                 @if (Model.LatestDirectRequest != null)
                 {
-                    <div class="mini-card">
-                        <div class="title">@Model.LatestDirectRequest.Title</div>
-                        <div class="meta">
-                            <span class="status-dot dot-pending"></span>
+                    <div class="bg-surface rounded-lg p-4 border border-outline-variant/20 bg-gray-50">
+                        <div class="font-semibold text-sm mb-1 text-on-surface">@Model.LatestDirectRequest.Title</div>
+                        <div class="flex items-center gap-2 text-xs text-secondary mb-1 text-gray-600">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
                             @Model.LatestDirectRequest.CustomerName
                         </div>
-                        <div class="meta">
+                        <div class="text-xs text-secondary mb-3 text-gray-600">
                             📍 @Model.LatestDirectRequest.RegionName
                         </div>
-                        <a asp-action="RequestDetail"
-                           asp-route-id="@Model.LatestDirectRequest.RequestId"
-                           class="mini-link">
+                        <a asp-action="RequestDetail" asp-route-id="@Model.LatestDirectRequest.RequestId" class="text-sm font-semibold text-[#003ec7] hover:underline">
                             View Request →
                         </a>
                     </div>
                 }
                 else
                 {
-                    <div class="no-item">No direct requests.</div>
+                    <div class="text-sm text-secondary text-center py-2 text-gray-500">No direct requests.</div>
                 }
             </div>
-
-        </div>
-
-    </div>
-
-    <!-- Image Modal -->
-    <div class="modal fade" id="imgModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-body text-center p-2">
-                    <img id="imgSrc" src="" class="img-fluid rounded"
-                         style="max-height:500px;object-fit:contain;" />
-                </div>
-            </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function openImg(src) {
-            document.getElementById('imgSrc').src = src;
-            new bootstrap.Modal(document.getElementById('imgModal')).show();
+<div id="imgModal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity opacity-0" onclick="closeImg(event)">
+    <div class="bg-white rounded-xl shadow-2xl p-2 max-w-4xl max-h-[90vh] overflow-hidden relative" onclick="event.stopPropagation()">
+        <button onclick="closeImg(event)" class="absolute top-4 right-4 bg-black/50 text-white rounded-full p-1 hover:bg-black transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <img id="imgSrc" src="" class="w-full h-full max-h-[80vh] object-contain rounded-lg" />
+    </div>
+</div>
+
+<script>
+    function openImg(src) {
+        const modal = document.getElementById('imgModal');
+        document.getElementById('imgSrc').src = src;
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.classList.add('opacity-100');
+        }, 10);
+    }
+
+    function closeImg(e) {
+        const modal = document.getElementById('imgModal');
+        modal.classList.remove('opacity-100');
+        modal.classList.add('opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.getElementById('imgSrc').src = '';
+        }, 300);
+    }
+
+    const regionInput = document.getElementById('regionSearchInput');
+    const regionDropdown = document.getElementById('regionDropdown');
+
+    const allRegions = [
+        @foreach (var r in Model.Regions)
+        {
+                <text>{ name: "@Html.Raw(r.RegionName)" },</text>
+        }
+    ];
+
+    regionInput.addEventListener('input', function () {
+        const query = this.value.trim().toLowerCase();
+        regionDropdown.innerHTML = '';
+
+        if (query.length < 1) {
+            regionDropdown.classList.add('hidden');
+            return;
         }
 
+        const filtered = allRegions.filter(r =>
+            r.name.toLowerCase().includes(query));
 
+        if (filtered.length === 0) {
+            regionDropdown.classList.add('hidden');
+            return;
+        }
 
-             const regionInput    = document.getElementById('regionSearchInput');
-        const regionDropdown = document.getElementById('regionDropdown');
+        filtered.forEach(r => {
+            const item = document.createElement('div');
+            item.textContent = r.name;
+            item.className = 'px-4 py-3 text-sm text-on-surface cursor-pointer hover:bg-surface-container-high transition-colors border-b border-outline-variant/10 last:border-0';
 
-        // All regions from server
-               const allRegions = [
-            @foreach (var r in Model.Regions)
-            {
-                    <text>{ name: "@Html.Raw(r.RegionName)" },</text>
-            }
-        ];
-
-        regionInput.addEventListener('input', function () {
-            const query = this.value.trim().toLowerCase();
-            regionDropdown.innerHTML = '';
-
-            if (query.length < 1) {
-                regionDropdown.style.display = 'none';
-                return;
-            }
-
-            const filtered = allRegions.filter(r =>
-                r.name.toLowerCase().includes(query));
-
-            if (filtered.length === 0) {
-                regionDropdown.style.display = 'none';
-                return;
-            }
-
-            filtered.forEach(r => {
-                const item = document.createElement('div');
-                item.textContent = r.name;
-                item.style.cssText = `
-                    padding: 9px 14px;
-                    font-size: 0.85rem;
-                    cursor: pointer;
-                    transition: background 0.1s;
-                `;
-                item.addEventListener('mouseover', () => item.style.background = '#f4f2ee');
-                item.addEventListener('mouseout',  () => item.style.background = '#fff');
-                item.addEventListener('click', () => {
-                    regionInput.value = r.name;
-                    regionDropdown.style.display = 'none';
-                    // Auto submit
-                    regionInput.closest('form').submit();
-                });
-                regionDropdown.appendChild(item);
+            item.addEventListener('click', () => {
+                regionInput.value = r.name;
+                regionDropdown.classList.add('hidden');
+                regionInput.closest('form').submit();
             });
-
-            regionDropdown.style.display = 'block';
+            regionDropdown.appendChild(item);
         });
 
-        // Hide on click outside
-        document.addEventListener('click', function (e) {
-            if (!regionDropdown.contains(e.target) && e.target !== regionInput) {
-                regionDropdown.style.display = 'none';
-            }
-        });
+        regionDropdown.classList.remove('hidden');
+    });
 
-
-    </script>
-</body>
-</html>
+    document.addEventListener('click', function (e) {
+        if (!regionDropdown.contains(e.target) && e.target !== regionInput) {
+            regionDropdown.classList.add('hidden');
+        }
+    });
+</script>

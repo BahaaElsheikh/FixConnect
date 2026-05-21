@@ -4,277 +4,440 @@
     Layout = "_WorkerLayout";
 }
 
-<div class="container py-4">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "surface-variant": "#e0e3e5",
+                    "surface-container-high": "#e6e8ea",
+                    "surface": "#f7f9fb",
+                    "surface-container": "#eceef0",
+                    "on-surface-variant": "#434656",
+                    "outline": "#737688",
+                    "outline-variant": "#c3c5d9",
+                    "background": "#f7f9fb",
+                    "primary": "#003ec7",
+                    "primary-container": "#0052ff",
+                    "on-primary-container": "#dfe3ff",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#191c1e",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a"
+                },
+                "fontFamily": {
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "display-xl": ["Plus Jakarta Sans"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"]
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    .font-plus-jakarta {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 4px 20px rgba(0, 62, 199, 0.04);
+    }
+
+    /* Modal Transitions */
+    .modal-enter {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    .modal-enter-active {
+        opacity: 1;
+        transform: scale(1);
+        transition: all 0.2s ease-out;
+    }
+
+    .modal-exit {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .modal-exit-active {
+        opacity: 0;
+        transform: scale(0.95);
+        transition: all 0.2s ease-in;
+    }
+</style>
+
+<div class="font-plus-jakarta flex-1 py-8 px-4 md:px-8 w-full max-w-[1440px] mx-auto overflow-hidden sm:overflow-visible">
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
+        <div class="mb-6 p-4 bg-[#10b981]/10 border border-[#10b981]/30 rounded-xl text-[#047857] font-body-md text-sm flex items-center gap-3">
+            <span class="material-symbols-outlined text-[#047857]">check_circle</span>
+            @TempData["Success"]
+        </div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">@TempData["Error"]</div>
+        <div class="mb-6 p-4 bg-error-container border border-error/30 rounded-xl text-on-error-container font-body-md text-sm flex items-center gap-3">
+            <span class="material-symbols-outlined text-error">error</span>
+            @TempData["Error"]
+        </div>
     }
 
-    <div class="row g-4">
-
-        <!-- Left: Job Info -->
-        <div class="col-md-4">
-            <div class="card shadow-sm p-4 mb-3">
-                <h6 class="fw-bold mb-3">Job Info</h6>
-
-                <p class="small fw-semibold mb-0">Request</p>
-                <p class="mb-2">@Model.RequestTitle</p>
-
-                <p class="small fw-semibold mb-0">Customer</p>
-                <p class="mb-2">@Model.CustomerName</p>
-
-                <p class="small fw-semibold mb-0">📍 Address</p>
-                <p class="mb-2">@Model.CustomerExactAddress</p>
-
-                <p class="small fw-semibold mb-0">📞 Contact</p>
-                <p class="mb-2">@Model.CustomerContactNumber</p>
-
-                <p class="small fw-semibold mb-0">Estimated Start</p>
-                <p class="mb-2">
-                    @(Model.EstimatedStartTime.HasValue
-                                        ? Model.EstimatedStartTime.Value.ToString("dd MMM yyyy, hh:mm tt")
-                                        : "—")
-                </p>
-
-                <p class="small fw-semibold mb-0">Actual Start</p>
-                <p class="mb-3">
-                    @(Model.ActualStartDate.HasValue
-                                        ? Model.ActualStartDate.Value.ToString("dd MMM yyyy, hh:mm tt")
-                                        : "Not started yet")
-                </p>
-
-                <span class="badge @(Model.Status == "Active"    ? "bg-info text-dark"    :
-                                                                                 Model.Status == "Completed" ? "bg-success" :
-                                                                                 Model.Status == "Disputed" ? "bg-warning text-dark" :
-                                                                                                                "bg-secondary") mb-3">
+    <div class="glass-panel rounded-2xl p-6 md:p-8 mb-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+                @{
+                    string badgeColor = Model.Status == "Active" ? "bg-primary-container text-on-primary" :
+                    Model.Status == "Completed" ? "bg-[#10b981] text-white" :
+                    Model.Status == "Disputed" ? "bg-[#f59e0b] text-white" : "bg-surface-variant text-on-surface-variant";
+                    string badgeIcon = Model.Status == "Active" ? "play_circle" :
+                    Model.Status == "Completed" ? "check_circle" : "info";
+                }
+                <span class="px-4 py-1.5 @badgeColor font-label-md text-sm rounded-full flex items-center gap-1.5 font-bold shadow-sm">
+                    <span class="material-symbols-outlined text-[16px]">@badgeIcon</span>
                     @Model.Status
                 </span>
 
-                <!-- Action Buttons -->
-                @if (Model.CanStart)
-                {
-                    <form asp-action="StartJob" method="post" class="mb-2">
-                        <input type="hidden" name="jobId" value="@Model.JobId" />
-                        <button type="submit" class="btn btn-success w-100"
-                                onclick="return confirm('Start this job now?')">
-                            ▶ Start Job
-                        </button>
-                    </form>
-                }
+                <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant font-caption text-xs rounded-full flex items-center gap-1 break-all">
+                    <span class="material-symbols-outlined text-[14px]">confirmation_number</span>
+                    Job ID: #@Model.JobId
+                </span>
+            </div>
 
-                @if (Model.CanCancel)
-                {
-                    <form asp-action="CancelJob" method="post" class="mb-2">
-                        <input type="hidden" name="jobId" value="@Model.JobId" />
-                        <button type="submit" class="btn btn-outline-danger w-100"
-                                onclick="return confirm('Cancel this job?')">
-                            ✖ Cancel Job
-                        </button>
-                    </form>
-                }
+            <h1 class="font-headline-lg text-2xl md:text-3xl text-on-surface mb-4 font-bold break-words">@Model.RequestTitle</h1>
 
-                @if (Model.CanMarkFinished)
-                {
-                    <form asp-action="MarkAsFinished" method="post">
-                        <input type="hidden" name="jobId" value="@Model.JobId" />
-                        <button type="submit" class="btn btn-warning w-100"
-                                onclick="return confirm('Mark as finished?')">
-                            ✔ Mark As Finished
-                        </button>
-                    </form>
-                }
+            <div class="flex flex-wrap gap-4 md:gap-6 text-on-surface-variant font-body-md text-sm font-medium">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-outline">person</span>
+                    <span class="break-words">@Model.CustomerName</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-outline">location_on</span>
+                    <span class="break-words">@Model.CustomerExactAddress</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-outline">call</span>
+                    <span>@Model.CustomerContactNumber</span>
+                </div>
             </div>
         </div>
 
+        <div class="flex flex-col gap-3 w-full md:w-auto md:min-w-[240px] shrink-0">
+            @if (Model.CanStart)
+            {
+                <form asp-action="StartJob" method="post" class="w-full">
+                    <input type="hidden" name="jobId" value="@Model.JobId" />
+                    <button type="submit" onclick="return confirm('Start this job now?')" class="w-full py-3.5 bg-gradient-to-r from-[#10b981] to-[#059669] text-white font-label-md text-sm rounded-xl shadow-[0_8px_16px_rgba(16,185,129,0.2)] hover:-translate-y-1 transition-all duration-300 flex justify-center items-center gap-2">
+                        <span class="material-symbols-outlined">play_arrow</span>
+                        <span>Start Job</span>
+                    </button>
+                </form>
+            }
+            @if (Model.CanMarkFinished)
+            {
+                <form asp-action="MarkAsFinished" method="post" class="w-full">
+                    <input type="hidden" name="jobId" value="@Model.JobId" />
+                    <button type="submit" onclick="return confirm('Mark as finished?')" class="w-full py-3.5 bg-[#fef3c7] text-[#92400e] border-2 border-[#f59e0b]/30 font-label-md text-sm rounded-xl hover:bg-[#f59e0b] hover:text-white transition-all duration-300 flex justify-center items-center gap-2">
+                        <span class="material-symbols-outlined">done_all</span>
+                        <span>Mark As Finished</span>
+                    </button>
+                </form>
+            }
+            @if (Model.CanCancel)
+            {
+                <form asp-action="CancelJob" method="post" class="w-full">
+                    <input type="hidden" name="jobId" value="@Model.JobId" />
+                    <button type="submit" onclick="return confirm('Cancel this job?')" class="w-full py-3 bg-transparent border-2 border-error text-error font-label-md text-sm rounded-xl hover:bg-error hover:text-white transition-all duration-300 flex justify-center items-center gap-2">
+                        <span class="material-symbols-outlined">close</span>
+                        <span>Cancel Job</span>
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- Right: Invoice -->
-        <div class="col-md-8">
-            <div class="card shadow-sm p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0">Live Invoice</h6>
-                    <span class="fw-bold fs-5">
-                        Total: @((Model.LiveInvoiceTotal + (Model.LaborCost ?? 0)).ToString("0.00")) EGP
-                    </span>
+        <div class="lg:col-span-8 space-y-6 min-w-0">
+            <section class="glass-panel rounded-2xl p-6 md:p-8">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 flex-wrap mb-8 pb-4 border-b border-outline-variant">
+                    <h2 class="font-headline-md text-xl font-bold text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">receipt_long</span>
+                        Live Invoice
+                    </h2>
+                    <div class="bg-primary/10 px-4 py-2 rounded-lg break-words">
+                        <span class="font-label-md text-xs text-primary uppercase tracking-wider block mb-0.5">Total Amount</span>
+                        <span class="font-display-xl text-2xl font-bold text-primary">
+                            @((Model.LiveInvoiceTotal + (Model.LaborCost ?? 0)).ToString("0.00")) EGP
+                        </span>
+                    </div>
                 </div>
 
+                <div class="mb-8 p-5 rounded-xl bg-surface-container border border-outline-variant">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-wrap">
+                        <div class="min-w-0">
+                            <p class="font-label-md text-sm font-bold text-on-surface mb-1">Service Labor Cost</p>
+                            <p class="font-body-md text-sm text-on-surface-variant break-words">Base cost for your labor & time.</p>
+                        </div>
 
-
-                <!-- Labor Cost (Service Price) -->
-                <div class="mb-3">
-                    <p class="small fw-semibold mb-1">Service Labor Cost</p>
-                    @if (Model.LaborCost.HasValue)
-                    {
-                        <p class="fw-bold mb-1">@Model.LaborCost.Value.ToString("0.00") EGP</p>
-                    }
-                    @if (Model.CanMarkFinished || Model.ActualStartDate.HasValue)
-                    {
-                        <form asp-action="SetJobLaborCost" method="post" class="d-flex gap-2 mt-1">
-                            <input type="hidden" name="jobId" value="@Model.JobId" />
-                            <input name="laborCost" type="number" step="0.01" min="0"
-                                   class="form-control form-control-sm"
-                                   placeholder="Set labor cost..."
-                                   value="@Model.LaborCost" />
-                            <button type="submit" class="btn btn-dark btn-sm">Set</button>
-                        </form>
-                    }
+                        @if (Model.CanMarkFinished || Model.ActualStartDate.HasValue)
+                        {
+                            <form asp-action="SetJobLaborCost" method="post" class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto shrink-0">
+                                <input type="hidden" name="jobId" value="@Model.JobId" />
+                                <div class="relative w-full sm:w-40 flex-1">
+                                    <input name="laborCost" type="number" step="0.01" min="0" class="w-full pl-3 pr-10 py-2 rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm" placeholder="Cost..." value="@Model.LaborCost" />
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xs">EGP</span>
+                                </div>
+                                <button type="submit" class="px-4 py-2 bg-on-surface text-white rounded-lg font-label-md text-sm hover:bg-on-surface-variant transition-colors w-full sm:w-auto">Set</button>
+                            </form>
+                        }
+                        else if (Model.LaborCost.HasValue)
+                        {
+                            <span class="font-bold text-lg text-on-surface shrink-0">@Model.LaborCost.Value.ToString("0.00") EGP</span>
+                        }
+                    </div>
                 </div>
 
+                <h3 class="font-label-md text-sm font-bold text-on-surface mb-4">Material & Extra Costs</h3>
 
-                <!-- Invoice Items -->
                 @if (!Model.InvoiceItems.Any())
                 {
-                    <p class="text-muted small">No invoice items yet.</p>
+                    <div class="text-center py-8 bg-surface-container-low rounded-xl border-2 border-dashed border-outline-variant">
+                        <span class="material-symbols-outlined text-outline text-4xl mb-2">inventory_2</span>
+                        <p class="text-on-surface-variant font-body-md text-sm">No extra invoice items added yet.</p>
+                    </div>
                 }
                 else
                 {
-                    <table class="table table-sm mb-3">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Description</th>
-                                <th class="text-end">Cost (EGP)</th>
-                                <th class="text-end">Date</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.InvoiceItems)
-                            {
-                                <tr id="row-@item.ItemId">
-                                    <td>
-                                        <span id="desc-@item.ItemId">@item.Description</span>
-                                    </td>
-                                    <td class="text-end">
-                                        <span id="cost-@item.ItemId">@item.Cost.ToString("0.00")</span>
-                                    </td>
-                                    <td class="text-end text-muted" style="font-size:0.78rem">
-                                        @item.AddedAt.ToString("dd MMM")
-                                    </td>
-                                    <td class="text-end">
-                                        <!-- أضف الشرط هنا -->
-                                        @if (Model.CanMarkFinished)
-                                        {
-                                            <div class="d-flex gap-1 justify-content-end">
-                                                <button class="btn btn-outline-secondary btn-sm"
-                                                        onclick="openEdit(@item.ItemId, '@Html.Raw(item.Description)', @item.Cost)">
-                                                    ✏
-                                                </button>
-                                                <form asp-action="DeleteInvoiceItem" method="post"
-                                                      onsubmit="return confirm('Delete this item?')">
-                                                    <input type="hidden" name="itemId" value="@item.ItemId" />
-                                                    <input type="hidden" name="jobId" value="@Model.JobId" />
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm">🗑</button>
-                                                </form>
-                                            </div>
-                                        }
-                                    </td>
+                    <div class="overflow-x-auto rounded-xl border border-outline-variant mb-6 w-full">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead class="bg-surface-container-high border-b border-outline-variant">
+                                <tr>
+                                    <th class="p-4 font-label-md text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Description</th>
+                                    <th class="p-4 font-label-md text-xs font-semibold text-on-surface-variant uppercase tracking-wider text-right">Cost (EGP)</th>
+                                    <th class="p-4 font-label-md text-xs font-semibold text-on-surface-variant uppercase tracking-wider text-right">Date</th>
+                                    <th class="p-4"></th>
                                 </tr>
-                            }
-                        </tbody>
-                        <tfoot>
-                            <tr class="border-top">
-                                <td class="small text-muted">Service Cost</td>
-                                <td class="text-end small text-muted">
-                                    @((Model.LaborCost ?? 0).ToString("0.00")) EGP
-                                </td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td class="small text-muted">Materials Subtotal</td>
-                                <td class="text-end small text-muted">
-                                    @(Model.InvoiceItems.Sum(i => i.Cost).ToString("0.00")) EGP
-                                </td>
-                                <td></td>
-                            </tr>
-                            <tr class="table-dark">
-                                <td class="fw-bold">Total</td>
-                                <td class="text-end fw-bold">
-                                    @(((Model.LaborCost ?? 0) + Model.InvoiceItems.Sum(i => i.Cost)).ToString("0.00")) EGP
-                                </td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant">
+                                @foreach (var item in Model.InvoiceItems)
+                                {
+                                    <tr class="hover:bg-surface-container-low transition-colors" id="row-@item.ItemId">
+                                        <td class="p-4 font-body-md text-sm text-on-surface font-medium">
+                                            <span id="desc-@item.ItemId">@item.Description</span>
+                                        </td>
+                                        <td class="p-4 font-body-md text-sm text-on-surface font-bold text-right">
+                                            <span id="cost-@item.ItemId">@item.Cost.ToString("0.00")</span>
+                                        </td>
+                                        <td class="p-4 font-body-md text-xs text-on-surface-variant text-right">
+                                            @item.AddedAt.ToString("dd MMM yyyy")
+                                        </td>
+                                        <td class="p-4 text-right">
+                                            @if (Model.CanMarkFinished)
+                                            {
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <button type="button" class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" onclick="openEdit(@item.ItemId, '@Html.Raw(item.Description)', @item.Cost)">
+                                                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                                                    </button>
+                                                    <form asp-action="DeleteInvoiceItem" method="post" onsubmit="return confirm('Delete this item?')" class="inline-block">
+                                                        <input type="hidden" name="itemId" value="@item.ItemId" />
+                                                        <input type="hidden" name="jobId" value="@Model.JobId" />
+                                                        <button type="submit" class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors">
+                                                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="bg-surface-container-low border-t-2 border-outline-variant font-body-md text-sm">
+                                <tr>
+                                    <td class="p-4 text-on-surface-variant">Service Cost Subtotal</td>
+                                    <td class="p-4 text-right font-semibold text-on-surface">@((Model.LaborCost ?? 0).ToString("0.00")) EGP</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 text-on-surface-variant">Materials Subtotal</td>
+                                    <td class="p-4 text-right font-semibold text-on-surface">@(Model.InvoiceItems.Sum(i => i.Cost).ToString("0.00")) EGP</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 }
 
-                <!-- Add Invoice Item -->
                 @if (Model.Status == "Active" && Model.ActualStartDate.HasValue)
                 {
-                    <hr />
-                    <h6 class="fw-semibold mb-3">+ Add Invoice Item</h6>
-                    <form asp-action="AddInvoiceItem" method="post">
-                        <input type="hidden" name="JobId" value="@Model.JobId" />
-                        <div class="row g-2">
-                            <div class="col-7">
-                                <input name="Description" class="form-control"
-                                       placeholder="e.g. 3kg of Cement" required />
+                    <div class="mt-6 pt-6 border-t border-outline-variant">
+                        <h4 class="font-label-md text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                            Add New Item
+                        </h4>
+                        <form asp-action="AddInvoiceItem" method="post" class="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
+                            <input type="hidden" name="JobId" value="@Model.JobId" />
+                            <div class="flex-1 w-full sm:w-auto">
+                                <input name="Description" class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm bg-surface" placeholder="e.g. 3kg of Cement" required />
                             </div>
-                            <div class="col-3">
-                                <input name="Cost" type="number" step="0.01" min="0"
-                                       class="form-control" placeholder="Cost" required />
+                            <div class="w-full sm:w-40 relative shrink-0">
+                                <input name="Cost" type="number" step="0.01" min="0" class="w-full pl-4 pr-10 py-2.5 rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm bg-surface" placeholder="Cost" required />
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xs font-bold">EGP</span>
                             </div>
-                            <div class="col-2">
-                                <button type="submit" class="btn btn-dark w-100">+</button>
-                            </div>
-                        </div>
-                    </form>
+                            <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-on-surface text-white rounded-xl font-label-md text-sm hover:bg-on-surface-variant transition-colors flex items-center justify-center gap-2 shrink-0">
+                                Add
+                            </button>
+                        </form>
+                    </div>
                 }
+            </section>
+        </div>
 
+        <div class="lg:col-span-4 space-y-6">
 
+            <div class="glass-panel rounded-2xl p-6 bg-gradient-to-br from-surface to-surface-container-low border-primary/20 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-5">
+                    <span class="material-symbols-outlined text-[100px] text-primary">schedule</span>
+                </div>
+                <h3 class="font-headline-md text-lg font-bold text-on-surface mb-6 relative z-10">Job Timeline</h3>
 
+                <div class="space-y-5 relative z-10">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                            <span class="material-symbols-outlined text-[20px]">event_upcoming</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-label-md text-xs text-on-surface-variant uppercase tracking-wider mb-1">Estimated Start</p>
+                            <p class="font-body-md text-sm font-bold text-on-surface break-words">
+                                @(Model.EstimatedStartTime.HasValue? Model.EstimatedStartTime.Value.ToString("dd MMM yyyy, hh:mm tt") : "—")
+                            </p>
+                        </div>
+                    </div>
 
+                    <div class="w-0.5 h-6 bg-outline-variant ml-5"></div>
 
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-[#10b981]/10 flex items-center justify-center text-[#10b981] shrink-0">
+                            <span class="material-symbols-outlined text-[20px]">flag</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-label-md text-xs text-on-surface-variant uppercase tracking-wider mb-1">Actual Start</p>
+                            <p class="font-body-md text-sm font-bold text-on-surface break-words">
+                                @(Model.ActualStartDate.HasValue? Model.ActualStartDate.Value.ToString("dd MMM yyyy, hh:mm tt") : "Not started yet")
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <div class="glass-panel rounded-2xl p-6">
+                <h3 class="font-headline-md text-lg font-bold text-on-surface mb-6">Client Details</h3>
+                <div class="flex items-center gap-4 mb-6 pb-6 border-b border-outline-variant">
+                    <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-headline-md text-lg shrink-0 uppercase">
+                        @(string.IsNullOrEmpty(Model.CustomerName) ? "C" : Model.CustomerName.Substring(0, 1))
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-label-md text-sm font-bold text-on-surface break-words">@Model.CustomerName</h4>
+                        <div class="flex items-center gap-1 mt-1 font-body-md text-sm text-on-surface-variant flex-wrap">
+                            <span class="material-symbols-outlined text-[16px] shrink-0">call</span>
+                            <span class="break-words">@Model.CustomerContactNumber</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-[#fef3c7]/50 border border-[#f59e0b]/30 rounded-xl p-4 flex gap-3">
+                    <span class="material-symbols-outlined text-[#f59e0b] shrink-0">gpp_maybe</span>
+                    <p class="font-caption text-xs font-medium text-[#92400e]">
+                        Ensure all extra costs and materials are added to the live invoice before marking the job as finished to guarantee secure platform payment.
+                    </p>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
-<!-- Edit Invoice Item Modal -->
-<div class="modal fade" id="editInvoiceModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+<div id="editInvoiceModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] hidden flex items-center justify-center transition-opacity duration-200 opacity-0" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="modalContent" class="bg-surface rounded-2xl shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-200">
         <form asp-action="EditInvoiceItem" method="post">
-            <div class="modal-content shadow">
-                <div class="modal-header border-0">
-                    <h6 class="modal-title fw-bold">Edit Invoice Item</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="ItemId" id="editItemId" />
-                    <input type="hidden" name="JobId" value="@Model.JobId" />
+            <div class="flex items-center justify-between p-5 border-b border-outline-variant">
+                <h3 class="font-headline-md text-lg font-bold text-on-surface" id="modal-title">Edit Invoice Item</h3>
+                <button type="button" onclick="closeEdit()" class="text-on-surface-variant hover:text-error transition-colors rounded-full p-1 hover:bg-error/10">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <input name="Description" id="editDesc"
-                               class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Cost (EGP)</label>
-                        <input name="Cost" id="editCost" type="number"
-                               step="0.01" min="0" class="form-control" required />
-                    </div>
+            <div class="p-6 space-y-4">
+                <input type="hidden" name="ItemId" id="editItemId" />
+                <input type="hidden" name="JobId" value="@Model.JobId" />
+
+                <div>
+                    <label class="block font-label-md text-sm font-bold text-on-surface-variant mb-1">Description</label>
+                    <input name="Description" id="editDesc" class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm bg-background" required />
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-secondary"
-                            data-bs-dismiss="modal">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-dark">Save</button>
+                <div>
+                    <label class="block font-label-md text-sm font-bold text-on-surface-variant mb-1">Cost (EGP)</label>
+                    <input name="Cost" id="editCost" type="number" step="0.01" min="0" class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm bg-background" required />
                 </div>
+            </div>
+
+            <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3 bg-surface-container-low rounded-b-2xl flex-wrap">
+                <button type="button" onclick="closeEdit()" class="px-5 py-2 rounded-xl font-label-md text-sm text-on-surface-variant hover:bg-surface-variant transition-colors border border-outline-variant bg-surface w-full sm:w-auto">
+                    Cancel
+                </button>
+                <button type="submit" class="px-5 py-2 rounded-xl font-label-md text-sm bg-primary text-white hover:bg-primary-container transition-colors shadow-sm w-full sm:w-auto">
+                    Save Changes
+                </button>
             </div>
         </form>
     </div>
 </div>
 
-<script>
-    function openEdit(itemId, description, cost) {
-        document.getElementById('editItemId').value = itemId;
-        document.getElementById('editDesc').value   = description;
-        document.getElementById('editCost').value   = cost;
-        new bootstrap.Modal(document.getElementById('editInvoiceModal')).show();
-    }
-</script>
+@section Scripts {
+    <script>
+        const modal = document.getElementById('editInvoiceModal');
+        const modalContent = document.getElementById('modalContent');
+
+        function openEdit(itemId, description, cost) {
+            document.getElementById('editItemId').value = itemId;
+            document.getElementById('editDesc').value = description;
+            document.getElementById('editCost').value = cost;
+
+            modal.classList.remove('hidden');
+            // Trigger reflow
+            void modal.offsetWidth;
+
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-95');
+        }
+
+        function closeEdit() {
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200); // Matches transition duration
+        }
+
+        // Close on backdrop click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeEdit();
+        });
+    </script>
+}

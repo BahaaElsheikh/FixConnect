@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Api\" />
+    <Folder Include="wwwroot\uploads\Default\" />
   </ItemGroup>
 
 </Project>

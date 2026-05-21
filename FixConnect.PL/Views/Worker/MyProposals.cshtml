@@ -4,63 +4,281 @@
     Layout = "_WorkerLayout";
 }
 
+<link href="https://fonts.googleapis.com" rel="preconnect" />
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "on-tertiary-container": "#d6e6ff",
+                    "on-error": "#ffffff",
+                    "surface-container": "#eceef0",
+                    "surface-tint": "#004ced",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "on-primary-container": "#dfe3ff",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-surface-variant": "#434656",
+                    "surface-dim": "#d8dadc",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#191c1e",
+                    "primary-fixed-dim": "#b7c4ff",
+                    "inverse-primary": "#b7c4ff",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#0052ff",
+                    "surface": "#f7f9fb",
+                    "secondary": "#5d5e62",
+                    "secondary-fixed": "#e2e2e6",
+                    "outline-variant": "#c3c5d9",
+                    "background": "#f7f9fb",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-primary-fixed": "#001452",
+                    "on-primary": "#ffffff",
+                    "tertiary": "#3f4f65",
+                    "on-surface": "#191c1e",
+                    "secondary-fixed-dim": "#c6c6ca",
+                    "on-secondary-fixed": "#1a1c1f",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#eff1f3",
+                    "surface-variant": "#e0e3e5",
+                    "tertiary-fixed": "#d3e4fe",
+                    "tertiary-container": "#57677e",
+                    "surface-container-low": "#f2f4f6",
+                    "on-secondary-container": "#616266",
+                    "on-secondary-fixed-variant": "#45474a",
+                    "inverse-surface": "#2d3133",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#0038b6",
+                    "surface-bright": "#f7f9fb",
+                    "primary": "#003ec7",
+                    "outline": "#737688",
+                    "secondary-container": "#dfdfe3",
+                    "primary-fixed": "#dde1ff"
+                },
+                "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+                "spacing": {
+                    "stack-lg": "48px",
+                    "gutter": "24px",
+                    "stack-md": "24px",
+                    "section-padding": "64px",
+                    "container-margin": "32px",
+                    "base": "8px",
+                    "stack-sm": "12px"
+                },
+                "fontFamily": {
+                    "caption": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "display-xl": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"]
+                },
+                "fontSize": {
+                    "caption": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                    "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                    "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                    "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                    "display-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                    "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                    "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
 
-<div class="container py-4">
-    <h5 class="fw-bold mb-4">My Proposals</h5>
+    .gradient-primary {
+        background: linear-gradient(135deg, #0052ff 0%, #00a3ff 100%);
+    }
+</style>
+
+<div class="p-stack-md md:p-stack-lg flex-1 min-w-0 font-body-md antialiased text-on-surface">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-stack-lg gap-4">
+        <div>
+            <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">My Proposals</h2>
+            <p class="font-body-md text-body-md text-secondary">Track and manage your active bids across all clients.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-low border border-outline-variant/30 text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-highest transition-colors">
+                <span class="material-symbols-outlined text-[18px]">filter_list</span>
+                Filter
+            </button>
+            <div class="relative hidden sm:block">
+                <select class="appearance-none bg-surface-container-lowest border border-outline-variant/50 text-on-surface font-label-md text-label-md rounded-lg px-4 py-2.5 pr-10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                    <option>Sort by: Newest</option>
+                    <option>Sort by: Value (High to Low)</option>
+                    <option>Sort by: Status</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none">expand_more</span>
+            </div>
+        </div>
+    </div>
 
     @if (!Model.Proposals.Any())
     {
-        <div class="text-center text-muted py-5">No proposals sent yet.</div>
+        <div class="text-center bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-12 shadow-sm max-w-md mx-auto my-12">
+            <span class="material-symbols-outlined text-4xl text-secondary mb-3">description</span>
+            <p class="font-body-lg text-body-lg text-on-surface font-medium mb-1">No proposals sent yet.</p>
+            <p class="font-caption text-caption text-secondary">When you submit proposals to client requests, they will appear here.</p>
+        </div>
     }
     else
     {
-        <div class="card shadow-sm">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Request</th>
-                            <th>Customer</th>
-                            <th>Labor</th>
-                            <th>Material</th>
-                            <th>Duration</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var p in Model.Proposals)
-                        {
-                            <tr>
-                                <td class="fw-semibold small">@p.RequestTitle</td>
-                                <td class="small">@p.CustomerName</td>
-                                <td class="small">@(p.LaborCost?.ToString("0.00") ?? "—")</td>
-                                <td class="small">@(p.MaterialCost?.ToString("0.00") ?? "—")</td>
-                                <td class="small">@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")</td>
-                                <td>
-                                    <span class="badge @(p.Status == "Pending"  ? "bg-warning text-dark" :
-                                                                                                   p.Status == "Accepted" ? "bg-success" :
-                                                                                                   p.Status == "Rejected" ? "bg-danger" :
-                                                                                                                             "bg-secondary")">
-                                @p.Status
-                            </span>
-                        </td>
-                        <td>
+        <div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-gutter">
+            @foreach (var p in Model.Proposals)
+            {
+                <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-stack-md shadow-sm relative overflow-hidden group flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-label-md text-label-md shadow-sm font-bold">
+                                    @(!string.IsNullOrEmpty(p.CustomerName) && p.CustomerName.Length >= 2 ? p.CustomerName.Substring(0, 2).ToUpper() : "FI")
+                                </div>
+                                <div>
+                                    <h3 class="font-label-md text-label-md text-on-surface">@p.CustomerName</h3>
+                                    <p class="font-caption text-caption text-secondary">Customer</p>
+                                </div>
+                            </div>
+
                             @if (p.Status == "Pending")
-                                    {
-                                        <a asp-action="SubmitProposal"
-                                           asp-route-requestId="@p.RequestId"
-                                           asp-route-proposalId="@p.ProposalId"
-                                           class="btn btn-outline-secondary btn-sm">
-                                            Edit
-                                        </a>
-                                    }
-                                </td>
-                            </tr>
+                            {
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full font-caption text-caption bg-[#f59e0b]/10 text-[#d97706] border border-[#f59e0b]/20">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b] mr-1.5"></span>
+                                    @p.Status
+                                </span>
+                            }
+                            else if (p.Status == "Accepted")
+                            {
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full font-caption text-caption bg-[#10b981]/10 text-[#059669] border border-[#10b981]/20">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] mr-1.5"></span>
+                                    @p.Status
+                                </span>
+                            }
+                            else if (p.Status == "Rejected")
+                            {
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full font-caption text-caption bg-[#ba1a1a]/10 text-[#ba1a1a] border border-[#ba1a1a]/20">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#ba1a1a] mr-1.5"></span>
+                                    @p.Status
+                                </span>
+                            }
+                            else if (p.Status == "Counter-offer")
+                            {
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full font-caption text-caption bg-[#f59e0b]/10 text-[#d97706] border border-[#f59e0b]/20">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b] mr-1.5"></span>
+                                    @p.Status
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full font-caption text-caption bg-secondary-container text-on-secondary-container border border-outline-variant/30">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-secondary mr-1.5"></span>
+                                    @p.Status
+                                </span>
+                            }
+                        </div>
+
+                        <div class="mb-6">
+                            <h4 class="font-headline-md text-body-lg font-semibold text-on-surface mb-1 break-words">@p.RequestTitle</h4>
+                            <p class="font-caption text-caption text-secondary flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                Sent Proposal
+                            </p>
+                        </div>
+
+                        <div class="bg-surface-container-low rounded-lg p-4 mb-6 relative">
+                            @if (p.Status == "Counter-offer")
+                            {
+                                <div class="absolute -right-2 -top-2 bg-[#f59e0b] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm transform rotate-12">CLIENT REVISED</div>
+                            }
+
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-caption text-caption text-secondary">Labor Cost</span>
+                                <span class="font-body-md text-body-md text-on-surface font-medium">
+                                    @(p.LaborCost.HasValue? p.LaborCost.Value.ToString("C") : "—")
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-caption text-caption text-secondary">Material Cost</span>
+                                <span class="font-body-md text-body-md text-on-surface font-medium">
+                                    @(p.MaterialCost.HasValue? p.MaterialCost.Value.ToString("C") : "—")
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="font-caption text-caption text-secondary">Estimated Duration</span>
+                                <span class="font-body-md text-body-md text-on-surface font-medium">
+                                    @(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")
+                                </span>
+                            </div>
+                            <div class="border-t border-outline-variant/30 pt-3 flex justify-between items-center">
+                                <span class="font-label-md text-label-md text-on-surface">Total Value</span>
+                                <span class="font-headline-md text-[20px] font-bold text-primary">
+                                    @(((p.LaborCost ?? 0) + (p.MaterialCost ?? 0)).ToString("C"))
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 mt-auto">
+                        @if (p.Status == "Pending")
+                        {
+                            <a asp-action="SubmitProposal"
+                               asp-route-requestId="@p.RequestId"
+                               asp-route-proposalId="@p.ProposalId"
+                               class="flex-1 text-center py-2.5 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant/50 text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors no-underline">
+                                Edit Proposal
+                            </a>
+                            @* <button type="button" class="flex-1 py-2.5 px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary/90 transition-colors">
+                                View Details
+                            </button> *@
                         }
-                    </tbody>
-                </table>
-            </div>
+                        else if (p.Status == "Counter-offer")
+                        {
+                            <button type="button" class="flex-1 py-2.5 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant/50 text-error font-label-md text-label-md hover:bg-error-container/20 transition-colors">
+                                Decline
+                            </button>
+                            <button type="button" class="flex-1 py-2.5 px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary/90 transition-colors">
+                                Review & Accept
+                            </button>
+                        }
+                        else if (p.Status == "Accepted")
+                        {
+                            <a asp-controller="Worker" asp-action="Jobs" class="w-full py-2.5 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant/50 text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 no-underline">
+                                <span class="material-symbols-outlined text-[18px]">handyman</span>
+                                Go to Workspace
+                            </a>
+                        }
+                        else
+                        {
+                            <button type="button" class="w-full py-2.5 px-4 rounded-lg bg-surface-container-low text-secondary font-label-md text-label-md cursor-not-allowed" disabled>
+                                No Actions Available
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     }
 </div>

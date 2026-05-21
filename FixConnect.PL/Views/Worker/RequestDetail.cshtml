@@ -4,68 +4,209 @@
     Layout = "_WorkerLayout";
 }
 
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
-<div class="container py-4" style="max-width:720px">
-    <div class="card shadow-sm p-4 mb-4">
-        <h5 class="fw-bold mb-1">@Model.Title</h5>
-        <div class="d-flex gap-2 mb-3 flex-wrap">
-            <span class="badge bg-light text-dark border">📍 @Model.RegionName</span>
-            @if (!string.IsNullOrEmpty(Model.SpecialtyName))
-            {
-                <span class="badge bg-light text-dark border">🔧 @Model.SpecialtyName</span>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "inverse-surface": "#2d3133",
+                    "on-surface": "#191c1e",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#004ced",
+                    "surface-variant": "#e0e3e5",
+                    "surface-container-high": "#e6e8ea",
+                    "surface": "#f7f9fb",
+                    "on-primary-fixed": "#001452",
+                    "surface-container": "#eceef0",
+                    "inverse-on-surface": "#eff1f3",
+                    "tertiary": "#3f4f65",
+                    "on-surface-variant": "#434656",
+                    "background": "#f7f9fb",
+                    "primary": "#003ec7",
+                    "on-primary": "#ffffff"
+                },
+                "fontFamily": {
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "display-xl": ["Plus Jakarta Sans"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"]
+                }
             }
-            <small class="text-muted">by @Model.CustomerName</small>
+        }
+    }
+</script>
+
+<style>
+    .worker-portal-body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 4px 20px rgba(0, 62, 199, 0.04);
+    }
+</style>
+
+<div class="worker-portal-body bg-background text-on-surface min-h-screen pt-8 pb-16 px-4 md:px-8 w-full max-w-[1440px] mx-auto overflow-hidden">
+
+    <div class="flex items-center gap-2 text-on-surface-variant mb-6 w-full">
+        <a href="#" class="font-caption text-[12px] hover:text-primary transition-colors shrink-0">Job Feed</a>
+        <span class="material-symbols-outlined text-[16px] shrink-0">chevron_right</span>
+        <span class="font-caption text-[12px] text-on-surface truncate">@Model.Title</span>
+    </div>
+
+    <div class="glass-panel rounded-2xl p-6 md:p-8 mb-8 flex flex-col md:flex-row md:items-start justify-between gap-6 overflow-hidden">
+        <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+                @if (!string.IsNullOrEmpty(Model.SpecialtyName))
+                {
+                    <span class="px-3 py-1 bg-primary/10 text-primary text-[12px] font-medium rounded-full flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">build</span>
+                        @Model.SpecialtyName
+                    </span>
+                }
+                <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-[12px] font-medium rounded-full flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">location_on</span>
+                    @Model.RegionName
+                </span>
+            </div>
+
+            <h1 class="text-[24px] md:text-[32px] font-bold text-on-surface break-words">@Model.Title</h1>
         </div>
 
-        <p class="text-muted">@Model.Description</p>
+        <div class="flex flex-col gap-4 min-w-[240px] shrink-0">
+            @if (Model.AlreadyBid && Model.ExistingProposal != null)
+            {
+                <a asp-action="SubmitProposal"
+                   asp-route-requestId="@Model.RequestId"
+                   asp-route-proposalId="@Model.ExistingProposal.ProposalId"
+                   class="w-full py-4 bg-gradient-to-r from-primary to-[#00d4ff] text-on-primary text-[14px] font-semibold rounded-xl shadow-[0_8px_16px_rgba(0,62,199,0.2)] hover:-translate-y-1 transition-all duration-300 flex justify-center items-center gap-2 no-underline">
+                    <span>Edit Proposal</span>
+                    <span class="material-symbols-outlined">edit</span>
+                </a>
+            }
+            else
+            {
+                <a asp-action="SubmitProposal"
+                   asp-route-requestId="@Model.RequestId"
+                   class="w-full py-4 bg-gradient-to-r from-primary to-[#00d4ff] text-on-primary text-[14px] font-semibold rounded-xl shadow-[0_8px_16px_rgba(0,62,199,0.2)] hover:-translate-y-1 transition-all duration-300 flex justify-center items-center gap-2 no-underline">
+                    <span>Send Proposal</span>
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+            }
+        </div>
+    </div>
 
-        @if (Model.ImagePaths.Any())
-        {
-            <div class="d-flex flex-wrap gap-2 mb-3">
-                @foreach (var img in Model.ImagePaths)
-                {
-                    <img src="@img"
-                         style="width:100px;height:100px;object-fit:cover;border-radius:6px;cursor:pointer"
-                         onclick="openImg('@img')" />
-                }
-            </div>
-        }
-
-        @if (Model.AlreadyBid && Model.ExistingProposal != null)
-        {
-            <div class="alert alert-success">
-                <strong>Your Proposal:</strong>
-                Labor: @Model.ExistingProposal.LaborCost EGP |
-                Material: @Model.ExistingProposal.MaterialCost EGP |
-                Duration: @Model.ExistingProposal.DurationEstimate days |
-                Status: <span class="badge bg-success">@Model.ExistingProposal.Status</span>
-                <div class="mt-2">
-                    <a asp-action="SubmitProposal"
-                       asp-route-requestId="@Model.RequestId"
-                       asp-route-proposalId="@Model.ExistingProposal.ProposalId"
-                       class="btn btn-outline-success btn-sm">
-                        Edit Proposal
-                    </a>
+    @if (Model.AlreadyBid && Model.ExistingProposal != null)
+    {
+        <div class="bg-[#dcfce7]/50 border border-[#22c55e]/30 rounded-2xl p-6 mb-8 overflow-hidden">
+            <h3 class="text-[20px] font-semibold text-[#166534] mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">check_circle</span>
+                Your Submitted Proposal
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    <div class="text-[12px] font-medium text-[#15803d]">Labor Cost</div>
+                    <div class="text-[16px] font-bold text-[#166534] break-words">@Model.ExistingProposal.LaborCost EGP</div>
+                </div>
+                <div>
+                    <div class="text-[12px] font-medium text-[#15803d]">Material Cost</div>
+                    <div class="text-[16px] font-bold text-[#166534] break-words">@Model.ExistingProposal.MaterialCost EGP</div>
+                </div>
+                <div>
+                    <div class="text-[12px] font-medium text-[#15803d]">Duration Estimate</div>
+                    <div class="text-[16px] font-bold text-[#166534] break-words">@Model.ExistingProposal.DurationEstimate days</div>
+                </div>
+                <div>
+                    <div class="text-[12px] font-medium text-[#15803d]">Status</div>
+                    <span class="inline-block px-3 py-1 bg-[#22c55e] text-white text-[12px] font-bold rounded-full mt-1 break-words">@Model.ExistingProposal.Status</span>
                 </div>
             </div>
-        }
-        else
-        {
-            <a asp-action="SubmitProposal" asp-route-requestId="@Model.RequestId"
-               class="btn btn-dark w-100">
-                Send Proposal
-            </a>
-        }
+        </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <div class="lg:col-span-8 space-y-6 min-w-0">
+
+            <section class="glass-panel rounded-2xl p-6 md:p-8 overflow-hidden">
+                <h2 class="text-[24px] font-semibold text-on-surface mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">description</span>
+                    About the Job
+                </h2>
+                <div class="text-[16px] text-on-surface-variant space-y-4 whitespace-pre-line break-words">
+                    @Model.Description
+                </div>
+            </section>
+
+            @if (Model.ImagePaths.Any())
+            {
+                <section class="glass-panel rounded-2xl p-6 md:p-8">
+                    <h2 class="text-[24px] font-semibold text-on-surface mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">photo_library</span>
+                        Site Photos
+                    </h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        @foreach (var img in Model.ImagePaths)
+                        {
+                            <div class="aspect-square rounded-xl overflow-hidden bg-surface-container cursor-pointer group relative" onclick="openImg('@img')">
+                                <img alt="Job image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="@img" />
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">zoom_in</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+        </div>
+
+        <div class="lg:col-span-4 space-y-6 min-w-0">
+
+            <div class="glass-panel rounded-2xl p-6 overflow-hidden">
+                <h3 class="text-[24px] font-semibold text-on-surface mb-6">About the Client</h3>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary text-[24px] font-semibold shrink-0">
+                        @(string.IsNullOrEmpty(Model.CustomerName) ? "C" : Model.CustomerName.Substring(0, 1).ToUpper())
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="text-[16px] font-semibold text-on-surface truncate block">@Model.CustomerName</h4>
+                        <div class="text-[12px] font-medium text-on-surface-variant">Registered Customer</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-[#fef3c7]/50 border border-[#f59e0b]/30 rounded-2xl p-4 flex gap-3">
+                <span class="material-symbols-outlined text-[#f59e0b] shrink-0">warning</span>
+                <p class="text-[12px] font-medium text-[#92400e]">
+                    Never start working before payment is secured in escrow. Report any client asking for communication outside the FixConnect platform.
+                </p>
+            </div>
+
+        </div>
     </div>
 </div>
 
-<!-- Image Zoom Modal -->
 <div class="modal fade" id="imgModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-body text-center p-2">
-                <img id="imgSrc" src="" class="img-fluid rounded"
-                     style="max-height:500px;object-fit:contain;" />
+        <div class="modal-content border-0 bg-transparent">
+            <div class="modal-body text-center p-2 relative">
+                <button type="button" class="absolute top-0 right-0 m-4 text-white hover:text-gray-300 z-50" data-bs-dismiss="modal">
+                    <span class="material-symbols-outlined text-[32px]">close</span>
+                </button>
+                <img id="imgSrc" src="" class="img-fluid rounded shadow-2xl" style="max-height:80vh;object-fit:contain;margin:0 auto;" />
             </div>
         </div>
     </div>
@@ -74,6 +215,8 @@
 <script>
     function openImg(src) {
         document.getElementById('imgSrc').src = src;
-        new bootstrap.Modal(document.getElementById('imgModal')).show();
+        // Assuming bootstrap is provided by the _WorkerLayout
+        var myModal = new bootstrap.Modal(document.getElementById('imgModal'));
+        myModal.show();
     }
 </script>

@@ -1,50 +1,90 @@
-﻿<div class="d-flex">
-    <nav class="d-flex flex-column flex-shrink-0 p-3 bg-white border-end shadow-sm" style="width: 250px; min-height: 100vh; position: fixed;">
-        <a class="navbar-brand fw-bold mb-4 fs-4 text-center" href="#">FixConnect</a>
+﻿@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
 
-        <div class="nav nav-pills flex-column mb-auto gap-2">
-            @{
-                var action = ViewContext.RouteData.Values["action"]?.ToString();
-            }
+    // Helper functions to keep HTML clean
+    string GetNavClass(string targetAction)
+    {
+        return action == targetAction
+            ? "flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg border-l-4 border-primary"
+            : "flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container hover:text-primary transition-all rounded-lg hover:translate-x-1 duration-200";
+    }
 
-            <a asp-controller="Worker" asp-action="Dashboard"
-               class="nav-link @(action == "Dashboard" ? "active bg-dark text-white" : "text-muted")">
-                🏠 Job Feed
-            </a>
+    string GetIconFill(string targetAction)
+    {
+        return action == targetAction ? "font-variation-settings: 'FILL' 1;" : "";
+    }
+}
 
-            <a asp-controller="Worker" asp-action="DirectRequests"
-               class="nav-link @(action == "DirectRequests" ? "active bg-dark text-white" : "text-muted")">
-                📩 Direct Requests
-            </a>
+<nav class="md:hidden fixed top-0 w-full z-50 flex justify-between items-center px-4 h-16 bg-surface-container-lowest/80 backdrop-blur-md shadow-sm">
+    <div class="flex items-center gap-4">
+        <span class="material-symbols-outlined text-on-surface cursor-pointer">menu</span>
+        <span class="font-headline-md text-headline-md font-bold text-primary">FixConnect</span>
+    </div>
+    <div class="flex items-center gap-4 text-primary">
+        <span class="material-symbols-outlined hover:bg-surface-container-low transition-colors rounded-full p-2 cursor-pointer">notifications</span>
+        <img alt="Worker profile avatar" class="w-8 h-8 rounded-full border border-outline-variant cursor-pointer" src="~/uploads/ProfilePictures/.png" />
+    </div>
+</nav>
 
-            <a asp-controller="Worker" asp-action="MyProposals"
-               class="nav-link @(action == "MyProposals" ? "active bg-dark text-white" : "text-muted")">
-                📝 My Proposals
-            </a>
+<aside class="hidden md:flex flex-col h-screen w-64 shrink-0 bg-surface-container-lowest/90 backdrop-blur-xl border-r border-outline-variant/30 shadow-lg shadow-primary/5 py-8 px-4 gap-4 z-40 relative">
 
-            <a asp-controller="Worker" asp-action="Jobs"
-               class="nav-link @(action == "Jobs" ? "active bg-dark text-white" : "text-muted")">
-                🔨 My Jobs
-            </a>
+    <div class="px-4 mb-6">
+        <h1 class="font-headline-md text-headline-md font-extrabold text-primary mb-1">FixConnect</h1>
 
-            <a asp-controller="Worker" asp-action="Profile"
-               class="nav-link @(action == "Profile" ? "active bg-dark text-white" : "text-muted")">
-                👤 My Profile
-            </a>
-
-            <a asp-controller="Worker" asp-action="Wallet"
-               class="nav-link @(action == "Wallet" ? "active bg-dark text-white" : "text-muted")">
-                💰 My Wallet
-            </a>
+        <div class="flex items-center gap-3 mt-6 bg-surface-container-low p-3 rounded-xl border border-outline-variant/50">
+            <img alt="Worker profile picture" class="w-10 h-10 rounded-full border border-surface" src="~/uploads/ProfilePictures/default.png" />
+            <div>
+                <div class="font-label-md text-label-md text-on-surface">Worker Portal</div>
+                <div class="font-caption text-caption text-primary flex items-center gap-1">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">verified</span> Verified Contractor
+                </div>
+            </div>
         </div>
+    </div>
 
-        <hr>
+    <nav class="flex flex-col gap-2 flex-1">
+        <a asp-controller="Worker" asp-action="Dashboard" class="@GetNavClass("Dashboard")">
+            <span class="material-symbols-outlined" style="@GetIconFill("Dashboard")">work</span>
+            <span class="font-label-md text-label-md">Job Feed</span>
+        </a>
 
-        <form asp-controller="Account" asp-action="Logout" method="post" class="w-100">
-            <button class="btn btn-outline-danger w-100">Logout</button>
-        </form>
+        <a asp-controller="Worker" asp-action="DirectRequests" class="@GetNavClass("DirectRequests")">
+            <span class="material-symbols-outlined" style="@GetIconFill("DirectRequests")">mail</span>
+            <span class="font-label-md text-label-md">Direct Requests</span>
+        </a>
+
+        <a asp-controller="Worker" asp-action="MyProposals" class="@GetNavClass("MyProposals")">
+            <span class="material-symbols-outlined" style="@GetIconFill("MyProposals")">description</span>
+            <span class="font-label-md text-label-md">My Proposals</span>
+        </a>
+
+        <a asp-controller="Worker" asp-action="Jobs" class="@GetNavClass("Jobs")">
+            <span class="material-symbols-outlined" style="@GetIconFill("Jobs")">assignment_turned_in</span>
+            <span class="font-label-md text-label-md">My Jobs</span>
+        </a>
+
+        <a asp-controller="Worker" asp-action="Profile" class="@GetNavClass("Profile")">
+            <span class="material-symbols-outlined" style="@GetIconFill("Profile")">person</span>
+            <span class="font-label-md text-label-md">My Profile</span>
+        </a>
+
+        <a asp-controller="Worker" asp-action="Wallet" class="@GetNavClass("Wallet")">
+            <span class="material-symbols-outlined" style="@GetIconFill("Wallet")">account_balance_wallet</span>
+            <span class="font-label-md text-label-md">My Wallet</span>
+        </a>
     </nav>
 
-    <main style="margin-left: 250px; width: 100%; padding: 20px;">
-    </main>
-</div>
+    <div class="flex flex-col gap-2 pt-4 border-t border-outline-variant/30 mt-auto">
+        <a href="#" class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container hover:text-primary transition-all rounded-lg">
+            <span class="material-symbols-outlined">help</span>
+            <span class="font-label-md text-label-md">Support</span>
+        </a>
+
+        <form asp-controller="Account" asp-action="Logout" method="post" class="w-full m-0 p-0">
+            <button type="submit" class="w-full flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container hover:text-error transition-all rounded-lg text-left">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="font-label-md text-label-md">Logout</span>
+            </button>
+        </form>
+    </div>
+</aside>

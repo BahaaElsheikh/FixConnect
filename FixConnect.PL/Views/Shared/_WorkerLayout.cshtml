@@ -1,20 +1,146 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>@ViewData["Title"] — FixConnect</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f2f4f6",
+                        "inverse-primary": "#b7c4ff",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed": "#e2e2e6",
+                        "on-tertiary-container": "#d6e6ff",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "on-primary-container": "#dfe3ff",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-secondary-fixed-variant": "#45474a",
+                        "secondary-container": "#dfdfe3",
+                        "surface": "#f7f9fb",
+                        "outline": "#737688",
+                        "surface-dim": "#d8dadc",
+                        "primary-fixed": "#dde1ff",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#0052ff",
+                        "on-primary-fixed": "#001452",
+                        "on-secondary-fixed": "#1a1c1f",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#d3e4fe",
+                        "surface-tint": "#004ced",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "background": "#f7f9fb",
+                        "primary": "#003ec7",
+                        "surface-bright": "#f7f9fb",
+                        "secondary-fixed-dim": "#c6c6ca",
+                        "secondary": "#5d5e62",
+                        "on-secondary-container": "#616266",
+                        "outline-variant": "#c3c5d9",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#434656",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-surface": "#191c1e",
+                        "on-primary-fixed-variant": "#0038b6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#57677e",
+                        "on-background": "#191c1e",
+                        "tertiary": "#3f4f65",
+                        "surface-container-high": "#e6e8ea"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "base": "8px",
+                        "stack-sm": "12px",
+                        "stack-md": "24px",
+                        "section-padding": "64px",
+                        "container-margin": "32px",
+                        "stack-lg": "48px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-xl": ["Plus Jakarta Sans"],
+                        "caption": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "caption": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e0e3e5;
+            border-radius: 4px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #c3c5d9;
+            }
+    </style>
 </head>
-<body class="bg-light">
+<body class="bg-background text-on-background font-body-md text-body-md flex h-screen overflow-hidden antialiased">
 
     <partial name="_WorkerNav" />
 
-    <main>
-        @RenderBody()
+    <main class="flex-1 overflow-y-auto relative pt-20 md:pt-0">
+        <div class="absolute top-0 right-0 w-1/2 h-96 bg-gradient-to-bl from-primary-fixed/20 to-transparent rounded-bl-full pointer-events-none blur-3xl"></div>
+
+        <div class="max-w-6xl mx-auto p-4 md:p-8 lg:p-container-margin relative z-10">
+            @RenderBody()
+        </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

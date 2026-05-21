@@ -4,59 +4,333 @@
     Layout = "_WorkerLayout";
 }
 
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com" rel="preconnect" />
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-<div class="container py-4" style="max-width:520px">
-    <h5 class="fw-bold mb-1">
-        @(Model.ProposalId.HasValue ? "Edit Proposal" : "Send Proposal")
-    </h5>
-    <p class="text-muted small mb-4">For: <strong>@Model.RequestTitle</strong></p>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "secondary-fixed-dim": "#c6c6ca",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#e2e2e6",
+                    "on-primary-fixed": "#001452",
+                    "on-secondary-fixed": "#1a1c1f",
+                    "outline": "#737688",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-container": "#dfe3ff",
+                    "surface-tint": "#004ced",
+                    "on-surface": "#191c1e",
+                    "tertiary-container": "#57677e",
+                    "on-surface-variant": "#434656",
+                    "primary": "#003ec7",
+                    "inverse-primary": "#b7c4ff",
+                    "on-background": "#191c1e",
+                    "surface-bright": "#f7f9fb",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e0e3e5",
+                    "primary-fixed": "#dde1ff",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-secondary-container": "#616266",
+                    "tertiary": "#3f4f65",
+                    "surface-container-high": "#e6e8ea",
+                    "surface": "#f7f9fb",
+                    "inverse-surface": "#2d3133",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-secondary-fixed-variant": "#45474a",
+                    "secondary-container": "#dfdfe3",
+                    "surface-container": "#eceef0",
+                    "primary-fixed-dim": "#b7c4ff",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "on-primary-fixed-variant": "#0038b6",
+                    "surface-container-low": "#f2f4f6",
+                    "on-error": "#ffffff",
+                    "primary-container": "#0052ff",
+                    "secondary": "#5d5e62",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#d3e4fe",
+                    "outline-variant": "#c3c5d9",
+                    "on-tertiary-container": "#d6e6ff",
+                    "surface-variant": "#e0e3e5",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "background": "#f7f9fb",
+                    "surface-dim": "#d8dadc",
+                    "on-secondary": "#ffffff"
+                },
+                "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+                "spacing": {
+                    "section-padding": "64px",
+                    "base": "8px",
+                    "stack-sm": "12px",
+                    "container-margin": "32px",
+                    "stack-md": "24px",
+                    "stack-lg": "48px",
+                    "gutter": "24px"
+                },
+                "fontFamily": {
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "display-xl": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "caption": ["Plus Jakarta Sans"]
+                }
+            },
+        },
+    }
+</script>
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
+<style>
+    .proposal-portal-body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
+    .shadow-level-1 {
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .shadow-level-3:hover {
+        box-shadow: 0px 8px 24px rgba(0, 82, 255, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .glass-overlay {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #0052ff 0%, #00d2ff 100%);
+        transition: all 0.3s ease;
+    }
+
+    .form-input {
+        min-height: 48px;
+        background-color: #F1F5F9;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+        .form-input:focus {
+            background-color: #ffffff;
+            border-color: #0052ff;
+            box-shadow: 0 0 0 2px rgba(0, 82, 255, 0.1);
+            outline: none;
+        }
+</style>
+
+<div class="proposal-portal-body text-on-surface antialiased bg-background min-h-screen pb-32">
     <form asp-action="SubmitProposal" method="post">
         <input type="hidden" asp-for="RequestId" />
         <input type="hidden" asp-for="ProposalId" />
         <input type="hidden" asp-for="RequestTitle" />
 
-        <div class="card shadow-sm p-4">
-            <div class="mb-3">
-                <label class="form-label">Labor Cost (EGP)</label>
-                <input asp-for="LaborCost" class="form-control" type="number" min="0" />
-                <span asp-validation-for="LaborCost" class="text-danger small"></span>
+        <div class="sticky top-0 z-30 glass-overlay border-b border-outline-variant/30 px-4 md:px-8 py-6">
+            <div class="max-w-4xl mx-auto flex items-center gap-4">
+                <button type="button" onclick="window.history.back()" aria-label="Go back" class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-primary/5">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </button>
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg text-on-surface">
+                        @(Model.ProposalId.HasValue ? "Edit Proposal" : "Send Proposal")
+                    </h2>
+                    <p class="font-body-md text-body-md text-secondary mt-1">Submit your bid to the client execution layout.</p>
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Material Cost (EGP)</label>
-                <input asp-for="MaterialCost" class="form-control" type="number" min="0" />
-                <span asp-validation-for="MaterialCost" class="text-danger small"></span>
+        </div>
+
+        <div class="px-4 md:px-8 py-6 pb-32">
+            <div class="max-w-4xl mx-auto space-y-6">
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="bg-error/10 border border-error/20 text-error rounded-xl p-4 font-body-md flex items-center gap-2">
+                        <span class="material-symbols-outlined shrink-0">error</span>
+                        <span>@TempData["Error"]</span>
+                    </div>
+                }
+
+                <div class="bg-surface-container-lowest rounded-xl border border-[#E2E8F0] shadow-level-1 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between gap-6">
+                        <div class="space-y-3 flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-primary/10 text-primary px-2 py-1 rounded font-caption text-caption uppercase tracking-wider font-semibold">Active Request</span>
+                                <span class="text-secondary font-caption text-caption flex items-center gap-1">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">schedule</span> Managed via FixConnect
+                                </span>
+                            </div>
+                            <h3 class="font-headline-md text-headline-md text-on-surface break-words">@Model.RequestTitle</h3>
+                            <div class="flex flex-wrap gap-4 mt-2">
+                                <div class="flex items-center gap-2 text-secondary font-body-md text-body-md">
+                                    <span class="material-symbols-outlined text-outline">verified_user</span>
+                                    Verified Assignment
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:text-right flex flex-col justify-center bg-surface p-4 rounded-lg border border-outline-variant/30 md:border-none md:bg-transparent md:p-0 shrink-0">
+                            <p class="font-label-md text-label-md text-secondary uppercase tracking-wider">Client Status</p>
+                            <p class="font-headline-md text-headline-md text-on-surface mt-1">Accepting Bids</p>
+                            <p class="font-caption text-caption text-secondary mt-1">Secure Escrow Platform</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <div class="md:col-span-8 space-y-6 min-w-0">
+                        <div class="bg-surface-container-lowest rounded-xl border border-[#E2E8F0] shadow-level-1 p-6">
+                            <h4 class="font-label-md text-label-md text-on-surface uppercase tracking-wider mb-4">Project Approach &amp; Scope</h4>
+                            <p class="font-body-md text-body-md text-secondary mb-4">Describe how you plan to execute this task and why your expertise fits this job.</p>
+                            <textarea asp-for="Notes" class="w-full form-input rounded-xl p-4 font-body-md text-body-md resize-y break-words" placeholder="Any additional notes or technical execution breakdown..." rows="8"></textarea>
+                            <span asp-validation-for="Notes" class="text-error text-[12px] block mt-1"></span>
+                        </div>
+
+                        <div class="bg-surface-container-lowest rounded-xl border border-[#E2E8F0] shadow-level-1 p-6">
+                            <h4 class="font-label-md text-label-md text-on-surface uppercase tracking-wider mb-4">Attachments (Optional)</h4>
+                            <p class="font-body-md text-body-md text-secondary mb-4">Upload previous similar work execution documents or certifications.</p>
+                            <div class="border-2 border-dashed border-outline-variant rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-surface-container-low transition-colors cursor-pointer group">
+                                <span class="material-symbols-outlined text-outline text-4xl mb-3 group-hover:text-primary transition-colors">upload_file</span>
+                                <p class="font-label-md text-label-md text-on-surface">Drag &amp; drop files here</p>
+                                <p class="font-caption text-caption text-secondary mt-1">PDF, JPG, PNG (Max 10MB)</p>
+                                <button class="mt-4 px-4 py-2 rounded-lg border border-outline text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors" type="button">Browse Files</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-4 space-y-6 min-w-0">
+                        <div class="bg-surface-container-lowest rounded-xl border border-[#E2E8F0] shadow-level-1 p-6">
+                            <h4 class="font-label-md text-label-md text-on-surface uppercase tracking-wider mb-4">Your Financial Bid</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Labor Cost (EGP)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary font-body-md">EGP</span>
+                                        <input asp-for="LaborCost" id="input-labor" class="w-full form-input rounded-xl pl-14 pr-4 py-3 font-body-md text-body-md" placeholder="0.00" type="number" min="0" />
+                                    </div>
+                                    <span asp-validation-for="LaborCost" class="text-error text-[12px] block mt-1"></span>
+                                </div>
+
+                                <div>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Material Cost (EGP)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary font-body-md">EGP</span>
+                                        <input asp-for="MaterialCost" id="input-material" class="w-full form-input rounded-xl pl-14 pr-4 py-3 font-body-md text-body-md" placeholder="0.00" type="number" min="0" />
+                                    </div>
+                                    <span asp-validation-for="MaterialCost" class="text-error text-[12px] block mt-1"></span>
+                                </div>
+
+                                <div class="h-px bg-outline-variant/30 w-full my-2"></div>
+
+                                <div class="space-y-3 bg-surface p-3 rounded-xl border border-outline-variant/20">
+                                    <div class="flex justify-between items-center text-secondary font-body-md text-[13px]">
+                                        <span>Gross Total Bid:</span>
+                                        <span id="display-gross">0 EGP</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-secondary font-body-md text-[13px]">
+                                        <span>Platform Fee (10%):</span>
+                                        <span id="display-fee">- 0 EGP</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-on-surface font-label-md text-label-md pt-2 border-t border-outline-variant/30">
+                                        <span>Net Payout:</span>
+                                        <span class="text-primary font-bold" id="display-net">0 EGP</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-surface-container-lowest rounded-xl border border-[#E2E8F0] shadow-level-1 p-6">
+                            <h4 class="font-label-md text-label-md text-on-surface uppercase tracking-wider mb-4">Timeline Planning</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Estimated Start Time</label>
+                                    <input asp-for="EstimatedStartTime"
+                                           asp-format="{0:yyyy-MM-ddTHH:mm}"
+                                           id="input-start-time"
+                                           min="2026-01-01T00:00"
+                                           class="w-full form-input rounded-xl px-4 py-3 font-body-md text-body-md"
+                                           type="datetime-local" />
+                                           <span asp-validation-for="EstimatedStartTime" class="text-error text-[12px] block mt-1"></span>
+                                </div>
+                                <div>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Duration Estimate (Days)</label>
+                                    <input asp-for="DurationEstimate" class="w-full form-input rounded-xl px-4 py-3 font-body-md text-body-md" type="number" min="1" placeholder="e.g. 5" />
+                                    <span asp-validation-for="DurationEstimate" class="text-error text-[12px] block mt-1"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
 
-
-            <div class="mb-3">
-                <label class="form-label">Estimated Start Time</label>
-                <input asp-for="EstimatedStartTime" class="form-control" type="datetime-local" />
-                <span asp-validation-for="EstimatedStartTime" class="text-danger small"></span>
+        <div class="fixed bottom-0 left-0 md:left-64 right-0 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/30 p-4 z-40 shadow-[0_-4px_24px_rgba(0,0,0,0.05)]">
+            <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-end items-center gap-4">
+                <button type="button" onclick="window.history.back()" class="w-full md:w-auto px-6 py-3 rounded-xl border-2 border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors shadow-level-3">
+                    Cancel Action
+                </button>
+                <button class="w-full md:w-auto px-8 py-3 rounded-xl btn-gradient text-on-primary font-label-md text-label-md shadow-level-3 flex items-center justify-center gap-2" type="submit">
+                    <span>@(Model.ProposalId.HasValue ? "Update Proposal" : "Submit Proposal")</span>
+                    <span class="material-symbols-outlined text-[20px]">send</span>
+                </button>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">Duration Estimate (days)</label>
-                <input asp-for="DurationEstimate" class="form-control" type="number" min="1" />
-                <span asp-validation-for="DurationEstimate" class="text-danger small"></span>
-            </div>
-
-            
-
-            <div class="mb-3">
-                <label class="form-label">Notes (Optional)</label>
-                <textarea asp-for="Notes" class="form-control" rows="3"
-                          placeholder="Any additional notes..."></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-dark w-100">
-                @(Model.ProposalId.HasValue ? "Update Proposal" : "Submit Proposal")
-            </button>
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // --- Date Picker Sync for Current Year ---
+        const startTimeInput = document.getElementById("input-start-time");
+        if (startTimeInput && !startTimeInput.value) {
+            const now = new Date();
+            // Force compliance with current year context
+            now.setFullYear(2026);
+
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+
+            startTimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        // --- Interactive Financial Calculation Logic ---
+        const laborInput = document.getElementById("input-labor");
+        const materialInput = document.getElementById("input-material");
+        const displayGross = document.getElementById("display-gross");
+        const displayFee = document.getElementById("display-fee");
+        const displayNet = document.getElementById("display-net");
+
+        function calculateBid() {
+            const labor = parseFloat(laborInput.value) || 0;
+            const material = parseFloat(materialInput.value) || 0;
+
+            const gross = labor + material;
+            const fee = gross * 0.10;
+            const net = gross - fee;
+
+            displayGross.innerText = gross.toLocaleString() + " EGP";
+            displayFee.innerText = "- " + fee.toLocaleString() + " EGP";
+            displayNet.innerText = net.toLocaleString() + " EGP";
+        }
+
+        laborInput.addEventListener("input", calculateBid);
+        materialInput.addEventListener("input", calculateBid);
+        calculateBid(); // Initial load run
+    });
+</script>

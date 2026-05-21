@@ -4,108 +4,340 @@
     Layout = "_WorkerLayout";
 }
 
-<div class="container py-4">
-    <h5 class="fw-bold mb-4">Direct Requests</h5>
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Direct Requests - FixConnect</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f2f4f6",
+                      "inverse-primary": "#b7c4ff",
+                      "surface-variant": "#e0e3e5",
+                      "secondary-fixed": "#e2e2e6",
+                      "on-tertiary-container": "#d6e6ff",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "on-primary-container": "#dfe3ff",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-secondary-fixed-variant": "#45474a",
+                      "secondary-container": "#dfdfe3",
+                      "surface": "#f7f9fb",
+                      "outline": "#737688",
+                      "surface-dim": "#d8dadc",
+                      "primary-fixed": "#dde1ff",
+                      "error-container": "#ffdad6",
+                      "primary-container": "#0052ff",
+                      "on-primary-fixed": "#001452",
+                      "on-secondary-fixed": "#1a1c1f",
+                      "error": "#ba1a1a",
+                      "on-secondary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "surface-container": "#eceef0",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed": "#d3e4fe",
+                      "surface-tint": "#004ced",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "on-primary": "#ffffff",
+                      "inverse-surface": "#2d3133",
+                      "background": "#f7f9fb",
+                      "primary": "#003ec7",
+                      "surface-bright": "#f7f9fb",
+                      "secondary-fixed-dim": "#c6c6ca",
+                      "secondary": "#5d5e62",
+                      "on-secondary-container": "#616266",
+                      "outline-variant": "#c3c5d9",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#434656",
+                      "primary-fixed-dim": "#b7c4ff",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-surface": "#191c1e",
+                      "on-primary-fixed-variant": "#0038b6",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#57677e",
+                      "on-background": "#191c1e",
+                      "tertiary": "#3f4f65",
+                      "surface-container-high": "#e6e8ea"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "base": "8px",
+                      "stack-sm": "12px",
+                      "stack-md": "24px",
+                      "section-padding": "64px",
+                      "container-margin": "32px",
+                      "stack-lg": "48px"
+              },
+              "fontFamily": {
+                      "label-md": ["Plus Jakarta Sans"],
+                      "headline-lg-mobile": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "body-md": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "display-xl": ["Plus Jakarta Sans"],
+                      "caption": ["Plus Jakarta Sans"],
+                      "body-lg": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                  }
+                }
+              }
+            }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-    @if (!Model.PublicRequests.Any())
-    {
-        <div class="text-center py-5">
-            <p class="text-muted">No direct requests yet.</p>
+        ::-webkit-scrollbar-thumb {
+            background: #e0e3e5;
+            border-radius: 4px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #c3c5d9;
+            }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md flex h-screen overflow-hidden antialiased">
+
+    <nav class="md:hidden fixed top-0 w-full z-50 flex justify-between items-center px-container-margin h-16 bg-surface-container-lowest/80 backdrop-blur-md shadow-sm">
+        <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-on-surface">menu</span>
+            <span class="font-headline-md text-headline-md font-bold text-primary">FixConnect</span>
         </div>
-    }
-    else
-    {
-        <div class="row g-3">
-            @foreach (var r in Model.PublicRequests)
-            {
-                <div class="col-md-6">
-                    <div class="card shadow-sm p-3 h-100 @(r.AlreadyBid ? "border-success" : "border-warning")">
+        <div class="flex items-center gap-4 text-primary">
+            <span class="material-symbols-outlined hover:bg-surface-container-low transition-colors rounded-full p-2 cursor-pointer">notifications</span>
+            <img alt="Worker profile avatar" class="w-8 h-8 rounded-full border border-outline-variant cursor-pointer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBn7S96ddzosudrFA8VbJysUY8v5jgEvdgQKgNwLPU3s_bPle0S2ElGCt5q76fy658WhQ31ktODW3kcPksBdgTSqiRIPpyod0CXmHCoJEZJztGvA4GcAx-vrSDd6fnoDpzZ-cXiKYNN-2-ky-JVYb4m2viW9Y8oWpmI04KbTY3-CiJMGrLbGDf6wfmu55PlNMVt1_GylxYfIemZD0PItgvSzY7Si-RIeIetQeRZoOGxF1weyOzJl8NUMzC9oiUjzliUV1o7mA9nRsOB" />
+        </div>
+    </nav>
 
-                        <div class="d-flex justify-content-between mb-1">
-                            <h6 class="fw-bold mb-0">@r.Title</h6>
-                            @if (r.AlreadyBid)
-                            {
-                                <span class="badge bg-success">Bid Sent</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning text-dark">Awaiting Bid</span>
-                            }
-                        </div>
-
-                        <p class="text-muted small mb-2">@r.Description</p>
-
-                        <div class="d-flex gap-1 flex-wrap mb-2">
-                            <span class="badge bg-light text-dark border">
-                                📍 @r.RegionName
-                            </span>
-                            @if (!string.IsNullOrEmpty(r.SpecialtyName))
-                            {
-                                <span class="badge bg-light text-dark border">
-                                    🔧 @r.SpecialtyName
-                                </span>
-                            }
-                            <span class="badge bg-info text-dark">
-                                👤 From: @r.CustomerName
-                            </span>
-                        </div>
-
-                        @if (r.ImagePaths.Any())
-                        {
-                            <div class="d-flex gap-1 flex-wrap mb-2">
-                                @foreach (var img in r.ImagePaths.Take(3))
-                                {
-                                    <img src="@img"
-                                         style="width:55px;height:55px;object-fit:cover;border-radius:4px;cursor:pointer"
-                                         onclick="openImg('@img')" />
-                                }
-                                @if (r.ImagePaths.Count > 3)
-                                {
-                                    <span class="badge bg-secondary align-self-center">
-                                        +@(r.ImagePaths.Count - 3) more
-                                    </span>
-                                }
-                            </div>
-                        }
-
-                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
-                            <small class="text-muted">
-                                @r.CreatedAt.ToString("dd MMM yyyy")
-                            </small>
-                            <a asp-action="RequestDetail" asp-route-id="@r.RequestId"
-                               class="btn btn-dark btn-sm">
-                                View Details
-                            </a>
-                        </div>
-
+    @* <aside class="hidden md:flex flex-col h-screen w-64 shrink-0 bg-surface-container-lowest/90 backdrop-blur-xl border-r border-outline-variant/30 shadow-lg shadow-primary/5 py-8 px-4 gap-4 z-40 relative">
+        <div class="px-4 mb-6">
+            <h1 class="font-headline-md text-headline-md font-extrabold text-primary mb-1">FixConnect</h1>
+            <div class="flex items-center gap-3 mt-6 bg-surface-container-low p-3 rounded-xl border border-outline-variant/50">
+                <img alt="Worker profile picture" class="w-10 h-10 rounded-full border border-surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAV4I5ZNJhF-d-ey-TmkhjlP5VemKURq8-JF3kGo45VXkjwQsEmnoNWSVedf5BLT14Y59iocLQt_oViIiUGrZfWUjcTr43tyjpVNAymoHqMA6GNkoI3Rkey7yE9Falo6KHMikk_w2SJ8CzKqeYSfDoOqLdcYsZXDHlEq-eOIXOWGTTgD2v_xfdgqGQ6zEZMCSKTEDYq2Pz8T4C91g8JDeHQoLgLJValvgjBKkV3BudphqMU15z1mVDOVI5PAGPax8d_hoaJfY-mFfnm" />
+                <div>
+                    <div class="font-label-md text-label-md text-on-surface">Worker Portal</div>
+                    <div class="font-caption text-caption text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">verified</span> Verified Contractor
                     </div>
+                </div>
+            </div>
+        </div>
+        <nav class="flex flex-col gap-2 flex-1">
+            <a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container hover:text-primary transition-all rounded-lg hover:translate-x-1 duration-200" href="#">
+                <span class="material-symbols-outlined">work</span>
+                <span class="font-label-md text-label-md">Job Feed</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg border-l-4 border-primary" href="#">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mail</span>
+                <span class="font-label-md text-label-md">Direct Requests</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container hover:text-primary transition-all rounded-lg hover:translate-x-1 duration-200" href="#">
+                <span class="material-symbols-outlined">description</span>
+                <span class="font-label-md text-label-md">My Proposals</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container hover:text-primary transition-all rounded-lg hover:translate-x-1 duration-200" href="#">
+                <span class="material-symbols-outlined">assignment_turned_in</span>
+                <span class="font-label-md text-label-md">My Jobs</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container hover:text-primary transition-all rounded-lg hover:translate-x-1 duration-200" href="#">
+                <span class="material-symbols-outlined">person</span>
+                <span class="font-label-md text-label-md">My Profile</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container hover:text-primary transition-all rounded-lg hover:translate-x-1 duration-200" href="#">
+                <span class="material-symbols-outlined">account_balance_wallet</span>
+                <span class="font-label-md text-label-md">My Wallet</span>
+            </a>
+        </nav>
+        <div class="px-4 mt-auto mb-4">
+            <button class="w-full py-3 bg-surface-container hover:bg-surface-container-highest text-primary font-label-md text-label-md rounded-lg transition-colors border border-primary-fixed-dim/30">
+                Browse Jobs
+            </button>
+        </div>
+        <div class="flex flex-col gap-2 pt-4 border-t border-outline-variant/30">
+            <a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container hover:text-primary transition-all rounded-lg" href="#">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-label-md text-label-md">Support</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container hover:text-error transition-all rounded-lg" href="#">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="font-label-md text-label-md">Logout</span>
+            </a>
+        </div>
+    </aside> *@
+
+    <main class="flex-1 overflow-y-auto relative pt-20 md:pt-0">
+        <div class="absolute top-0 right-0 w-1/2 h-96 bg-gradient-to-bl from-primary-fixed/20 to-transparent rounded-bl-full pointer-events-none blur-3xl"></div>
+
+        <div class="max-w-6xl mx-auto p-4 md:p-8 lg:p-container-margin relative z-10">
+
+            <div class="mb-stack-md flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2 tracking-tight">Direct Requests</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                        Clients have specifically requested your services based on your profile and past performance. Respond promptly to secure these priority jobs.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="flex items-center justify-center w-6 h-6 bg-primary-container text-on-primary-container rounded-full font-label-md text-caption">@Model.PublicRequests.Count()</span>
+                    <span class="font-label-md text-label-md text-secondary">Pending Action</span>
+                </div>
+            </div>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="mb-6 p-4 rounded-xl bg-green-100 border border-green-200 text-green-800 font-medium text-sm flex items-center gap-2 shadow-sm">
+                    <span class="material-symbols-outlined text-green-600">check_circle</span>
+                    @TempData["Success"]
+                </div>
+            }
+
+            @if (!Model.PublicRequests.Any())
+            {
+                <div class="text-center py-12 bg-surface-container-lowest rounded-xl border border-outline-variant p-8 shadow-sm max-w-md mx-auto mt-10">
+                    <span class="material-symbols-outlined text-4xl text-secondary mb-3">mail_outline</span>
+                    <p class="text-on-surface-variant font-medium">No direct requests yet.</p>
+                </div>
+            }
+            else
+            {
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+                    @foreach (var r in Model.PublicRequests)
+                    {
+                        <div class="bg-surface-container-lowest rounded-xl border p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group @(r.AlreadyBid ? "border-green-500/50 shadow-green-500/5" : "border-amber-500/50 shadow-amber-500/5")">
+                            <div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="Customer profile picture" class="w-12 h-12 rounded-full border border-surface-variant object-cover" src="~/uploads/ProfilePictures/default.png" />
+                                        <div>
+                                            <h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">@r.CustomerName</h3>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                @if (!string.IsNullOrEmpty(r.SpecialtyName))
+                                                {
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-tertiary-fixed/30 text-on-tertiary-fixed-variant font-caption text-caption border border-tertiary-fixed-dim/50">
+                                                        <span class="material-symbols-outlined text-[14px]">handyman</span> @r.SpecialtyName
+                                                    </span>
+                                                }
+                                                <span class="font-caption text-caption text-secondary flex items-center gap-1">
+                                                    <span class="material-symbols-outlined text-[14px]">schedule</span> @r.CreatedAt.ToString("dd MMM yyyy")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        @if (r.AlreadyBid)
+                                        {
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+                                                Bid Sent
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                                                Awaiting Bid
+                                            </span>
+                                        }
+                                        <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors cursor-pointer">more_vert</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h4 class="font-bold text-on-surface text-[16px] mb-1">@r.Title</h4>
+                                    <p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">
+                                        "@r.Description"
+                                    </p>
+                                </div>
+
+                                @if (r.ImagePaths.Any())
+                                {
+                                    <div class="flex gap-1.5 flex-wrap mb-4">
+                                        @foreach (var img in r.ImagePaths.Take(3))
+                                        {
+                                            <img src="@img"
+                                                 class="w-[55px] h-[55px] object-cover rounded border border-outline-variant/60 cursor-pointer hover:opacity-80 transition-opacity"
+                                                 onclick="openImg('@img')" />
+                                        }
+                                        @if (r.ImagePaths.Count > 3)
+                                        {
+                                            <span class="inline-flex items-center justify-center px-2 py-1 rounded bg-secondary text-white text-xs font-semibold self-center shadow-sm">
+                                                +@(r.ImagePaths.Count - 3) more
+                                            </span>
+                                        }
+                                    </div>
+                                }
+
+                                <div class="flex items-center gap-2 mb-6 p-3 bg-surface-container-low rounded-lg border border-outline-variant/50">
+                                    <span class="material-symbols-outlined text-primary">location_on</span>
+                                    <span class="font-body-md text-body-md text-on-surface">@r.RegionName</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 pt-4 border-t border-surface-variant">
+                                <a asp-action="RequestDetail" asp-route-id="@r.RequestId"
+                                   class="flex-1 py-2.5 px-4 bg-primary text-on-primary font-label-md text-label-md rounded-lg shadow-sm hover:shadow-md hover:bg-on-primary-fixed-variant transition-all flex justify-center items-center gap-2 text-center">
+                                    <span class="material-symbols-outlined text-[18px]">visibility</span> View Details
+                                </a>
+                            </div>
+                        </div>
+                    }
                 </div>
             }
         </div>
-    }
-</div>
+    </main>
 
-<!-- Image Zoom Modal -->
-<div class="modal fade" id="imgModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-body text-center p-2">
-                <img id="imgSrc" src=""
-                     class="img-fluid rounded"
-                     style="max-height:500px;object-fit:contain;" />
-            </div>
+    <div id="imgModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImg()">
+        <div class="relative max-w-3xl w-full bg-transparent flex justify-center items-center" onclick="event.stopPropagation()">
+            <button class="absolute -top-12 right-0 text-white hover:text-surface-variant flex items-center gap-1 text-sm font-medium bg-surface/10 px-3 py-1 rounded-full backdrop-blur-sm transition-colors" onclick="closeImg()">
+                <span class="material-symbols-outlined text-[18px]">close</span> Close
+            </button>
+            <img id="imgSrc" src="" class="max-h-[80vh] max-w-full rounded-xl object-contain shadow-2xl border border-white/10" />
         </div>
     </div>
-</div>
 
-<script>
-    function openImg(src) {
-        document.getElementById('imgSrc').src = src;
-        new bootstrap.Modal(document.getElementById('imgModal')).show();
-    }
-</script>
+    <script>
+        function openImg(src) {
+            document.getElementById('imgSrc').src = src;
+            document.getElementById('imgModal').classList.remove('hidden');
+        }
+
+        function closeImg() {
+            document.getElementById('imgModal').classList.add('hidden');
+        }
+    </script>
+
+</body>
+</html>

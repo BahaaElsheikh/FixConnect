@@ -5,112 +5,438 @@
     Layout = "_WorkerLayout";
 }
 
-<div class="container py-4" style="max-width:680px">
-    <h5 class="fw-bold mb-4">Edit Profile</h5>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
-    <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
-
-
-        {{!-- Profile Photo --}}
-        <div class="mb-3">
-            <label class="form-label">Profile Photo</label>
-            @if (!string.IsNullOrEmpty(Model.CurrentPhotoUrl))
-            {
-                <div class="mb-2">
-                    <img src="@Model.CurrentPhotoUrl"
-                         style="width:80px;height:80px;object-fit:cover;border-radius:50%;" />
-                </div>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "inverse-surface": "#2d3133",
+                    "on-surface": "#191c1e",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#e0e3e5",
+                    "surface": "#f7f9fb",
+                    "surface-container": "#eceef0",
+                    "outline": "#737688",
+                    "outline-variant": "#c3c5d9",
+                    "on-surface-variant": "#434656",
+                    "primary-container": "#0052ff",
+                    "on-primary-container": "#dfe3ff",
+                    "background": "#f7f9fb",
+                    "primary": "#003ec7",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-container-low": "#f2f4f6"
+                },
+                "fontFamily": {
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"]
+                }
             }
-            <input asp-for="PhotoFile" type="file" class="form-control" accept="image/*" />
+        }
+    }
+</script>
+
+<style>
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #F8FAFC;
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 20px rgba(0, 62, 199, 0.04);
+    }
+
+    .input-field {
+        background-color: #F1F5F9;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+        .input-field:focus {
+            background-color: #ffffff;
+            border-color: #003ec7;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 62, 199, 0.1);
+        }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #003ec7 0%, #0052ff 100%);
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 15px rgba(0, 62, 199, 0.25);
+            transform: translateY(-1px);
+        }
+
+    .btn-secondary {
+        border: 1.5px solid #191c1e;
+        color: #191c1e;
+        background: transparent;
+        transition: all 0.2s ease;
+    }
+
+        .btn-secondary:hover {
+            background: rgba(25, 28, 30, 0.05);
+        }
+</style>
+
+<form asp-action="EditProfile" method="post" enctype="multipart/form-data" class="flex-1 py-8 px-4 md:px-8 w-full mx-auto" style="max-width: 1200px;">
+
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">Edit Profile</h2>
+            <p class="font-body-md text-on-surface-variant mt-1">Update your professional details to attract better jobs.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a asp-action="Profile" class="btn-secondary px-6 py-2.5 rounded-lg font-label-md font-semibold text-sm cursor-pointer text-decoration-none text-center">Cancel</a>
+            <button type="submit" class="btn-primary px-6 py-2.5 rounded-lg font-label-md font-semibold text-sm text-on-primary border-0">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <div class="lg:col-span-8 flex flex-col gap-6">
+
+            <section class="glass-panel rounded-xl p-6 lg:p-8">
+                <h3 class="font-headline-md text-xl font-semibold text-on-surface mb-6 pb-4 border-b border-outline-variant flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                    Basic Information
+                </h3>
+
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8">
+                    <div class="relative group">
+                        <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-outline-variant bg-surface-container-high flex items-center justify-center">
+                            @if (!string.IsNullOrEmpty(Model.CurrentPhotoUrl))
+                            {
+                                <img src="@Model.CurrentPhotoUrl" alt="Profile Photo" class="w-full h-full object-cover" />
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined text-4xl text-outline">person</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-label-md font-semibold text-sm text-on-surface">Profile Photo</h4>
+                        <p class="font-caption text-xs font-medium text-on-surface-variant mt-1 mb-3">Upload a new photo to update your avatar.</p>
+                        <input asp-for="PhotoFile" type="file" class="block w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-surface-container-high file:text-on-surface hover:file:bg-surface-variant cursor-pointer transition-colors" accept="image/*" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label asp-for="FullName" class="font-label-md font-semibold text-sm text-on-surface-variant block">Full Name</label>
+                        <input asp-for="FullName" class="w-full h-12 px-4 rounded-lg input-field font-body-md text-on-surface" placeholder="e.g. John Doe" />
+                        <span asp-validation-for="FullName" class="text-error text-xs"></span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label asp-for="Phone" class="font-label-md font-semibold text-sm text-on-surface-variant block">Phone Number</label>
+                        <input asp-for="Phone" class="w-full h-12 px-4 rounded-lg input-field font-body-md text-on-surface" placeholder="01000000000" />
+                        <span asp-validation-for="Phone" class="text-error text-xs"></span>
+                    </div>
+
+                    <div class="space-y-2 md:col-span-2">
+                        <label asp-for="SpecialtyId" class="font-label-md font-semibold text-sm text-on-surface-variant block">Specialty</label>
+                        <div class="relative">
+                            <select asp-for="SpecialtyId" class="w-full h-12 px-4 appearance-none rounded-lg input-field font-body-md text-on-surface cursor-pointer">
+                                <option value="">— Select Specialty —</option>
+                                @foreach (var s in Model.AllSpecialties)
+                                {
+                                    <option value="@s.SpecialtyId" selected="@(Model.SpecialtyId == s.SpecialtyId)">
+                                        @s.SpecialtyName
+                                    </option>
+                                }
+                            </select>
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+                        </div>
+                        <span asp-validation-for="SpecialtyId" class="text-error text-xs"></span>
+                    </div>
+                </div>
+
+                <div class="mt-6 space-y-2">
+                    <label asp-for="Bio" class="font-label-md font-semibold text-sm text-on-surface-variant block flex justify-between">
+                        <span>Professional Bio</span>
+                    </label>
+                    <textarea asp-for="Bio" class="w-full p-4 rounded-lg input-field font-body-md text-on-surface resize-none" rows="4" placeholder="Briefly describe your experience and skills..."></textarea>
+                    <span asp-validation-for="Bio" class="text-error text-xs"></span>
+                </div>
+            </section>
+
+            <section class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-6 shadow-sm">
+                <h3 class="font-headline-md text-headline-md text-on-surface mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">map</span>
+                    Working Areas
+                </h3>
+
+                <div class="space-y-4">
+                    <div class="flex flex-wrap gap-2" id="selected-areas-container">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-container/30 text-primary-fixed-dim rounded-lg border border-primary-container area-badge" data-value="Cairo">
+                            <span class="font-label-md font-semibold text-sm">Cairo</span>
+                            <span class="material-symbols-outlined text-[16px] cursor-pointer hover:text-error transition-colors" onclick="removeArea(this, 'Cairo')">close</span>
+                        </div>
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-container/30 text-primary-fixed-dim rounded-lg border border-primary-container area-badge" data-value="Alexandria">
+                            <span class="font-label-md font-semibold text-sm">Alexandria</span>
+                            <span class="material-symbols-outlined text-[16px] cursor-pointer hover:text-error transition-colors" onclick="removeArea(this, 'Alexandria')">close</span>
+                        </div>
+                    </div>
+
+                    <div class="border border-outline-variant/50 rounded-lg overflow-hidden bg-surface flex flex-col shadow-sm">
+
+                        <div class="relative border-b border-outline-variant/50 bg-white">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+                            <input type="text" id="areaSearch" onkeyup="filterAreas()" class="w-full pl-12 pr-4 py-3 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-outline outline-none" placeholder="Search available areas...">
+                        </div>
+
+                        
+
+                            <div class="area-group">
+                                <div class="sticky top-0 bg-surface-container-lowest px-4 py-1.5 border-b border-outline-variant/20 z-10 backdrop-blur-md">
+                                    <span class="font-label-sm font-bold text-primary">A</span>
+                                </div>
+                                <label class="flex items-center px-4 py-2.5 hover:bg-surface-variant/50 cursor-pointer border-b border-outline-variant/10 transition-colors area-item">
+                                    <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary mr-3" value="Alexandria" checked onchange="toggleArea(this)">
+                                    <span class="text-sm font-body-md text-on-surface area-name">Alexandria</span>
+                                </label>
+                                <label class="flex items-center px-4 py-2.5 hover:bg-surface-variant/50 cursor-pointer border-b border-outline-variant/10 transition-colors area-item">
+                                    <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary mr-3" value="Aswan" onchange="toggleArea(this)">
+                                    <span class="text-sm font-body-md text-on-surface area-name">Aswan</span>
+                                </label>
+                                <label class="flex items-center px-4 py-2.5 hover:bg-surface-variant/50 cursor-pointer border-b border-outline-variant/10 transition-colors area-item">
+                                    <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary mr-3" value="Asyut" onchange="toggleArea(this)">
+                                    <span class="text-sm font-body-md text-on-surface area-name">Asyut</span>
+                                </label>
+                            </div>
+
+                            <div class="area-group">
+                                <div class="sticky top-0 bg-surface-container-lowest px-4 py-1.5 border-y border-outline-variant/20 z-10 backdrop-blur-md">
+                                    <span class="font-label-sm font-bold text-primary">C</span>
+                                </div>
+                                <label class="flex items-center px-4 py-2.5 hover:bg-surface-variant/50 cursor-pointer border-b border-outline-variant/10 transition-colors area-item">
+                                    <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary mr-3" value="Cairo" checked onchange="toggleArea(this)">
+                                    <span class="text-sm font-body-md text-on-surface area-name">Cairo</span>
+                                </label>
+                            </div>
+
+                            <div class="area-group">
+                                <div class="sticky top-0 bg-surface-container-lowest px-4 py-1.5 border-y border-outline-variant/20 z-10 backdrop-blur-md">
+                                    <span class="font-label-sm font-bold text-primary">G</span>
+                                </div>
+                                <label class="flex items-center px-4 py-2.5 hover:bg-surface-variant/50 cursor-pointer border-b border-outline-variant/10 transition-colors area-item">
+                                    <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary mr-3" value="Gharbia" onchange="toggleArea(this)">
+                                    <span class="text-sm font-body-md text-on-surface area-name">Gharbia</span>
+                                </label>
+                                <label class="flex items-center px-4 py-2.5 hover:bg-surface-variant/50 cursor-pointer border-b border-outline-variant/10 transition-colors area-item">
+                                    <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary mr-3" value="Giza" onchange="toggleArea(this)">
+                                    <span class="text-sm font-body-md text-on-surface area-name">Giza</span>
+                                </label>
+                            </div>
+
+                            <div class="area-group">
+                                <div class="sticky top-0 bg-surface-container-lowest px-4 py-1.5 border-y border-outline-variant/20 z-10 backdrop-blur-md">
+                                    <span class="font-label-sm font-bold text-primary">M</span>
+                                </div>
+                                <label class="flex items-center px-4 py-2.5 hover:bg-surface-variant/50 cursor-pointer border-b border-outline-variant/10 transition-colors area-item">
+                                    <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary mr-3" value="Mansoura" onchange="toggleArea(this)">
+                                    <span class="text-sm font-body-md text-on-surface area-name">Mansoura</span>
+                                </label>
+                                <label class="flex items-center px-4 py-2.5 hover:bg-surface-variant/50 cursor-pointer border-b border-outline-variant/10 transition-colors area-item">
+                                    <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary mr-3" value="Minya" onchange="toggleArea(this)">
+                                    <span class="text-sm font-body-md text-on-surface area-name">Minya</span>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
+        <div class="lg:col-span-4 flex flex-col gap-6">
 
+            <section class="glass-panel rounded-xl p-6">
+                <h3 class="font-headline-md text-lg font-semibold text-on-surface mb-6 pb-4 border-b border-outline-variant flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
+                    ID Verification
+                </h3>
 
-
-        {{!-- Basic Info --}}
-        <div class="card shadow-sm p-4 mb-4">
-            <h6 class="fw-semibold mb-3">Basic Information</h6>
-
-            <div class="mb-3">
-                <label class="form-label">Full Name</label>
-                <input asp-for="FullName" class="form-control" />
-                <span asp-validation-for="FullName" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Phone</label>
-                <input asp-for="Phone" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-    <label class="form-label">Specialty</label>
-    <select asp-for="SpecialtyId" class="form-select">
-        <option value="">— Select Specialty —</option>
-        @foreach (var s in Model.AllSpecialties)
-        {
-                        <option value="@s.SpecialtyId" 
-                    selected="@(Model.SpecialtyId == s.SpecialtyId)">
-                @s.SpecialtyName  
-            </option>
-        }
-    </select>
-</div>
-            <div class="mb-3">
-                <label class="form-label">Bio</label>
-                <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
-            </div>
-
-           
-
-       
-
-        {{!-- Working Regions --}}
-        <div class="card shadow-sm p-4 mb-4">
-            <h6 class="fw-semibold mb-3">Working Areas</h6>
-            <div class="row">
-                @foreach (var region in Model.AllRegions)
+                @if (!Model.HasPendingVerification)
                 {
-                    <div class="col-6 col-md-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox"
-                                   name="SelectedRegionIds" value="@region.RegionId"
-                                   @(Model.SelectedRegionIds.Contains(region.RegionId) ? "checked" : "") />
-                            <label class="form-check-label small">@region.RegionName</label>
+                    <p class="text-sm text-on-surface-variant mb-5">Upload your national ID to get a Verified badge and build trust with clients.</p>
+                    <div class="space-y-4">
+                        <label asp-for="IdFrontImage" class="block w-full p-4 border-2 border-dashed border-outline-variant rounded-lg text-center hover:bg-surface-container-low hover:border-primary transition-colors cursor-pointer group">
+                            <span class="material-symbols-outlined text-on-surface-variant mb-2 group-hover:text-primary transition-colors">badge</span>
+                            <p class="font-label-md font-semibold text-sm text-on-surface">Upload ID Front</p>
+                            <p class="font-caption text-xs font-medium text-on-surface-variant mt-1">Image format</p>
+                            <input asp-for="IdFrontImage" type="file" class="hidden" accept="image/*" />
+                        </label>
+
+                        <label asp-for="IdBackImage" class="block w-full p-4 border-2 border-dashed border-outline-variant rounded-lg text-center hover:bg-surface-container-low hover:border-primary transition-colors cursor-pointer group">
+                            <span class="material-symbols-outlined text-on-surface-variant mb-2 group-hover:text-primary transition-colors">credit_card</span>
+                            <p class="font-label-md font-semibold text-sm text-on-surface">Upload ID Back</p>
+                            <p class="font-caption text-xs font-medium text-on-surface-variant mt-1">Image format</p>
+                            <input asp-for="IdBackImage" type="file" class="hidden" accept="image/*" />
+                        </label>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 rounded-lg bg-surface-container-high border border-outline-variant flex flex-col items-center text-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-4xl">hourglass_top</span>
+                        <div>
+                            <h6 class="font-label-md font-bold text-on-surface mb-1">Verification in Progress</h6>
+                            <p class="text-sm text-on-surface-variant">Your documents are currently under review. You cannot re-submit until they are processed.</p>
                         </div>
                     </div>
                 }
-            </div>
+            </section>
+
+            <section class="glass-panel rounded-xl p-6">
+                <h3 class="font-headline-md text-lg font-semibold text-on-surface mb-6 pb-4 border-b border-outline-variant flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[20px]">language</span>
+                    Languages
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-surface rounded-lg border border-outline-variant">
+                        <div>
+                            <p class="font-label-md font-semibold text-sm text-on-surface">English</p>
+                            <p class="font-caption text-xs font-medium text-on-surface-variant">Native/Bilingual</p>
+                        </div>
+                        <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-error">close</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-surface rounded-lg border border-outline-variant">
+                        <div>
+                            <p class="font-label-md font-semibold text-sm text-on-surface">Spanish</p>
+                            <p class="font-caption text-xs font-medium text-on-surface-variant">Conversational</p>
+                        </div>
+                        <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-error">close</span>
+                    </div>
+                    <button type="button" class="w-full py-2.5 mt-2 rounded-lg btn-secondary font-label-md font-semibold text-sm flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">add</span>
+                        Add Language
+                    </button>
+                </div>
+            </section>
+
         </div>
+    </div>
+</form>
 
-        {{!-- Verification --}}
-        @if (!Model.HasPendingVerification)
-        {
-            <div class="card shadow-sm p-4 mb-4">
-                <h6 class="fw-semibold mb-1">ID Verification</h6>
-                <p class="text-muted small mb-3">
-                    Upload your national ID to get a Verified badge.
-                </p>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+            const allAreas = [
+            "Alexandria", "Aswan", "Asyut", "Beheira", "Beni Suef", "Cairo",
+            "Dakahlia", "Damietta", "Faiyum", "Gharbia", "Giza", "Ismailia",
+            "Kafr El Sheikh", "Luxor", "Matrouh", "Minya", "Monufia", "New Valley",
+            "North Sinai", "Port Said", "Qalyubia", "Qena", "Red Sea",
+            "Sharqia", "Sohag", "South Sinai", "Suez"
+        ];
 
-                <div class="mb-3">
-                    <label class="form-label">ID Front</label>
-                    <input asp-for="IdFrontImage" type="file" class="form-control" accept="image/*" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">ID Back</label>
-                    <input asp-for="IdBackImage" type="file" class="form-control" accept="image/*" />
-                </div>
-            </div>
+        // Build the A-Z list automatically when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const areaList = document.getElementById('areaList');
+            areaList.innerHTML = ''; // Clear just in case
+
+            let currentLetter = '';
+            let currentGroup = null;
+
+            allAreas.forEach(area => {
+                const firstLetter = area.charAt(0).toUpperCase();
+
+                // Create a new A-Z header if the letter changes
+                if (firstLetter !== currentLetter) {
+                    currentLetter = firstLetter;
+
+                    currentGroup = document.createElement('div');
+                    currentGroup.className = 'area-group';
+
+                    const header = document.createElement('div');
+                    header.className = 'sticky top-0 bg-surface-container-lowest px-4 py-1.5 border-y border-outline-variant/20 z-10 backdrop-blur-md';
+                    header.innerHTML = `<span class="font-label-sm font-bold text-primary">${currentLetter}</span>`;
+
+                    currentGroup.appendChild(header);
+                    areaList.appendChild(currentGroup);
+                }
+
+                // Create the checkbox item for the area
+                const item = document.createElement('label');
+                item.className = 'flex items-center px-4 py-2.5 hover:bg-surface-variant/50 cursor-pointer border-b border-outline-variant/10 transition-colors area-item';
+
+                // Note: If you want certain boxes checked by default (like Cairo/Alexandria),
+                // you can handle that logic here later!
+                item.innerHTML = `
+                    <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary mr-3" value="${area}" onchange="toggleArea(this)">
+                    <span class="text-sm font-body-md text-on-surface area-name">${area}</span>
+                `;
+
+                currentGroup.appendChild(item);
+            });
+        });
+        // Toggles the badge when a checkbox is clicked
+        function toggleArea(checkbox) {
+            const container = document.getElementById('selected-areas-container');
+            const areaName = checkbox.value;
+
+            if (checkbox.checked) {
+                // Create and append the badge
+                const badge = document.createElement('div');
+                badge.className = "inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-container/30 text-primary-fixed-dim rounded-lg border border-primary-container area-badge";
+                badge.setAttribute('data-value', areaName);
+                badge.innerHTML = `
+                    <span class="font-label-md font-semibold text-sm">${areaName}</span>
+                    <span class="material-symbols-outlined text-[16px] cursor-pointer hover:text-error transition-colors" onclick="removeArea(this, '${areaName}')">close</span>
+                `;
+                container.appendChild(badge);
+            } else {
+                // Find and remove the badge
+                const badge = container.querySelector(`[data-value="${areaName}"]`);
+                if (badge) badge.remove();
+            }
         }
-        else
-        {
-            <div class="alert alert-warning">
-                ⏳ Verification is under review. You cannot re-submit until it is processed.
-            </div>
+
+        // Removes the badge and unchecks the corresponding list item
+        function removeArea(element, areaName) {
+            element.parentElement.remove();
+            const checkbox = document.querySelector(`input[value="${areaName}"]`);
+            if (checkbox) checkbox.checked = false;
         }
 
-        <button type="submit" class="btn btn-dark w-100">Save Changes</button>
-        <a asp-action="Profile" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
-    </form>
-</div>
+        // Live search filtering
+        function filterAreas() {
+            const query = document.getElementById('areaSearch').value.toLowerCase();
+            const groups = document.querySelectorAll('.area-group');
 
-<partial name="_ValidationScriptsPartial" />
+            groups.forEach(group => {
+                const items = group.querySelectorAll('.area-item');
+                let hasVisibleItem = false;
+
+                items.forEach(item => {
+                    const text = item.querySelector('.area-name').textContent.toLowerCase();
+                    if (text.includes(query)) {
+                        item.style.display = 'flex';
+                        hasVisibleItem = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                // Hide the letter header entirely if no cities match the search
+                group.style.display = hasVisibleItem ? 'block' : 'none';
+            });
+        }
+    </script>
+}
