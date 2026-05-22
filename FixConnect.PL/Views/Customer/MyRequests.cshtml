@@ -3,80 +3,511 @@
     ViewData["Title"] = "My Requests";
     Layout = "_CustomerLayout";
 }
-@* <partial name="_CustomerNav" /> *@
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="fw-bold mb-0">My Requests</h5>
-        <a asp-action="CreateRequest" class="btn btn-dark btn-sm">+ New Request</a>
-    </div>
-
-    @if (!Model.Requests.Any())
-    {
-        <div class="text-center text-muted py-5">No requests yet.</div>
+<style>
+    :root {
+        --fc-blue: #1a4fd6;
+        --fc-blue-light: #e8effe;
+        --fc-blue-mid: #3b6fe8;
+        --fc-bg: #f0f4fb;
+        --fc-card: #ffffff;
+        --fc-text: #1a1f36;
+        --fc-muted: #6b7a99;
+        --fc-border: #dde4f0;
+        --fc-green: #16a34a;
+        --fc-green-bg: #dcfce7;
+        --fc-green-bdr: #86efac;
+        --fc-warning: #d97706;
+        --fc-warning-bg: #fef3c7;
+        --fc-warning-bdr: #fde68a;
+        --fc-info: #0284c7;
+        --fc-info-bg: #e0f2fe;
+        --fc-info-bdr: #7dd3fc;
+        --fc-danger: #dc2626;
+        --fc-danger-bg: #fee2e2;
+        --fc-danger-bdr: #fca5a5;
+        --fc-radius: 14px;
+        --fc-radius-sm: 8px;
+        --fc-shadow: 0 2px 16px rgba(26,79,214,.08);
+        --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
     }
-    else
-    {
-        <div class="row g-3">
-            @foreach (var r in Model.Requests)
-            {
-                <div class="col-md-6">
-                    <div class="card shadow-sm p-3 h-100">
-                        <div class="d-flex justify-content-between mb-1">
-                            <h6 class="fw-bold mb-0">@r.Title</h6>
-                            <span class="badge @(r.Status == "Pending" ? "bg-warning text-dark" :
-                                                                                   r.Status == "InProgress" ? "bg-info text-dark" :
-                                                                                   r.Status == "Completed" ? "bg-success" : "bg-secondary")">
-                        @r.Status
-                    </span>
-                </div>
-                <p class="text-muted small mb-1">@r.Description</p>
-                <div class="d-flex gap-2 flex-wrap mb-2">
-                    <span class="badge bg-light text-dark border">@r.RegionName</span>
-                    @if (!string.IsNullOrEmpty(r.SpecialtyName))
-                            {
-                                <span class="badge bg-light text-dark border">@r.SpecialtyName</span>
-                            }
-                            <span class="badge bg-light text-dark border">@r.RequestType</span>
+
+    .fc-page {
+        background: var(--fc-bg);
+        min-height: 100vh;
+        padding: 2.5rem 1rem 3.5rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    /* ── Top bar ── */
+    .fc-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+    }
+
+    .fc-page-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin: 0;
+    }
+
+    .fc-btn-new {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: .5rem 1.1rem;
+        background: var(--fc-blue);
+        color: #fff;
+        font-size: .82rem;
+        font-weight: 700;
+        border-radius: var(--fc-radius-sm);
+        text-decoration: none;
+        transition: background .15s, transform .12s, box-shadow .15s;
+        box-shadow: 0 3px 10px rgba(26,79,214,.2);
+        white-space: nowrap;
+    }
+
+        .fc-btn-new:hover {
+            background: var(--fc-blue-mid);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 14px rgba(26,79,214,.27);
+        }
+
+    /* ── Empty ── */
+    .fc-empty {
+        text-align: center;
+        padding: 4rem 1rem;
+        color: var(--fc-muted);
+    }
+
+    .fc-empty-icon {
+        font-size: 2.8rem;
+        margin-bottom: .75rem;
+    }
+
+    .fc-empty p {
+        font-size: .9rem;
+        margin-bottom: 1rem;
+    }
+
+    /* ── Grid: 2 cols ── */
+    .fc-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.1rem;
+    }
+
+    /* ── Request Card ── */
+    .fc-req-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        transition: box-shadow .2s, transform .2s;
+    }
+
+        .fc-req-card:hover {
+            box-shadow: var(--fc-shadow-md);
+            transform: translateY(-2px);
+        }
+
+    /* Card top */
+    .fc-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: .5rem;
+        margin-bottom: .55rem;
+    }
+
+    .fc-req-title {
+        font-size: .92rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        line-height: 1.3;
+        flex: 1;
+    }
+
+    /* Status badges */
+    .fc-status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: .7rem;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+        letter-spacing: .2px;
+    }
+
+        .fc-status.pending {
+            background: var(--fc-warning-bg);
+            color: var(--fc-warning);
+            border: 1px solid var(--fc-warning-bdr);
+        }
+
+        .fc-status.inprogress {
+            background: var(--fc-info-bg);
+            color: var(--fc-info);
+            border: 1px solid var(--fc-info-bdr);
+        }
+
+        .fc-status.completed {
+            background: var(--fc-green-bg);
+            color: var(--fc-green);
+            border: 1px solid var(--fc-green-bdr);
+        }
+
+        .fc-status.other {
+            background: #f1f5f9;
+            color: var(--fc-muted);
+            border: 1px solid var(--fc-border);
+        }
+
+    /* Description */
+    .fc-req-desc {
+        font-size: .8rem;
+        color: var(--fc-muted);
+        line-height: 1.55;
+        margin-bottom: .65rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Tags */
+    .fc-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: .7rem;
+    }
+
+    .fc-tag {
+        background: var(--fc-blue-light);
+        color: var(--fc-blue);
+        font-size: .7rem;
+        font-weight: 500;
+        padding: 2px 9px;
+        border-radius: 20px;
+        border: 1px solid #c5d6f8;
+    }
+
+        .fc-tag.type {
+            background: #f1f5f9;
+            color: var(--fc-muted);
+            border-color: var(--fc-border);
+        }
+
+    /* Images */
+    .fc-thumbs {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-bottom: .7rem;
+    }
+
+    .fc-thumb {
+        width: 55px;
+        height: 55px;
+        object-fit: cover;
+        border-radius: 7px;
+        border: 1px solid var(--fc-border);
+        cursor: pointer;
+        transition: transform .15s;
+    }
+
+        .fc-thumb:hover {
+            transform: scale(1.07);
+        }
+
+    /* Footer */
+    .fc-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+        padding-top: .75rem;
+        border-top: 1px solid var(--fc-border);
+        gap: .5rem;
+        flex-wrap: wrap;
+    }
+
+    .fc-req-date {
+        font-size: .72rem;
+        color: var(--fc-muted);
+        flex-shrink: 0;
+    }
+
+    /* Action buttons */
+    .fc-card-actions {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .fc-btn-proposals {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 11px;
+        background: var(--fc-blue);
+        color: #fff;
+        font-size: .73rem;
+        font-weight: 700;
+        border-radius: 7px;
+        text-decoration: none;
+        transition: background .15s;
+        white-space: nowrap;
+    }
+
+        .fc-btn-proposals:hover {
+            background: var(--fc-blue-mid);
+            color: #fff;
+        }
+
+    .fc-btn-edit {
+        padding: 5px 10px;
+        color: var(--fc-muted);
+        font-size: .73rem;
+        font-weight: 600;
+        border: 1.5px solid var(--fc-border);
+        border-radius: 7px;
+        text-decoration: none;
+        transition: all .15s;
+        background: transparent;
+    }
+
+        .fc-btn-edit:hover {
+            border-color: var(--fc-blue);
+            color: var(--fc-blue);
+            background: var(--fc-blue-light);
+        }
+
+    .fc-btn-delete {
+        padding: 5px 9px;
+        color: var(--fc-danger);
+        font-size: .73rem;
+        font-weight: 600;
+        border: 1.5px solid var(--fc-danger-bdr);
+        border-radius: 7px;
+        background: transparent;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background .15s;
+    }
+
+        .fc-btn-delete:hover {
+            background: var(--fc-danger-bg);
+        }
+
+    /* ── Image Modal ── */
+    .fc-img-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10,15,30,.7);
+        backdrop-filter: blur(6px);
+        z-index: 1050;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .fc-img-backdrop.open {
+            display: flex;
+        }
+
+    .fc-img-box {
+        max-width: 700px;
+        width: 92%;
+        border-radius: var(--fc-radius);
+        overflow: hidden;
+        animation: fcIn .2s ease;
+        position: relative;
+    }
+
+    @@keyframes fcIn {
+        from {
+            transform: scale(.93);
+            opacity: 0
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1
+        }
+    }
+
+    .fc-img-box img {
+        width: 100%;
+        max-height: 520px;
+        object-fit: contain;
+        background: #000;
+        display: block;
+    }
+
+    .fc-img-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,.5);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background .15s;
+    }
+
+        .fc-img-close:hover {
+            background: rgba(0,0,0,.85);
+        }
+
+    @@media (max-width: 700px) {
+        .fc-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .fc-card-footer {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="fc-page">
+    <div class="container">
+
+        <!-- Top bar -->
+        <div class="fc-topbar">
+            <h5 class="fc-page-title">📋 My Requests</h5>
+            <a asp-action="CreateRequest" class="fc-btn-new">+ New Request</a>
+        </div>
+
+        @if (!Model.Requests.Any())
+        {
+            <div class="fc-empty">
+                <div class="fc-empty-icon">📋</div>
+                <p>No requests yet. Create your first one!</p>
+                <a asp-action="CreateRequest" class="fc-btn-new">+ Create Request</a>
+            </div>
+        }
+        else
+        {
+            <div class="fc-grid">
+                @foreach (var r in Model.Requests)
+                {
+                    var statusClass = r.Status switch
+                    {
+                        "Pending" => "pending",
+                        "InProgress" => "inprogress",
+                        "Completed" => "completed",
+                        _ => "other"
+                    };
+
+                    <div class="fc-req-card">
+
+                        <!-- Top -->
+                        <div class="fc-card-top">
+                            <div class="fc-req-title">@r.Title</div>
+                            <span class="fc-status @statusClass">@r.Status</span>
                         </div>
 
+                        <!-- Description -->
+                        <p class="fc-req-desc">@r.Description</p>
+
+                        <!-- Tags -->
+                        <div class="fc-tags">
+                            <span class="fc-tag">📍 @r.RegionName</span>
+                            @if (!string.IsNullOrEmpty(r.SpecialtyName))
+                            {
+                                <span class="fc-tag">🔧 @r.SpecialtyName</span>
+                            }
+                            <span class="fc-tag type">@r.RequestType</span>
+                        </div>
+
+                        <!-- Images -->
                         @if (r.ImagePaths.Any())
                         {
-                            <div class="d-flex gap-1 mb-2">
+                            <div class="fc-thumbs">
                                 @foreach (var img in r.ImagePaths.Take(3))
                                 {
-                                    <img src="@img" style="width:50px;height:50px;object-fit:cover;border-radius:4px;" />
+                                    <img src="@img" class="fc-thumb"
+                                         onclick="fcOpenImg('@img')" alt="Request image" />
+                                }
+                                @if (r.ImagePaths.Count > 3)
+                                {
+                                    <span style="font-size:.72rem;color:var(--fc-muted);align-self:center;">
+                                        +@(r.ImagePaths.Count - 3) more
+                                    </span>
                                 }
                             </div>
                         }
 
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <small class="text-muted">@r.CreatedAt.ToString("dd MMM yyyy")</small>
-                            <div class="d-flex gap-1">
-
-                                <!-- Proposals Count Button -->
+                        <!-- Footer -->
+                        <div class="fc-card-footer">
+                            <span class="fc-req-date">@r.CreatedAt.ToString("dd MMM yyyy")</span>
+                            <div class="fc-card-actions">
                                 <a asp-action="RequestProposals"
                                    asp-route-requestId="@r.RequestId"
-                                   class="btn btn-sm btn-dark">
-                                    📨 @r.ProposalCount proposals
+                                   class="fc-btn-proposals">
+                                    📨 @r.ProposalCount
                                 </a>
-
-                                <!-- Edit Button -->
-                                <a asp-action="EditRequest" asp-route-id="@r.RequestId"
-                                   class="btn btn-outline-secondary btn-sm">Edit</a>
-
-                                <!-- Delete Button -->
+                                <a asp-action="EditRequest"
+                                   asp-route-id="@r.RequestId"
+                                   class="fc-btn-edit">Edit</a>
                                 <form asp-action="DeleteRequest" method="post"
                                       onsubmit="return confirm('Delete this request?')">
                                     <input type="hidden" name="requestId" value="@r.RequestId" />
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">🗑</button>
+                                    <button type="submit" class="fc-btn-delete">🗑</button>
                                 </form>
-
                             </div>
                         </div>
+
                     </div>
-                </div>
-            }
-        </div>
-    }
+                }
+            </div>
+        }
+    </div>
 </div>
+
+<!-- Image Modal -->
+<div class="fc-img-backdrop" id="fcImgModal" onclick="fcCloseOnBackdrop(event)">
+    <div class="fc-img-box">
+        <button class="fc-img-close" onclick="fcCloseImg()">✕</button>
+        <img id="fcImgSrc" src="" alt="Preview" />
+    </div>
+</div>
+
+<script>
+    function fcOpenImg(src) {
+        document.getElementById('fcImgSrc').src = src;
+        document.getElementById('fcImgModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function fcCloseImg() {
+        document.getElementById('fcImgModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    function fcCloseOnBackdrop(e) {
+        if (e.target === document.getElementById('fcImgModal')) fcCloseImg();
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') fcCloseImg(); });
+</script>

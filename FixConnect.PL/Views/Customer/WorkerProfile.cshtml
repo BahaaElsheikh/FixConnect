@@ -1,161 +1,552 @@
-﻿ @model FixConnect.BLL.DTOs.PublicWorkerProfileViewModel
+﻿@model FixConnect.BLL.DTOs.PublicWorkerProfileViewModel
 @{
     ViewData["Title"] = Model.FullName;
     Layout = "_CustomerLayout";
 }
 
-<div class="container py-4">
-    <div class="row g-4">
+<style>
+    /* ── FixConnect Design System ── */
+    :root {
+        --fc-blue: #1a4fd6;
+        --fc-blue-light: #e8effe;
+        --fc-blue-mid: #3b6fe8;
+        --fc-bg: #f0f4fb;
+        --fc-card: #ffffff;
+        --fc-text: #1a1f36;
+        --fc-muted: #6b7a99;
+        --fc-border: #dde4f0;
+        --fc-star-on: #f5a623;
+        --fc-star-off: #dde4f0;
+        --fc-success: #16a34a;
+        --fc-warning: #d97706;
+        --fc-secondary: #64748b;
+        --fc-radius: 14px;
+        --fc-radius-sm: 8px;
+        --fc-shadow: 0 2px 16px rgba(26,79,214,.08);
+        --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
+    }
 
-        <!-- Left: Profile Card -->
-        <div class="col-md-4">
-            <div class="card shadow-sm text-center p-4">
+    /* ── Page background ── */
+    .fc-profile-page {
+        background: var(--fc-bg);
+        min-height: 100vh;
+        padding: 2.5rem 0 3.5rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
 
-                <img src="@(Model.PhotoUrl ?? "/uploads/ProfilePictures/default.png")"
-                     class="rounded-circle mx-auto mb-3"
-                     style="width:110px;height:110px;object-fit:cover;" />
+    /* ── Cards ── */
+    .fc-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        padding: 1.75rem;
+        margin-bottom: 1.25rem;
+        transition: box-shadow .2s;
+    }
 
-                <h5 class="fw-bold mb-1">
-                    @Model.FullName
-                    @if (Model.IsVerified)
-                    {
-                        <span class="badge bg-primary ms-1">✔ Verified</span>
-                    }
-                </h5>
+        .fc-card:hover {
+            box-shadow: var(--fc-shadow-md);
+        }
 
-                <p class="text-muted small mb-1" @Model.SpecialtyName</p>
-                <p class="text-muted small mb-2">@Model.Email</p>
+    /* ── Profile Card ── */
+    .fc-profile-photo {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid var(--fc-blue-light);
+        box-shadow: 0 0 0 4px #fff, 0 4px 12px rgba(26,79,214,.18);
+        display: block;
+        margin: 0 auto 1rem;
+    }
 
-                <!-- Stars -->
-                <div class="mb-3">
-                    @for (int i = 1; i <= 5; i++)
-                    {
-                        <span style="color:@(i <= (int)Model.AvgRating ? "#f5a623" : "#ccc");font-size:1.1rem">★</span>
-                    }
-                    <small class="text-muted ms-1">(@Model.AvgRating.ToString("0.0"))</small>
-                </div>
+    .fc-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: .25rem;
+        line-height: 1.3;
+    }
 
-                <!-- Availability -->
-                <span class="badge @(Model.AvailabilityStatus == "Available" ? "bg-success" :
-                                                            Model.AvailabilityStatus == "Busy" ? "bg-warning text-dark" :
-                                                                                                       "bg-secondary")">
-                    @Model.AvailabilityStatus
-                </span>
+    .fc-badge-verified {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        background: var(--fc-blue);
+        color: #fff;
+        font-size: .7rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 20px;
+        vertical-align: middle;
+        margin-left: 4px;
+        letter-spacing: .3px;
+    }
 
-                <hr />
+    .fc-specialty {
+        color: var(--fc-blue-mid);
+        font-size: .875rem;
+        font-weight: 500;
+        margin-bottom: .2rem;
+    }
 
-                <!-- Regions -->
-                <p class="small fw-semibold mb-2">Working Areas</p>
-                <div class="d-flex flex-wrap justify-content-center gap-1">
-                    @foreach (var region in Model.WorkingRegions)
-                    {
-                        <span class="badge bg-light text-dark border">@region</span>
-                    }
-                </div>
-            </div>
-        </div>
+    .fc-email {
+        color: var(--fc-muted);
+        font-size: .8rem;
+        margin-bottom: 1rem;
+    }
 
-        <!-- Right -->
-        <div class="col-md-8">
+    /* ── Stars ── */
+    .fc-stars {
+        line-height: 1;
+    }
 
-            <!-- Bio -->
-            @if (!string.IsNullOrEmpty(Model.Bio))
-            {
-                <div class="card shadow-sm p-4 mb-4">
-                    <h6 class="fw-bold mb-2">About</h6>
-                    <p class="text-muted mb-0">@Model.Bio</p>
-                </div>
+        .fc-stars .star {
+            font-size: 1.15rem;
+        }
+
+            .fc-stars .star.on {
+                color: var(--fc-star-on);
             }
 
-            <!-- Portfolio (View Only — No Buttons) -->
-            <div class="card shadow-sm p-4 mb-4">
-                <h6 class="fw-bold mb-3">Portfolio</h6>
+            .fc-stars .star.off {
+                color: var(--fc-star-off);
+            }
 
-                @if (!Model.PortfolioItems.Any())
-                {
-                    <p class="text-muted small">No portfolio items yet.</p>
-                }
-                else
-                {
-                    <div class="row g-3">
-                        @foreach (var item in Model.PortfolioItems)
+    .fc-rating-value {
+        font-size: .8rem;
+        color: var(--fc-muted);
+        margin-left: 4px;
+    }
+
+    /* ── Availability badges ── */
+    .fc-avail {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: .78rem;
+        font-weight: 600;
+        letter-spacing: .3px;
+    }
+
+        .fc-avail.available {
+            background: #dcfce7;
+            color: var(--fc-success);
+        }
+
+        .fc-avail.busy {
+            background: #fef3c7;
+            color: var(--fc-warning);
+        }
+
+        .fc-avail.unavailable {
+            background: #f1f5f9;
+            color: var(--fc-secondary);
+        }
+
+    /* ── Divider ── */
+    .fc-divider {
+        border: none;
+        border-top: 1px solid var(--fc-border);
+        margin: 1.1rem 0;
+    }
+
+    /* ── Region chips ── */
+    .fc-region-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    .fc-chip {
+        background: var(--fc-blue-light);
+        color: var(--fc-blue);
+        font-size: .75rem;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 20px;
+        border: 1px solid #c5d6f8;
+    }
+
+    /* ── Section headings ── */
+    .fc-section-title {
+        font-size: .85rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        letter-spacing: .4px;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .fc-section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: var(--fc-blue-light);
+            border-radius: 2px;
+        }
+
+    /* ── About ── */
+    .fc-bio-text {
+        color: var(--fc-muted);
+        font-size: .9rem;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    /* ── Portfolio ── */
+    .fc-portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 14px;
+    }
+
+    .fc-portfolio-item {
+        border-radius: var(--fc-radius-sm);
+        overflow: hidden;
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        cursor: pointer;
+        transition: transform .2s, box-shadow .2s;
+    }
+
+        .fc-portfolio-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(26,79,214,.14);
+        }
+
+        .fc-portfolio-item img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            display: block;
+        }
+
+    .fc-portfolio-item-body {
+        padding: 8px 10px 10px;
+    }
+
+        .fc-portfolio-item-body p {
+            margin: 0;
+            font-size: .78rem;
+            color: var(--fc-text);
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fc-portfolio-item-body small {
+            font-size: .72rem;
+            color: var(--fc-muted);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+    .fc-empty {
+        color: var(--fc-muted);
+        font-size: .875rem;
+        padding: .5rem 0;
+    }
+
+    /* ── Reviews ── */
+    .fc-review-item {
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--fc-border);
+    }
+
+        .fc-review-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+    .fc-reviewer-name {
+        font-size: .875rem;
+        font-weight: 600;
+        color: var(--fc-text);
+    }
+
+    .fc-review-stars .star {
+        font-size: .9rem;
+    }
+
+    .fc-review-comment {
+        color: var(--fc-muted);
+        font-size: .845rem;
+        margin: .3rem 0 0;
+        line-height: 1.6;
+    }
+
+    /* ── Modal ── */
+    .fc-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10,15,30,.55);
+        backdrop-filter: blur(4px);
+        z-index: 1050;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .fc-modal-backdrop.open {
+            display: flex;
+        }
+
+    .fc-modal-box {
+        background: #fff;
+        border-radius: var(--fc-radius);
+        box-shadow: 0 20px 60px rgba(0,0,0,.2);
+        max-width: 640px;
+        width: 90%;
+        animation: fcModalIn .22s ease;
+        overflow: hidden;
+    }
+
+    @@keyframes fcModalIn {
+        from {
+            transform: scale(.93);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .fc-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.1rem 1.4rem .6rem;
+        border-bottom: 1px solid var(--fc-border);
+    }
+
+        .fc-modal-header h6 {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--fc-text);
+            margin: 0;
+        }
+
+    .fc-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: var(--fc-muted);
+        cursor: pointer;
+        line-height: 1;
+        padding: 2px 6px;
+        border-radius: 6px;
+        transition: background .15s;
+    }
+
+        .fc-modal-close:hover {
+            background: var(--fc-blue-light);
+            color: var(--fc-blue);
+        }
+
+    .fc-modal-body {
+        padding: 1.2rem 1.4rem 1.4rem;
+        text-align: center;
+    }
+
+        .fc-modal-body img {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: var(--fc-radius-sm);
+            margin-bottom: .8rem;
+        }
+
+        .fc-modal-body p {
+            color: var(--fc-muted);
+            font-size: .875rem;
+            margin: 0;
+        }
+
+    /* ── Responsive ── */
+    @@media (max-width: 767px) {
+        .fc-profile-page {
+            padding: 1.25rem 0 2.5rem;
+        }
+
+        .fc-portfolio-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<div class="fc-profile-page">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- ══ LEFT: Profile Card ══ -->
+            <div class="col-md-4">
+                <div class="fc-card text-center">
+
+                    <img src="@(Model.PhotoUrl ?? "/uploads/ProfilePictures/default.png")"
+                         alt="@Model.FullName"
+                         class="fc-profile-photo" />
+
+                    <div class="fc-name">
+                        @Model.FullName
+                        @if (Model.IsVerified)
                         {
-                            <div class="col-6 col-md-4">
-                                <div class="card border-0 shadow-sm h-100 portfolio-card"
-                                     style="cursor:pointer"
-                                     onclick="openPortfolioModal('@item.ImageUrl', '@item.Title', '@item.Description')">
-                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                    {
-                                        <img src="@item.ImageUrl"
-                                             class="card-img-top"
-                                             style="height:140px;object-fit:cover;" />
-                                    }
-                                    <div class="card-body p-2">
-                                        <p class="fw-semibold small mb-0">@item.Title</p>
-                                        <p class="text-muted" style="font-size:0.75rem">@item.Description</p>
-                                    </div>
-                                </div>
-                            </div>
+                            <span class="fc-badge-verified">✔ Verified</span>
                         }
                     </div>
-                }
+
+                    <div class="fc-specialty">@Model.SpecialtyName</div>
+                    <div class="fc-email">@Model.Email</div>
+
+                    <!-- Rating -->
+                    <div class="fc-stars mb-2">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <span class="star @(i <= (int)Model.AvgRating ? "on" : "off")">★</span>
+                        }
+                        <span class="fc-rating-value">(@Model.AvgRating.ToString("0.0"))</span>
+                    </div>
+
+                    <!-- Availability -->
+                    @{
+                        var availClass = Model.AvailabilityStatus == "Available" ? "available"
+                        : Model.AvailabilityStatus == "Busy" ? "busy"
+                        : "unavailable";
+                    }
+                    <span class="fc-avail @availClass">@Model.AvailabilityStatus</span>
+
+                    <hr class="fc-divider" />
+
+                    <!-- Working Areas -->
+                    <div class="fc-section-title" style="justify-content:center;font-size:.75rem;">Working Areas</div>
+                    <div class="fc-region-chips">
+                        @foreach (var region in Model.WorkingRegions)
+                        {
+                            <span class="fc-chip">@region</span>
+                        }
+                    </div>
+                </div>
             </div>
 
-            <!-- Reviews (View Only) -->
-            <div class="card shadow-sm p-4">
-                <h6 class="fw-bold mb-3">Reviews</h6>
-                @if (!Model.Reviews.Any())
+            <!-- ══ RIGHT: Content ══ -->
+            <div class="col-md-8">
+
+                <!-- Bio -->
+                @if (!string.IsNullOrEmpty(Model.Bio))
                 {
-                    <p class="text-muted small">No reviews yet.</p>
+                    <div class="fc-card">
+                        <div class="fc-section-title">About</div>
+                        <p class="fc-bio-text">@Model.Bio</p>
+                    </div>
                 }
-                else
-                {
-                    @foreach (var r in Model.Reviews)
+
+                <!-- Portfolio -->
+                <div class="fc-card">
+                    <div class="fc-section-title">Portfolio</div>
+
+                    @if (!Model.PortfolioItems.Any())
                     {
-                        <div class="border-bottom pb-3 mb-3">
-                            <div class="d-flex justify-content-between">
-                                <strong class="small">@r.CustomerName</strong>
-                                <span>
-                                    @for (int i = 1; i <= 5; i++)
+                        <p class="fc-empty">No portfolio items yet.</p>
+                    }
+                    else
+                    {
+                        <div class="fc-portfolio-grid">
+                            @foreach (var item in Model.PortfolioItems)
+                            {
+                                <div class="fc-portfolio-item"
+                                     onclick="fcOpenModal('@item.ImageUrl', '@item.Title', '@item.Description')">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
                                     {
-                                        <span style="color:@(i <= r.RatingValue ? "#f5a623" : "#ccc")">★</span>
+                                        <img src="@item.ImageUrl" alt="@item.Title" />
                                     }
-                                </span>
-                            </div>
-                            <p class="text-muted small mb-0">@r.Comment</p>
+                                    <div class="fc-portfolio-item-body">
+                                        <p>@item.Title</p>
+                                        <small>@item.Description</small>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     }
-                }
-            </div>
+                </div>
 
+                <!-- Reviews -->
+                <div class="fc-card">
+                    <div class="fc-section-title">Reviews</div>
+
+                    @if (!Model.Reviews.Any())
+                    {
+                        <p class="fc-empty">No reviews yet.</p>
+                    }
+                    else
+                    {
+                        @foreach (var r in Model.Reviews)
+                        {
+                            <div class="fc-review-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fc-reviewer-name">@r.CustomerName</span>
+                                    <div class="fc-review-stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <span class="star @(i <= r.RatingValue ? "on" : "off")">★</span>
+                                        }
+                                    </div>
+                                </div>
+                                <p class="fc-review-comment">@r.Comment</p>
+                            </div>
+                        }
+                    }
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Portfolio Image Modal -->
-<div class="modal fade" id="portfolioModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-bold" id="portfolioModalTitle"></h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="portfolioModalImage"
-                     src=""
-                     class="img-fluid rounded mb-3"
-                     style="max-height:420px;object-fit:contain;" />
-                <p id="portfolioModalDescription" class="text-muted small mb-0"></p>
-            </div>
+<!-- ══ Portfolio Modal ══ -->
+<div class="fc-modal-backdrop" id="fcPortfolioModal" onclick="fcCloseModalOnBackdrop(event)">
+    <div class="fc-modal-box">
+        <div class="fc-modal-header">
+            <h6 id="fcModalTitle"></h6>
+            <button class="fc-modal-close" onclick="fcCloseModal()">✕</button>
+        </div>
+        <div class="fc-modal-body">
+            <img id="fcModalImage" src="" alt="" />
+            <p id="fcModalDescription"></p>
         </div>
     </div>
 </div>
 
 <script>
-    function openPortfolioModal(imageUrl, title, description) {
-        document.getElementById('portfolioModalImage').src       = imageUrl || '';
-        document.getElementById('portfolioModalTitle').innerText = title   || '';
-        document.getElementById('portfolioModalDescription').innerText = description || '';
-        new bootstrap.Modal(document.getElementById('portfolioModal')).show();
+    function fcOpenModal(imageUrl, title, description) {
+        document.getElementById('fcModalImage').src          = imageUrl    || '';
+        document.getElementById('fcModalTitle').innerText    = title       || '';
+        document.getElementById('fcModalDescription').innerText = description || '';
+        document.getElementById('fcPortfolioModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
     }
+
+    function fcCloseModal() {
+        document.getElementById('fcPortfolioModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function fcCloseModalOnBackdrop(e) {
+        if (e.target === document.getElementById('fcPortfolioModal')) fcCloseModal();
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') fcCloseModal();
+    });
 </script>

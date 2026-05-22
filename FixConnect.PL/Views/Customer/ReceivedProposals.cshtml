@@ -4,209 +4,829 @@
     Layout = "_CustomerLayout";
 }
 
-<div class="container py-4">
-    <h5 class="fw-bold mb-4">Received Proposals</h5>
-
-    @if (!Model.Proposals.Any())
-    {
-        <div class="text-center text-muted py-5">No proposals received yet.</div>
+<style>
+    :root {
+        --fc-blue: #1a4fd6;
+        --fc-blue-light: #e8effe;
+        --fc-blue-mid: #3b6fe8;
+        --fc-bg: #f0f4fb;
+        --fc-card: #ffffff;
+        --fc-text: #1a1f36;
+        --fc-muted: #6b7a99;
+        --fc-border: #dde4f0;
+        --fc-green: #16a34a;
+        --fc-green-bg: #dcfce7;
+        --fc-green-bdr: #86efac;
+        --fc-warning: #d97706;
+        --fc-warning-bg: #fef3c7;
+        --fc-warning-bdr: #fde68a;
+        --fc-danger: #dc2626;
+        --fc-danger-bg: #fee2e2;
+        --fc-danger-bdr: #fca5a5;
+        --fc-star-on: #f5a623;
+        --fc-star-off: #dde4f0;
+        --fc-radius: 14px;
+        --fc-radius-sm: 8px;
+        --fc-shadow: 0 2px 16px rgba(26,79,214,.08);
+        --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
     }
-    else
-    {
-        @foreach (var p in Model.Proposals)
+
+    .fc-page {
+        background: var(--fc-bg);
+        min-height: 100vh;
+        padding: 2.5rem 1rem 3.5rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .fc-page-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: 1.5rem;
+    }
+
+    /* ── Empty ── */
+    .fc-empty {
+        text-align: center;
+        padding: 4rem 1rem;
+        color: var(--fc-muted);
+    }
+
+    .fc-empty-icon {
+        font-size: 2.8rem;
+        margin-bottom: .75rem;
+    }
+
+    .fc-empty p {
+        font-size: .9rem;
+    }
+
+    /* ── Proposal Card ── */
+    .fc-proposal-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        margin-bottom: 1.25rem;
+        overflow: hidden;
+        transition: box-shadow .2s;
+    }
+
+        .fc-proposal-card:hover {
+            box-shadow: var(--fc-shadow-md);
+        }
+
+    /* Card body — 3 columns */
+    .fc-proposal-body {
+        display: grid;
+        grid-template-columns: 200px 1fr 1fr;
+        gap: 0;
+    }
+
+    /* Column dividers */
+    .fc-col-worker {
+        padding: 1.5rem 1.25rem;
+        border-right: 1px solid var(--fc-border);
+        text-align: center;
+    }
+
+    .fc-col-info {
+        padding: 1.5rem 1.25rem;
+        border-right: 1px solid var(--fc-border);
+    }
+
+    .fc-col-extras {
+        padding: 1.5rem 1.25rem;
+    }
+
+    /* ── Worker Column ── */
+    .fc-worker-photo {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--fc-blue-light);
+        box-shadow: 0 0 0 3px #fff, 0 3px 10px rgba(26,79,214,.15);
+        display: block;
+        margin: 0 auto .75rem;
+    }
+
+    .fc-worker-name {
+        font-size: .9rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: .2rem;
+        line-height: 1.3;
+    }
+
+    .fc-badge-verified {
+        display: inline-block;
+        background: var(--fc-blue);
+        color: #fff;
+        font-size: .6rem;
+        font-weight: 700;
+        padding: 1px 6px;
+        border-radius: 20px;
+        margin-left: 3px;
+        vertical-align: middle;
+    }
+
+    .fc-worker-specialty {
+        font-size: .75rem;
+        color: var(--fc-muted);
+        margin-bottom: .5rem;
+    }
+
+    .fc-worker-stars {
+        font-size: .85rem;
+        margin-bottom: .75rem;
+    }
+
+        .fc-worker-stars .s-on {
+            color: var(--fc-star-on);
+        }
+
+        .fc-worker-stars .s-off {
+            color: var(--fc-star-off);
+        }
+
+    .fc-btn-profile {
+        display: block;
+        width: 100%;
+        padding: 5px 0;
+        font-size: .75rem;
+        font-weight: 600;
+        color: var(--fc-blue);
+        background: var(--fc-blue-light);
+        border: 1px solid #c5d6f8;
+        border-radius: var(--fc-radius-sm);
+        text-decoration: none;
+        text-align: center;
+        transition: background .15s;
+    }
+
+        .fc-btn-profile:hover {
+            background: #d4e3fc;
+            color: var(--fc-blue);
+        }
+
+    /* ── Info Column ── */
+    .fc-info-section-title {
+        font-size: .7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: var(--fc-muted);
+        margin-bottom: .6rem;
+    }
+
+    .fc-request-title {
+        font-size: .875rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: .85rem;
+        padding-bottom: .6rem;
+        border-bottom: 1px solid var(--fc-border);
+    }
+
+    /* Stats grid */
+    .fc-info-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        margin-bottom: .85rem;
+    }
+
+    .fc-info-stat {
+        background: var(--fc-bg);
+        border-radius: var(--fc-radius-sm);
+        padding: .5rem .6rem;
+    }
+
+    .fc-info-stat-label {
+        font-size: .65rem;
+        color: var(--fc-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        margin-bottom: .2rem;
+    }
+
+    .fc-info-stat-val {
+        font-size: .85rem;
+        font-weight: 700;
+        color: var(--fc-text);
+    }
+
+    /* Notes */
+    .fc-notes-box {
+        background: var(--fc-bg);
+        border-radius: var(--fc-radius-sm);
+        padding: .5rem .7rem;
+        font-size: .78rem;
+        color: var(--fc-muted);
+        font-style: italic;
+        line-height: 1.5;
+    }
+
+    /* Status badge */
+    .fc-status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .2px;
+        margin-top: .65rem;
+    }
+
+        .fc-status.pending {
+            background: var(--fc-warning-bg);
+            color: var(--fc-warning);
+            border: 1px solid var(--fc-warning-bdr);
+        }
+
+        .fc-status.accepted {
+            background: var(--fc-green-bg);
+            color: var(--fc-green);
+            border: 1px solid var(--fc-green-bdr);
+        }
+
+        .fc-status.rejected {
+            background: var(--fc-danger-bg);
+            color: var(--fc-danger);
+            border: 1px solid var(--fc-danger-bdr);
+        }
+
+        .fc-status.autorejected {
+            background: #f1f5f9;
+            color: var(--fc-muted);
+            border: 1px solid var(--fc-border);
+        }
+
+        .fc-status.other {
+            background: #f1f5f9;
+            color: var(--fc-muted);
+            border: 1px solid var(--fc-border);
+        }
+
+    /* ── Extras Column ── */
+    .fc-portfolio-thumbs {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-bottom: .75rem;
+    }
+
+    .fc-portfolio-thumb {
+        width: 56px;
+        height: 56px;
+        object-fit: cover;
+        border-radius: 7px;
+        border: 1px solid var(--fc-border);
+        cursor: pointer;
+        transition: transform .15s, box-shadow .15s;
+    }
+
+        .fc-portfolio-thumb:hover {
+            transform: scale(1.07);
+            box-shadow: var(--fc-shadow);
+        }
+
+    .fc-review-box {
+        background: var(--fc-bg);
+        border-radius: var(--fc-radius-sm);
+        padding: .6rem .75rem;
+        font-size: .78rem;
+        color: var(--fc-muted);
+        line-height: 1.55;
+        font-style: italic;
+        margin-bottom: .5rem;
+    }
+
+    .fc-review-by {
+        font-size: .72rem;
+        color: var(--fc-muted);
+        font-style: normal;
+    }
+
+    /* ── Card Footer ── */
+    .fc-proposal-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 7px;
+        padding: .85rem 1.25rem;
+        border-top: 1px solid var(--fc-border);
+        background: var(--fc-bg);
+    }
+
+    .fc-btn-details {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: .5rem 1rem;
+        font-size: .8rem;
+        font-weight: 600;
+        color: var(--fc-muted);
+        background: transparent;
+        border: 1.5px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        cursor: pointer;
+        font-family: inherit;
+        transition: all .15s;
+    }
+
+        .fc-btn-details:hover {
+            border-color: var(--fc-blue);
+            color: var(--fc-blue);
+            background: var(--fc-card);
+        }
+
+    .fc-btn-accept {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: .5rem 1.2rem;
+        font-size: .8rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--fc-green);
+        border: none;
+        border-radius: var(--fc-radius-sm);
+        text-decoration: none;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background .15s, transform .12s;
+        box-shadow: 0 3px 10px rgba(22,163,74,.22);
+    }
+
+        .fc-btn-accept:hover {
+            background: #15803d;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    /* ── Modals ── */
+    .fc-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10,15,30,.55);
+        backdrop-filter: blur(4px);
+        z-index: 1050;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .fc-modal-backdrop.open {
+            display: flex;
+        }
+
+    .fc-modal-box {
+        background: #fff;
+        border-radius: var(--fc-radius);
+        box-shadow: 0 20px 60px rgba(0,0,0,.2);
+        max-width: 480px;
+        width: 92%;
+        animation: fcMIn .22s ease;
+        overflow: hidden;
+    }
+
+    @@keyframes fcMIn {
+        from {
+            transform: scale(.93);
+            opacity: 0
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1
+        }
+    }
+
+    .fc-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.1rem 1.4rem .65rem;
+        border-bottom: 1px solid var(--fc-border);
+    }
+
+        .fc-modal-header h6 {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--fc-text);
+            margin: 0;
+        }
+
+    .fc-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        color: var(--fc-muted);
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 6px;
+        transition: background .15s;
+    }
+
+        .fc-modal-close:hover {
+            background: var(--fc-blue-light);
+            color: var(--fc-blue);
+        }
+
+    .fc-modal-body {
+        padding: 1.2rem 1.4rem 1.4rem;
+    }
+
+    .fc-modal-sub {
+        font-size: .78rem;
+        color: var(--fc-muted);
+        margin-bottom: .75rem;
+    }
+
+    /* Detail modal stats */
+    .fc-detail-stats {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .fc-detail-stat {
+        background: var(--fc-bg);
+        border-radius: var(--fc-radius-sm);
+        padding: .6rem .75rem;
+    }
+
+    .fc-detail-stat-label {
+        font-size: .65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        color: var(--fc-muted);
+        margin-bottom: .2rem;
+    }
+
+    .fc-detail-stat-val {
+        font-size: .88rem;
+        font-weight: 700;
+        color: var(--fc-text);
+    }
+
+    .fc-detail-notes {
+        background: var(--fc-bg);
+        border-radius: var(--fc-radius-sm);
+        padding: .65rem .8rem;
+        font-size: .8rem;
+        color: var(--fc-muted);
+        font-style: italic;
+        line-height: 1.55;
+        margin-bottom: .85rem;
+    }
+
+    .fc-detail-divider {
+        border: none;
+        border-top: 1px solid var(--fc-border);
+        margin: .85rem 0;
+    }
+
+    /* Image modal */
+    .fc-img-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10,15,30,.7);
+        backdrop-filter: blur(6px);
+        z-index: 1060;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .fc-img-backdrop.open {
+            display: flex;
+        }
+
+    .fc-img-box {
+        max-width: 700px;
+        width: 92%;
+        border-radius: var(--fc-radius);
+        overflow: hidden;
+        animation: fcMIn .2s ease;
+        position: relative;
+    }
+
+        .fc-img-box img {
+            width: 100%;
+            max-height: 520px;
+            object-fit: contain;
+            background: #000;
+            display: block;
+        }
+
+    .fc-img-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,.5);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .fc-img-close:hover {
+            background: rgba(0,0,0,.85);
+        }
+
+    @@media (max-width: 860px) {
+        .fc-proposal-body {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .fc-col-worker {
+            border-right: none;
+            border-bottom: 1px solid var(--fc-border);
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .fc-worker-photo {
+            margin: 0;
+            width: 56px;
+            height: 56px;
+        }
+
+        .fc-btn-profile {
+            width: auto;
+            padding: 4px 14px;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .fc-proposal-body {
+            grid-template-columns: 1fr;
+        }
+
+        .fc-col-info {
+            border-right: none;
+            border-bottom: 1px solid var(--fc-border);
+        }
+
+        .fc-col-worker {
+            border-bottom: 1px solid var(--fc-border);
+        }
+
+        .fc-info-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
+
+<div class="fc-page">
+    <div class="container">
+
+        <div class="fc-page-title">📨 Received Proposals</div>
+
+        @if (!Model.Proposals.Any())
         {
-            <div class="card shadow-sm mb-4 p-4">
-                <div class="row g-3">
-
-                    <!-- Worker Info -->
-                    <div class="col-md-3 text-center">
-                        <img src="@(p.WorkerPhoto ?? "/uploads/ProfilePictures/default.png")"
-                             class="rounded-circle mb-2"
-                             style="width:80px;height:80px;object-fit:cover;" />
-                        <h6 class="fw-bold mb-0">
-                            @p.WorkerName
-                            @if (p.WorkerIsVerified)
-                            {
-                                <span class="badge bg-primary" style="font-size:0.6rem">✔</span>
-                            }
-                        </h6>
-                        <p class="text-muted small mb-1">@p.WorkerSpecialty</p>
-                        <div class="mb-2">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <span style="color:@(i <= (int)p.WorkerRating ? "#f5a623" : "#ccc")">★</span>
-                            }
-                    </div>
-                    <a asp-controller="Customer" asp-action="WorkerProfile"
-                       asp-route-id="@p.WorkerId"
-                       class="btn btn-outline-secondary btn-sm w-100">
-                        View Profile
-                    </a>
-                </div>
-
-                <!-- Proposal Info -->
-                <div class="col-md-4">
-                    <p class="small text-muted mb-1">
-                        Request: <strong>@p.RequestTitle</strong>
-                    </p>
-                    <p class="small mb-1">
-                        💰 Labor: <strong>@(p.LaborCost?.ToString("0.00") ?? "—") EGP</strong>
-                    </p>
-                    <p class="small mb-1">
-                        🔩 Material: <strong>@(p.MaterialCost?.ToString("0.00") ?? "—") EGP</strong>
-                    </p>
-                    <p class="small mb-1">
-                        📅 Duration: <strong>@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")</strong>
-                    </p>
-                    <p class="small mb-1">
-                        🕐 Est. Start:
-                        <strong>
-                            @(p.EstimatedStartTime.HasValue
-                                                    ? p.EstimatedStartTime.Value.ToString("dd MMM yyyy, hh:mm tt")
-                                                    : "—")
-                    </strong>
-                </p>
-                @if (!string.IsNullOrEmpty(p.Notes))
-                        {
-                            <p class="small mb-1">
-                                📝 Notes: <strong>@p.Notes</strong>
-                            </p>
-                        }
-                        <span class="badge @(p.Status == "Pending"      ? "bg-warning text-dark" :
-                                                                           p.Status == "Accepted" ? "bg-success" :
-                                                                           p.Status == "Rejected" ? "bg-danger" :
-                                                                           p.Status == "AutoRejected" ? "bg-secondary" :
-                                                                                                         "bg-secondary")">
-                    @p.Status
-                </span>
+            <div class="fc-empty">
+                <div class="fc-empty-icon">📨</div>
+                <p>No proposals received yet. Workers will bid on your active requests.</p>
             </div>
+        }
+        else
+        {
+            @foreach (var p in Model.Proposals)
+            {
+                var statusClass = p.Status switch
+                {
+                    "Pending" => "pending",
+                    "Accepted" => "accepted",
+                    "Rejected" => "rejected",
+                    "AutoRejected" => "autorejected",
+                    _ => "other"
+                };
 
-                    <!-- Portfolio & Reviews -->
-                    <div class="col-md-5">
-                @if (p.Portfolio.Any())
-                        {
-                            <p class="small fw-semibold mb-1">Portfolio</p>
-                            <div class="d-flex gap-1 flex-wrap mb-2">
-                                @foreach (var item in p.Portfolio.Take(3))
-                                {
-                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                <div class="fc-proposal-card">
+                    <div class="fc-proposal-body">
+
+                        <!-- ── Worker Column ── -->
+                        <div class="fc-col-worker">
+                            <img src="@(p.WorkerPhoto ?? "/uploads/ProfilePictures/default.png")"
+                                 class="fc-worker-photo" alt="@p.WorkerName" />
+                            <div>
+                                <div class="fc-worker-name">
+                                    @p.WorkerName
+                                    @if (p.WorkerIsVerified)
                                     {
-                                        <img src="@item.ImageUrl"
-                                             style="width:55px;height:55px;object-fit:cover;border-radius:4px;cursor:pointer"
-                                             onclick="openImg('@item.ImageUrl')" />
+                                        <span class="fc-badge-verified">✔</span>
                                     }
-                                }
+                                </div>
+                                <div class="fc-worker-specialty">@p.WorkerSpecialty</div>
+                                <div class="fc-worker-stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span class="@(i <= (int)p.WorkerRating ? "s-on" : "s-off")">★</span>
+                                    }
+                                </div>
+                                <a asp-controller="Customer" asp-action="WorkerProfile"
+                                   asp-route-id="@p.WorkerId"
+                                   class="fc-btn-profile">View Profile</a>
                             </div>
-                        }
+                        </div>
 
-                        @if (p.Reviews.Any())
-                        {
-                            <p class="small fw-semibold mb-1">Latest Review</p>
-                            var rev = p.Reviews.First();
-                            <p class="small text-muted mb-0">
-                                "@rev.Comment" — @rev.CustomerName
-                            </p>
-                        }
+                        <!-- ── Info Column ── -->
+                        <div class="fc-col-info">
+                            <div class="fc-info-section-title">Proposal Details</div>
+                            <div class="fc-request-title">📋 @p.RequestTitle</div>
+
+                            <div class="fc-info-stats">
+                                <div class="fc-info-stat">
+                                    <div class="fc-info-stat-label">💰 Labor</div>
+                                    <div class="fc-info-stat-val">@(p.LaborCost?.ToString("0.00") ?? "—") <small style="font-size:.6rem;font-weight:400;">EGP</small></div>
+                                </div>
+                                <div class="fc-info-stat">
+                                    <div class="fc-info-stat-label">🔩 Material</div>
+                                    <div class="fc-info-stat-val">@(p.MaterialCost?.ToString("0.00") ?? "—") <small style="font-size:.6rem;font-weight:400;">EGP</small></div>
+                                </div>
+                                <div class="fc-info-stat">
+                                    <div class="fc-info-stat-label">📅 Duration</div>
+                                    <div class="fc-info-stat-val">@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")</div>
+                                </div>
+                                <div class="fc-info-stat">
+                                    <div class="fc-info-stat-label">🕐 Est. Start</div>
+                                    <div class="fc-info-stat-val" style="font-size:.72rem;">@(p.EstimatedStartTime.HasValue? p.EstimatedStartTime.Value.ToString("dd MMM, hh:mm tt") : "—")</div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(p.Notes))
+                            {
+                                <div class="fc-notes-box">📝 "@p.Notes"</div>
+                            }
+
+                            <div><span class="fc-status @statusClass">@p.Status</span></div>
+                        </div>
+
+                        <!-- ── Extras Column ── -->
+                        <div class="fc-col-extras">
+                            @if (p.Portfolio.Any())
+                            {
+                                <div class="fc-info-section-title">Portfolio</div>
+                                <div class="fc-portfolio-thumbs">
+                                    @foreach (var item in p.Portfolio.Take(4))
+                                    {
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" class="fc-portfolio-thumb"
+                                                 onclick="fcOpenImg('@item.ImageUrl')" alt="Portfolio" />
+                                        }
+                                    }
+                                </div>
+                            }
+
+                            @if (p.Reviews.Any())
+                            {
+                                var rev = p.Reviews.First();
+                                <div class="fc-info-section-title" style="margin-top:.5rem;">Latest Review</div>
+                                <div class="fc-review-box">
+                                    "@rev.Comment"
+                                    <div class="fc-review-by">— @rev.CustomerName</div>
+                                </div>
+                            }
+                        </div>
+
                     </div>
 
-                    <!-- Actions -->
-                    <div class="col-12 d-flex gap-2 justify-content-end border-top pt-3">
-
-                        <!-- View Details -->
-                        <button class="btn btn-outline-dark btn-sm"
-                                onclick="openDetails(
-                                            '@p.WorkerName',
-                                            '@p.WorkerSpecialty',
-                                            '@p.RequestTitle',
+                    <!-- ── Footer Actions ── -->
+                    <div class="fc-proposal-footer">
+                        <button class="fc-btn-details"
+                                onclick="fcOpenDetails(
+                                            '@Html.Raw(p.WorkerName.Replace("'", "\\\'"))',
+                                            '@Html.Raw((p.WorkerSpecialty ?? "").Replace("'", "\\\'"))',
+                                            '@Html.Raw(p.RequestTitle.Replace("'", "\\\'"))',
                                             '@(p.LaborCost?.ToString("0.00") ?? "—")',
                                             '@(p.MaterialCost?.ToString("0.00") ?? "—")',
                                             '@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")',
                                             '@(p.EstimatedStartTime.HasValue? p.EstimatedStartTime.Value.ToString("dd MMM yyyy, hh:mm tt") : "—")',
-                                            '@(p.Notes ?? "—")',
+                                            '@Html.Raw((p.Notes ?? "—").Replace("'", "\\\'"))',
                                             '@p.Status')">
                             🔍 View Details
                         </button>
 
-                        <!-- Accept (Pending only) -->
                         @if (p.Status == "Pending")
                         {
                             <a asp-action="AcceptProposal"
                                asp-route-proposalId="@p.ProposalId"
-                               class="btn btn-success btn-sm">
+                               class="fc-btn-accept">
                                 ✔ Accept
                             </a>
                         }
-
                     </div>
-
                 </div>
-            </div>
+            }
         }
-    }
+    </div>
 </div>
 
-<!-- Proposal Detail Modal -->
-<div class="modal fade" id="proposalDetailModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow">
-            <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-bold" id="modalWorkerName"></h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<!-- ── Proposal Detail Modal ── -->
+<div class="fc-modal-backdrop" id="fcDetailModal" onclick="fcCloseDetailOnBackdrop(event)">
+    <div class="fc-modal-box">
+        <div class="fc-modal-header">
+            <h6 id="fcModalWorker"></h6>
+            <button class="fc-modal-close" onclick="fcCloseDetail()">✕</button>
+        </div>
+        <div class="fc-modal-body">
+            <div class="fc-modal-sub" id="fcModalSpecialty"></div>
+            <div class="fc-request-title" id="fcModalRequest" style="margin-bottom:.85rem;padding-bottom:.6rem;border-bottom:1px solid var(--fc-border);"></div>
+            <div class="fc-detail-stats">
+                <div class="fc-detail-stat">
+                    <div class="fc-detail-stat-label">💰 Labor</div>
+                    <div class="fc-detail-stat-val" id="fcModalLabor"></div>
+                </div>
+                <div class="fc-detail-stat">
+                    <div class="fc-detail-stat-label">🔩 Material</div>
+                    <div class="fc-detail-stat-val" id="fcModalMaterial"></div>
+                </div>
+                <div class="fc-detail-stat">
+                    <div class="fc-detail-stat-label">📅 Duration</div>
+                    <div class="fc-detail-stat-val" id="fcModalDuration"></div>
+                </div>
+                <div class="fc-detail-stat">
+                    <div class="fc-detail-stat-label">🕐 Est. Start</div>
+                    <div class="fc-detail-stat-val" id="fcModalStart" style="font-size:.75rem;"></div>
+                </div>
             </div>
-            <div class="modal-body">
-                <p class="text-muted small mb-3" id="modalSpecialty"></p>
-                <hr class="mt-0" />
-                <p class="small mb-2">📋 Request: <strong id="modalRequest"></strong></p>
-                <p class="small mb-2">💰 Labor Cost: <strong id="modalLabor"></strong> EGP</p>
-                <p class="small mb-2">🔩 Material Cost: <strong id="modalMaterial"></strong> EGP</p>
-                <p class="small mb-2">📅 Duration: <strong id="modalDuration"></strong></p>
-                <p class="small mb-2">🕐 Estimated Start: <strong id="modalStart"></strong></p>
-                <p class="small mb-2">📝 Notes: <strong id="modalNotes"></strong></p>
-                <hr />
-                <p class="small mb-0">
-                    Status: <span id="modalStatus" class="badge"></span>
-                </p>
-            </div>
+            <div class="fc-detail-notes" id="fcModalNotes"></div>
+            <hr class="fc-detail-divider" />
+            <div>Status: <span id="fcModalStatus" class="fc-status"></span></div>
         </div>
     </div>
 </div>
 
-<!-- Image Zoom Modal -->
-<div class="modal fade" id="imgModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-body text-center p-2">
-                <img id="imgSrc" src="" class="img-fluid rounded"
-                     style="max-height:500px;object-fit:contain;" />
-            </div>
-        </div>
+<!-- ── Image Modal ── -->
+<div class="fc-img-backdrop" id="fcImgModal" onclick="fcCloseImgOnBackdrop(event)">
+    <div class="fc-img-box">
+        <button class="fc-img-close" onclick="fcCloseImg()">✕</button>
+        <img id="fcImgSrc" src="" alt="Preview" />
     </div>
 </div>
 
 <script>
-    function openDetails(worker, specialty, request, labor, material, duration, start, notes, status) {
-        document.getElementById('modalWorkerName').innerText = worker;
-        document.getElementById('modalSpecialty').innerText  = specialty || '—';
-        document.getElementById('modalRequest').innerText    = request;
-        document.getElementById('modalLabor').innerText      = labor;
-        document.getElementById('modalMaterial').innerText   = material;
-        document.getElementById('modalDuration').innerText   = duration;
-        document.getElementById('modalStart').innerText      = start;
-        document.getElementById('modalNotes').innerText      = notes || '—';
+    /* ── Detail Modal ── */
+    function fcOpenDetails(worker, specialty, request, labor, material, duration, start, notes, status) {
+        document.getElementById('fcModalWorker').innerText   = worker;
+        document.getElementById('fcModalSpecialty').innerText = specialty || '—';
+        document.getElementById('fcModalRequest').innerText  = '📋 ' + request;
+        document.getElementById('fcModalLabor').innerText    = labor + ' EGP';
+        document.getElementById('fcModalMaterial').innerText = material + ' EGP';
+        document.getElementById('fcModalDuration').innerText = duration;
+        document.getElementById('fcModalStart').innerText    = start;
+        document.getElementById('fcModalNotes').innerText    = '📝 ' + (notes || '—');
 
-        const badge = document.getElementById('modalStatus');
+        const badge = document.getElementById('fcModalStatus');
         badge.innerText = status;
-        badge.className = 'badge ' + (
-            status === 'Pending'      ? 'bg-warning text-dark' :
-            status === 'Accepted'     ? 'bg-success'           :
-            status === 'Rejected'     ? 'bg-danger'            :
-            status === 'AutoRejected' ? 'bg-secondary'         : 'bg-secondary');
+        badge.className = 'fc-status ' + (
+            status === 'Pending'      ? 'pending'      :
+            status === 'Accepted'     ? 'accepted'     :
+            status === 'Rejected'     ? 'rejected'     :
+            status === 'AutoRejected' ? 'autorejected' : 'other');
 
-        new bootstrap.Modal(document.getElementById('proposalDetailModal')).show();
+        document.getElementById('fcDetailModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function fcCloseDetail() {
+        document.getElementById('fcDetailModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    function fcCloseDetailOnBackdrop(e) {
+        if (e.target === document.getElementById('fcDetailModal')) fcCloseDetail();
     }
 
-    function openImg(src) {
-        document.getElementById('imgSrc').src = src;
-        new bootstrap.Modal(document.getElementById('imgModal')).show();
+    /* ── Image Modal ── */
+    function fcOpenImg(src) {
+        document.getElementById('fcImgSrc').src = src;
+        document.getElementById('fcImgModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
     }
+    function fcCloseImg() {
+        document.getElementById('fcImgModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    function fcCloseImgOnBackdrop(e) {
+        if (e.target === document.getElementById('fcImgModal')) fcCloseImg();
+    }
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { fcCloseDetail(); fcCloseImg(); }
+    });
 </script>

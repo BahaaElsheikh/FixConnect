@@ -1,0 +1,133 @@
+﻿@model FixConnect.PL.ViewModels.CustomerJobsViewModel
+@{
+    ViewData["Title"] = "My Jobs";
+    Layout = "_CustomerLayout";
+}
+
+<div class="container py-4">
+    <h5 class="fw-bold mb-4">My Jobs</h5>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (!Model.Jobs.Any())
+    {
+        <div class="text-center text-muted py-5">No jobs yet.</div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var j in Model.Jobs)
+            {
+                <div class="col-md-6">
+                    <div class="card shadow-sm p-3 h-100">
+
+                        <!-- Title + Status -->
+                        <div class="d-flex justify-content-between mb-2">
+                            <h6 class="fw-bold mb-0">@j.RequestTitle</h6>
+                            <span class="badge @(j.Status == "Active"    ? "bg-info text-dark"    :
+                                                                                   j.Status == "Completed" ? "bg-success" :
+                                                                                   j.Status == "Disputed" ? "bg-warning text-dark" :
+                                                                                                              "bg-secondary")">
+                                                                                                                           @(j.WorkerMarkedFinished ? "Awaiting Confirmation" : j.Status)
+                                                                                                                       </span>
+                                                                                                                   </div>
+
+                        <!-- Worker -->
+                        <div class="d-flex gap-2 align-items-center mb-3">
+                            <img src="@(j.WorkerPhoto ?? "/uploads/ProfilePictures/default.png")"
+                                 class="rounded-circle"
+                                 style="width:32px;height:32px;object-fit:cover;" />
+                            <span class="small">@j.WorkerName</span>
+                        </div>
+
+                        <!-- Cost Breakdown -->
+                        <div class="bg-light rounded p-2 mb-3" style="font-size:0.82rem">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">🔧 Service Cost</span>
+                                <span class="fw-semibold">
+                                    @((j.LaborCost ?? 0).ToString("0.00")) EGP
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">🧱 Materials</span>
+                                <span class="fw-semibold">
+                                    @((j.LiveInvoiceTotal).ToString("0.00")) EGP
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between border-top pt-1 mt-1">
+                                <span class="fw-bold">Total</span>
+                                <span class="fw-bold">@((j.LiveInvoiceTotal + (j.LaborCost ?? 0)).ToString("0.00")) EGP</span>
+                            </div>
+                        </div>
+
+                        <!-- Started -->
+                        <p class="small text-muted mb-3">
+                            Started:
+                            <strong>
+                                @(j.ActualStartDate.HasValue
+                                                        ? j.ActualStartDate.Value.ToString("dd MMM yyyy")
+                                                        : "Not started yet")
+                    </strong>
+                </p>
+
+                        <!-- Confirm Completion -->
+                @if (j.WorkerMarkedFinished)
+                        {
+                            <form asp-action="ConfirmCompletion" method="post" class="mb-2">
+                                <input type="hidden" name="jobId" value="@j.JobId" />
+                                <button type="submit" class="btn btn-success w-100 fw-bold"
+                                        onclick="return confirm('Confirm job completion?')">
+                                    ✔ Confirm Completion
+                                </button>
+                            </form>
+                        }
+
+                        <!-- View Invoice -->
+                        <button class="btn btn-outline-dark btn-sm w-100"
+                                onclick="openInvoice(@j.JobId)">
+                            🧾 View Invoice
+                        </button>
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Invoice Modal — خارج الـ loop -->
+<div class="modal fade" id="invoiceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow">
+            <div class="modal-header border-0">
+                <h6 class="modal-title fw-bold">🧾 Job Invoice</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="invoiceBody">
+                <div class="text-center py-4 text-muted">Loading...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openInvoice(jobId) {
+        document.getElementById('invoiceBody').innerHTML =
+            '<div class="text-center py-4 text-muted">Loading...</div>';
+
+        new bootstrap.Modal(document.getElementById('invoiceModal')).show();
+
+        fetch(`/Customer/JobInvoice?jobId=${jobId}`)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('invoiceBody').innerHTML = html;
+            });
+    }
+</script>

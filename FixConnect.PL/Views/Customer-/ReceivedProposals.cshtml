@@ -1,0 +1,212 @@
+﻿@model FixConnect.PL.ViewModels.ReceivedProposalsViewModel
+@{
+    ViewData["Title"] = "Received Proposals";
+    Layout = "_CustomerLayout";
+}
+
+<div class="container py-4">
+    <h5 class="fw-bold mb-4">Received Proposals</h5>
+
+    @if (!Model.Proposals.Any())
+    {
+        <div class="text-center text-muted py-5">No proposals received yet.</div>
+    }
+    else
+    {
+        @foreach (var p in Model.Proposals)
+        {
+            <div class="card shadow-sm mb-4 p-4">
+                <div class="row g-3">
+
+                    <!-- Worker Info -->
+                    <div class="col-md-3 text-center">
+                        <img src="@(p.WorkerPhoto ?? "/uploads/ProfilePictures/default.png")"
+                             class="rounded-circle mb-2"
+                             style="width:80px;height:80px;object-fit:cover;" />
+                        <h6 class="fw-bold mb-0">
+                            @p.WorkerName
+                            @if (p.WorkerIsVerified)
+                            {
+                                <span class="badge bg-primary" style="font-size:0.6rem">✔</span>
+                            }
+                        </h6>
+                        <p class="text-muted small mb-1">@p.WorkerSpecialty</p>
+                        <div class="mb-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span style="color:@(i <= (int)p.WorkerRating ? "#f5a623" : "#ccc")">★</span>
+                            }
+                    </div>
+                    <a asp-controller="Customer" asp-action="WorkerProfile"
+                       asp-route-id="@p.WorkerId"
+                       class="btn btn-outline-secondary btn-sm w-100">
+                        View Profile
+                    </a>
+                </div>
+
+                <!-- Proposal Info -->
+                <div class="col-md-4">
+                    <p class="small text-muted mb-1">
+                        Request: <strong>@p.RequestTitle</strong>
+                    </p>
+                    <p class="small mb-1">
+                        💰 Labor: <strong>@(p.LaborCost?.ToString("0.00") ?? "—") EGP</strong>
+                    </p>
+                    <p class="small mb-1">
+                        🔩 Material: <strong>@(p.MaterialCost?.ToString("0.00") ?? "—") EGP</strong>
+                    </p>
+                    <p class="small mb-1">
+                        📅 Duration: <strong>@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")</strong>
+                    </p>
+                    <p class="small mb-1">
+                        🕐 Est. Start:
+                        <strong>
+                            @(p.EstimatedStartTime.HasValue
+                                                    ? p.EstimatedStartTime.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                                    : "—")
+                    </strong>
+                </p>
+                @if (!string.IsNullOrEmpty(p.Notes))
+                        {
+                            <p class="small mb-1">
+                                📝 Notes: <strong>@p.Notes</strong>
+                            </p>
+                        }
+                        <span class="badge @(p.Status == "Pending"      ? "bg-warning text-dark" :
+                                                                           p.Status == "Accepted" ? "bg-success" :
+                                                                           p.Status == "Rejected" ? "bg-danger" :
+                                                                           p.Status == "AutoRejected" ? "bg-secondary" :
+                                                                                                         "bg-secondary")">
+                    @p.Status
+                </span>
+            </div>
+
+                    <!-- Portfolio & Reviews -->
+                    <div class="col-md-5">
+                @if (p.Portfolio.Any())
+                        {
+                            <p class="small fw-semibold mb-1">Portfolio</p>
+                            <div class="d-flex gap-1 flex-wrap mb-2">
+                                @foreach (var item in p.Portfolio.Take(3))
+                                {
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl"
+                                             style="width:55px;height:55px;object-fit:cover;border-radius:4px;cursor:pointer"
+                                             onclick="openImg('@item.ImageUrl')" />
+                                    }
+                                }
+                            </div>
+                        }
+
+                        @if (p.Reviews.Any())
+                        {
+                            <p class="small fw-semibold mb-1">Latest Review</p>
+                            var rev = p.Reviews.First();
+                            <p class="small text-muted mb-0">
+                                "@rev.Comment" — @rev.CustomerName
+                            </p>
+                        }
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="col-12 d-flex gap-2 justify-content-end border-top pt-3">
+
+                        <!-- View Details -->
+                        <button class="btn btn-outline-dark btn-sm"
+                                onclick="openDetails(
+                                            '@p.WorkerName',
+                                            '@p.WorkerSpecialty',
+                                            '@p.RequestTitle',
+                                            '@(p.LaborCost?.ToString("0.00") ?? "—")',
+                                            '@(p.MaterialCost?.ToString("0.00") ?? "—")',
+                                            '@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")',
+                                            '@(p.EstimatedStartTime.HasValue? p.EstimatedStartTime.Value.ToString("dd MMM yyyy, hh:mm tt") : "—")',
+                                            '@(p.Notes ?? "—")',
+                                            '@p.Status')">
+                            🔍 View Details
+                        </button>
+
+                        <!-- Accept (Pending only) -->
+                        @if (p.Status == "Pending")
+                        {
+                            <a asp-action="AcceptProposal"
+                               asp-route-proposalId="@p.ProposalId"
+                               class="btn btn-success btn-sm">
+                                ✔ Accept
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<!-- Proposal Detail Modal -->
+<div class="modal fade" id="proposalDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold" id="modalWorkerName"></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3" id="modalSpecialty"></p>
+                <hr class="mt-0" />
+                <p class="small mb-2">📋 Request: <strong id="modalRequest"></strong></p>
+                <p class="small mb-2">💰 Labor Cost: <strong id="modalLabor"></strong> EGP</p>
+                <p class="small mb-2">🔩 Material Cost: <strong id="modalMaterial"></strong> EGP</p>
+                <p class="small mb-2">📅 Duration: <strong id="modalDuration"></strong></p>
+                <p class="small mb-2">🕐 Estimated Start: <strong id="modalStart"></strong></p>
+                <p class="small mb-2">📝 Notes: <strong id="modalNotes"></strong></p>
+                <hr />
+                <p class="small mb-0">
+                    Status: <span id="modalStatus" class="badge"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Zoom Modal -->
+<div class="modal fade" id="imgModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-body text-center p-2">
+                <img id="imgSrc" src="" class="img-fluid rounded"
+                     style="max-height:500px;object-fit:contain;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDetails(worker, specialty, request, labor, material, duration, start, notes, status) {
+        document.getElementById('modalWorkerName').innerText = worker;
+        document.getElementById('modalSpecialty').innerText  = specialty || '—';
+        document.getElementById('modalRequest').innerText    = request;
+        document.getElementById('modalLabor').innerText      = labor;
+        document.getElementById('modalMaterial').innerText   = material;
+        document.getElementById('modalDuration').innerText   = duration;
+        document.getElementById('modalStart').innerText      = start;
+        document.getElementById('modalNotes').innerText      = notes || '—';
+
+        const badge = document.getElementById('modalStatus');
+        badge.innerText = status;
+        badge.className = 'badge ' + (
+            status === 'Pending'      ? 'bg-warning text-dark' :
+            status === 'Accepted'     ? 'bg-success'           :
+            status === 'Rejected'     ? 'bg-danger'            :
+            status === 'AutoRejected' ? 'bg-secondary'         : 'bg-secondary');
+
+        new bootstrap.Modal(document.getElementById('proposalDetailModal')).show();
+    }
+
+    function openImg(src) {
+        document.getElementById('imgSrc').src = src;
+        new bootstrap.Modal(document.getElementById('imgModal')).show();
+    }
+</script>

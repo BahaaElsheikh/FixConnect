@@ -4,130 +4,655 @@
     Layout = "_CustomerLayout";
 }
 
-<div class="container py-4">
-    <h5 class="fw-bold mb-4">My Jobs</h5>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
+<style>
+    :root {
+        --fc-blue: #1a4fd6;
+        --fc-blue-light: #e8effe;
+        --fc-blue-mid: #3b6fe8;
+        --fc-bg: #f0f4fb;
+        --fc-card: #ffffff;
+        --fc-text: #1a1f36;
+        --fc-muted: #6b7a99;
+        --fc-border: #dde4f0;
+        --fc-green: #16a34a;
+        --fc-green-bg: #dcfce7;
+        --fc-green-bdr: #86efac;
+        --fc-warning: #d97706;
+        --fc-warning-bg: #fef3c7;
+        --fc-warning-bdr: #fde68a;
+        --fc-info: #0284c7;
+        --fc-info-bg: #e0f2fe;
+        --fc-info-bdr: #7dd3fc;
+        --fc-danger: #dc2626;
+        --fc-danger-bg: #fee2e2;
+        --fc-danger-bdr: #fca5a5;
+        --fc-radius: 14px;
+        --fc-radius-sm: 8px;
+        --fc-shadow: 0 2px 16px rgba(26,79,214,.08);
+        --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
     }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
+
+    .fc-page {
+        background: var(--fc-bg);
+        min-height: 100vh;
+        padding: 2.5rem 1rem 3.5rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
-    @if (!Model.Jobs.Any())
-    {
-        <div class="text-center text-muted py-5">No jobs yet.</div>
+    .fc-page-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: 1.5rem;
     }
-    else
-    {
-        <div class="row g-3">
-            @foreach (var j in Model.Jobs)
-            {
-                <div class="col-md-6">
-                    <div class="card shadow-sm p-3 h-100">
 
-                        <!-- Title + Status -->
-                        <div class="d-flex justify-content-between mb-2">
-                            <h6 class="fw-bold mb-0">@j.RequestTitle</h6>
-                            <span class="badge @(j.Status == "Active"    ? "bg-info text-dark"    :
-                                                                                   j.Status == "Completed" ? "bg-success" :
-                                                                                   j.Status == "Disputed" ? "bg-warning text-dark" :
-                                                                                                              "bg-secondary")">
-                                                                                                                           @(j.WorkerMarkedFinished ? "Awaiting Confirmation" : j.Status)
-                                                                                                                       </span>
-                                                                                                                   </div>
+    /* ── Toast ── */
+    .fc-toast-wrap {
+        position: fixed;
+        top: 1.25rem;
+        right: 1.25rem;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+    }
+
+    .fc-toast {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: var(--fc-card);
+        border-radius: var(--fc-radius-sm);
+        box-shadow: 0 8px 30px rgba(0,0,0,.14);
+        padding: .9rem 1.1rem;
+        min-width: 280px;
+        max-width: 360px;
+        pointer-events: all;
+        animation: fcToastIn .3s ease forwards;
+        border-left: 4px solid transparent;
+    }
+
+        .fc-toast.success {
+            border-left-color: var(--fc-green);
+        }
+
+        .fc-toast.danger {
+            border-left-color: var(--fc-danger);
+        }
+
+    .fc-toast-icon {
+        font-size: 1.15rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .fc-toast-body {
+        flex: 1;
+    }
+
+    .fc-toast-title {
+        font-size: .82rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: 2px;
+    }
+
+    .fc-toast-msg {
+        font-size: .8rem;
+        color: var(--fc-muted);
+        margin: 0;
+    }
+
+    .fc-toast-close {
+        background: none;
+        border: none;
+        font-size: .85rem;
+        color: var(--fc-muted);
+        cursor: pointer;
+        padding: 0;
+        flex-shrink: 0;
+    }
+
+        .fc-toast-close:hover {
+            color: var(--fc-text);
+        }
+
+    @@keyframes fcToastIn {
+        from {
+            transform: translateX(20px);
+            opacity: 0
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1
+        }
+    }
+
+    @@keyframes fcToastOut {
+        from {
+            transform: translateX(0);
+            opacity: 1
+        }
+
+        to {
+            transform: translateX(20px);
+            opacity: 0
+        }
+    }
+
+    /* ── Empty ── */
+    .fc-empty {
+        text-align: center;
+        padding: 4rem 1rem;
+        color: var(--fc-muted);
+    }
+
+    .fc-empty-icon {
+        font-size: 2.8rem;
+        margin-bottom: .75rem;
+    }
+
+    .fc-empty p {
+        font-size: .9rem;
+    }
+
+    /* ── Grid 2 cols ── */
+    .fc-grid {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 1.1rem;
+    }
+
+    /* ── Job Card ── */
+    .fc-job-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow .2s, transform .2s;
+    }
+
+        .fc-job-card:hover {
+            box-shadow: var(--fc-shadow-md);
+            transform: translateY(-2px);
+        }
+
+    /* Card top */
+    .fc-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: .5rem;
+        margin-bottom: .75rem;
+    }
+
+    .fc-job-title {
+        font-size: .95rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        line-height: 1.3;
+        flex: 1;
+    }
+
+    /* Status */
+    .fc-status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: .7rem;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+        letter-spacing: .2px;
+    }
+
+        .fc-status.active {
+            background: var(--fc-info-bg);
+            color: var(--fc-info);
+            border: 1px solid var(--fc-info-bdr);
+        }
+
+        .fc-status.completed {
+            background: var(--fc-green-bg);
+            color: var(--fc-green);
+            border: 1px solid var(--fc-green-bdr);
+        }
+
+        .fc-status.disputed {
+            background: var(--fc-warning-bg);
+            color: var(--fc-warning);
+            border: 1px solid var(--fc-warning-bdr);
+        }
+
+        .fc-status.awaiting {
+            background: #f5f3ff;
+            color: #7c3aed;
+            border: 1px solid #ddd6fe;
+        }
+
+        .fc-status.other {
+            background: #f1f5f9;
+            color: var(--fc-muted);
+            border: 1px solid var(--fc-border);
+        }
+
+    /* Worker row */
+    .fc-worker-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: .6rem .75rem;
+        background: var(--fc-bg);
+        border-radius: var(--fc-radius-sm);
+        margin-bottom: .85rem;
+    }
+
+    .fc-worker-photo {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--fc-blue-light);
+        flex-shrink: 0;
+    }
+
+    .fc-worker-name {
+        font-size: .83rem;
+        font-weight: 600;
+        color: var(--fc-text);
+    }
+
+    /* Cost breakdown */
+    .fc-cost-box {
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        overflow: hidden;
+        margin-bottom: .85rem;
+    }
+
+    .fc-cost-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: .5rem .85rem;
+        font-size: .82rem;
+        border-bottom: 1px solid var(--fc-border);
+    }
+
+        .fc-cost-row:last-child {
+            border-bottom: none;
+        }
+
+        .fc-cost-row.total {
+            background: var(--fc-text);
+            border-bottom: none;
+        }
+
+            .fc-cost-row.total .fc-cost-label,
+            .fc-cost-row.total .fc-cost-val {
+                color: #fff;
+                font-weight: 700;
+                font-size: .875rem;
+            }
+
+    .fc-cost-label {
+        color: var(--fc-muted);
+    }
+
+    .fc-cost-val {
+        font-weight: 600;
+        color: var(--fc-text);
+    }
+
+    /* Started */
+    .fc-started {
+        font-size: .78rem;
+        color: var(--fc-muted);
+        margin-bottom: .85rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .fc-started strong {
+            color: var(--fc-text);
+            font-weight: 600;
+        }
+
+    /* Action buttons */
+    .fc-card-actions {
+        display: flex;
+        gap: 7px;
+        margin-top: auto;
+    }
+
+    .fc-btn-confirm {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: .6rem .75rem;
+        background: var(--fc-green);
+        color: #fff;
+        font-size: .8rem;
+        font-weight: 700;
+        border: none;
+        border-radius: var(--fc-radius-sm);
+        cursor: pointer;
+        font-family: inherit;
+        transition: background .15s, transform .12s;
+    }
+
+        .fc-btn-confirm:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+        }
+
+    .fc-btn-invoice {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: .6rem .75rem;
+        background: transparent;
+        color: var(--fc-blue);
+        font-size: .8rem;
+        font-weight: 600;
+        border: 1.5px solid #c5d6f8;
+        border-radius: var(--fc-radius-sm);
+        cursor: pointer;
+        font-family: inherit;
+        transition: background .15s;
+    }
+
+        .fc-btn-invoice:hover {
+            background: var(--fc-blue-light);
+        }
+
+    /* ── Invoice Modal ── */
+    .fc-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10,15,30,.55);
+        backdrop-filter: blur(4px);
+        z-index: 1050;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .fc-modal-backdrop.open {
+            display: flex;
+        }
+
+    .fc-modal-box {
+        background: #fff;
+        border-radius: var(--fc-radius);
+        box-shadow: 0 20px 60px rgba(0,0,0,.2);
+        max-width: 560px;
+        width: 92%;
+        max-height: 85vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: fcMIn .22s ease;
+    }
+
+    @@keyframes fcMIn {
+        from {
+            transform: scale(.93);
+            opacity: 0
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1
+        }
+    }
+
+    .fc-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.1rem 1.4rem .65rem;
+        border-bottom: 1px solid var(--fc-border);
+        flex-shrink: 0;
+    }
+
+        .fc-modal-header h6 {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--fc-text);
+            margin: 0;
+        }
+
+    .fc-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        color: var(--fc-muted);
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 6px;
+        transition: background .15s;
+    }
+
+        .fc-modal-close:hover {
+            background: var(--fc-blue-light);
+            color: var(--fc-blue);
+        }
+
+    .fc-modal-body {
+        padding: 1.2rem 1.4rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    /* Loading spinner */
+    .fc-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5rem;
+        color: var(--fc-muted);
+        font-size: .875rem;
+        gap: .75rem;
+    }
+
+    .fc-spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid var(--fc-border);
+        border-top-color: var(--fc-blue);
+        border-radius: 50%;
+        animation: fcSpin .7s linear infinite;
+    }
+
+    @@keyframes fcSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@media (max-width: 700px) {
+        .fc-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Toast -->
+<div class="fc-toast-wrap" id="fcToastWrap"></div>
+
+<div class="fc-page">
+    <div class="container">
+
+        <div class="fc-page-title">🔨 My Jobs</div>
+
+        @if (!Model.Jobs.Any())
+        {
+            <div class="fc-empty">
+                <div class="fc-empty-icon">🔨</div>
+                <p>No jobs yet. Accept a proposal to start your first job.</p>
+            </div>
+        }
+        else
+        {
+            <div class="fc-grid">
+                @foreach (var j in Model.Jobs)
+                {
+                    var displayStatus = j.WorkerMarkedFinished ? "awaiting" : j.Status switch
+                    {
+                        "Active" => "active",
+                        "Completed" => "completed",
+                        "Disputed" => "disputed",
+                        _ => "other"
+                    };
+                    var displayLabel = j.WorkerMarkedFinished ? "⏳ Awaiting Confirmation" : j.Status;
+
+                    <div class="fc-job-card">
+
+                        <!-- Top -->
+                        <div class="fc-card-top">
+                            <div class="fc-job-title">@j.RequestTitle</div>
+                            <span class="fc-status @displayStatus">@displayLabel</span>
+                        </div>
 
                         <!-- Worker -->
-                        <div class="d-flex gap-2 align-items-center mb-3">
+                        <div class="fc-worker-row">
                             <img src="@(j.WorkerPhoto ?? "/uploads/ProfilePictures/default.png")"
-                                 class="rounded-circle"
-                                 style="width:32px;height:32px;object-fit:cover;" />
-                            <span class="small">@j.WorkerName</span>
+                                 class="fc-worker-photo" alt="@j.WorkerName" />
+                            <span class="fc-worker-name">@j.WorkerName</span>
                         </div>
 
                         <!-- Cost Breakdown -->
-                        <div class="bg-light rounded p-2 mb-3" style="font-size:0.82rem">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span class="text-muted">🔧 Service Cost</span>
-                                <span class="fw-semibold">
-                                    @((j.LaborCost ?? 0).ToString("0.00")) EGP
-                                </span>
+                        <div class="fc-cost-box">
+                            <div class="fc-cost-row">
+                                <span class="fc-cost-label">🔧 Service Cost</span>
+                                <span class="fc-cost-val">@((j.LaborCost ?? 0).ToString("0.00")) EGP</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span class="text-muted">🧱 Materials</span>
-                                <span class="fw-semibold">
-                                    @((j.LiveInvoiceTotal).ToString("0.00")) EGP
-                                </span>
+                            <div class="fc-cost-row">
+                                <span class="fc-cost-label">🧱 Materials</span>
+                                <span class="fc-cost-val">@j.LiveInvoiceTotal.ToString("0.00") EGP</span>
                             </div>
-                            <div class="d-flex justify-content-between border-top pt-1 mt-1">
-                                <span class="fw-bold">Total</span>
-                                <span class="fw-bold">@((j.LiveInvoiceTotal + (j.LaborCost ?? 0)).ToString("0.00")) EGP</span>
+                            <div class="fc-cost-row total">
+                                <span class="fc-cost-label">Total</span>
+                                <span class="fc-cost-val">@((j.LiveInvoiceTotal + (j.LaborCost ?? 0)).ToString("0.00")) EGP</span>
                             </div>
                         </div>
 
                         <!-- Started -->
-                        <p class="small text-muted mb-3">
-                            Started:
+                        <div class="fc-started">
+                            📅 Started:
                             <strong>
                                 @(j.ActualStartDate.HasValue
                                                         ? j.ActualStartDate.Value.ToString("dd MMM yyyy")
                                                         : "Not started yet")
                     </strong>
-                </p>
+                </div>
 
-                        <!-- Confirm Completion -->
-                @if (j.WorkerMarkedFinished)
-                        {
-                            <form asp-action="ConfirmCompletion" method="post" class="mb-2">
-                                <input type="hidden" name="jobId" value="@j.JobId" />
-                                <button type="submit" class="btn btn-success w-100 fw-bold"
-                                        onclick="return confirm('Confirm job completion?')">
-                                    ✔ Confirm Completion
-                                </button>
-                            </form>
-                        }
-
-                        <!-- View Invoice -->
-                        <button class="btn btn-outline-dark btn-sm w-100"
-                                onclick="openInvoice(@j.JobId)">
-                            🧾 View Invoice
-                        </button>
+                        <!-- Actions -->
+                        <div class="fc-card-actions">
+                    @if (j.WorkerMarkedFinished)
+                            {
+                                <form asp-action="ConfirmCompletion" method="post" style="flex:1;display:flex;">
+                                    <input type="hidden" name="jobId" value="@j.JobId" />
+                                    <button type="submit" class="fc-btn-confirm w-100"
+                                            onclick="return confirm('Confirm job completion?')">
+                                        ✔ Confirm Completion
+                                    </button>
+                                </form>
+                            }
+                            <button class="fc-btn-invoice" onclick="fcOpenInvoice(@j.JobId)">
+                                🧾 View Invoice
+                            </button>
+                        </div>
 
                     </div>
-                </div>
-            }
-        </div>
-    }
+                }
+            </div>
+        }
+    </div>
 </div>
 
-<!-- Invoice Modal — خارج الـ loop -->
-<div class="modal fade" id="invoiceModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow">
-            <div class="modal-header border-0">
-                <h6 class="modal-title fw-bold">🧾 Job Invoice</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="invoiceBody">
-                <div class="text-center py-4 text-muted">Loading...</div>
+<!-- Invoice Modal -->
+<div class="fc-modal-backdrop" id="fcInvoiceModal" onclick="fcCloseOnBackdrop(event)">
+    <div class="fc-modal-box">
+        <div class="fc-modal-header">
+            <h6>🧾 Job Invoice</h6>
+            <button class="fc-modal-close" onclick="fcCloseModal()">✕</button>
+        </div>
+        <div class="fc-modal-body" id="fcInvoiceBody">
+            <div class="fc-loading">
+                <div class="fc-spinner"></div>
+                Loading invoice...
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    function openInvoice(jobId) {
-        document.getElementById('invoiceBody').innerHTML =
-            '<div class="text-center py-4 text-muted">Loading...</div>';
-
-        new bootstrap.Modal(document.getElementById('invoiceModal')).show();
+    /* ── Invoice Modal ── */
+    function fcOpenInvoice(jobId) {
+        document.getElementById('fcInvoiceBody').innerHTML =
+            '<div class="fc-loading"><div class="fc-spinner"></div>Loading invoice...</div>';
+        document.getElementById('fcInvoiceModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
 
         fetch(`/Customer/JobInvoice?jobId=${jobId}`)
             .then(res => res.text())
-            .then(html => {
-                document.getElementById('invoiceBody').innerHTML = html;
-            });
+            .then(html => { document.getElementById('fcInvoiceBody').innerHTML = html; })
+            .catch(()  => { document.getElementById('fcInvoiceBody').innerHTML =
+                '<p style="color:var(--fc-danger);text-align:center;padding:1.5rem;">Failed to load invoice.</p>'; });
+    }
+
+    function fcCloseModal() {
+        document.getElementById('fcInvoiceModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    function fcCloseOnBackdrop(e) {
+        if (e.target === document.getElementById('fcInvoiceModal')) fcCloseModal();
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') fcCloseModal(); });
+
+    /* ── Toast ── */
+    function fcShowToast(type, message) {
+        const wrap   = document.getElementById('fcToastWrap');
+        const icons  = { success: '✅', danger: '❌' };
+        const titles = { success: 'Success', danger: 'Error' };
+        const toast  = document.createElement('div');
+        toast.className = `fc-toast ${type}`;
+        toast.innerHTML = `
+            <span class="fc-toast-icon">${icons[type]}</span>
+            <div class="fc-toast-body">
+                <div class="fc-toast-title">${titles[type]}</div>
+                <p class="fc-toast-msg">${message}</p>
+            </div>
+            <button class="fc-toast-close" onclick="fcDismissToast(this.closest('.fc-toast'))">✕</button>
+        `;
+        wrap.appendChild(toast);
+        setTimeout(() => fcDismissToast(toast), 4000);
+    }
+    function fcDismissToast(el) {
+        if (!el) return;
+        el.style.animation = 'fcToastOut .3s ease forwards';
+        setTimeout(() => el.remove(), 300);
+    }
+
+    @if (TempData["Success"] != null)
+    {
+            <text>fcShowToast('success', '@Html.Raw(TempData["Success"].ToString().Replace("'", "\\'"))');</text>
+    }
+    @if (TempData["Error"] != null)
+    {
+            <text>fcShowToast('danger', '@Html.Raw(TempData["Error"].ToString().Replace("'", "\\'"))');</text>
     }
 </script>

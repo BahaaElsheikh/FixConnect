@@ -4,64 +4,298 @@
     Layout = "_CustomerLayout";
 }
 
-<div class="container py-4" style="max-width:580px">
-    <h5 class="fw-bold mb-1">Accept Proposal</h5>
-    <p class="text-muted small mb-4">
-        Request: <strong>@Model.RequestTitle</strong> —
-        Worker: <strong>@Model.WorkerName</strong>
-    </p>
+<style>
+    :root {
+        --fc-blue: #1a4fd6;
+        --fc-blue-light: #e8effe;
+        --fc-blue-mid: #3b6fe8;
+        --fc-bg: #f0f4fb;
+        --fc-card: #ffffff;
+        --fc-text: #1a1f36;
+        --fc-muted: #6b7a99;
 
-    <!-- Proposal Summary -->
-    <div class="card shadow-sm p-3 mb-4 bg-light">
-        <div class="row text-center">
-            <div class="col-4">
-                <p class="small text-muted mb-0">Labor Cost</p>
-                <p class="fw-bold mb-0">@(Model.LaborCost?.ToString("0.00") ?? "—") EGP</p>
-            </div>
-            <div class="col-4">
-                <p class="small text-muted mb-0">Material Cost</p>
-                <p class="fw-bold mb-0">@(Model.MaterialCost?.ToString("0.00") ?? "—") EGP</p>
-            </div>
-            <div class="col-4">
-                <p class="small text-muted mb-0">Duration</p>
-                <p class="fw-bold mb-0">@(Model.DurationEstimate.HasValue ? $"{Model.DurationEstimate} days" : "—")</p>
-            </div>
-        </div>
-    </div>
+        --fc-border: #dde4f0;
+        --fc-success: #16a34a;
+        --fc-success-bg: #dcfce7;
+        --fc-radius: 14px;
+        --fc-radius-sm: 8px;
+        --fc-shadow: 0 2px 16px rgba(26,79,214,.08);
+        --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
+    }
 
-    <form asp-action="AcceptProposal" method="post">
-        <input type="hidden" asp-for="ProposalId" />
-        <input type="hidden" asp-for="WorkerName" />
-        <input type="hidden" asp-for="RequestTitle" />
-        <input type="hidden" asp-for="LaborCost" />
-        <input type="hidden" asp-for="MaterialCost" />
-        <input type="hidden" asp-for="DurationEstimate" />
+    .fc-page {
+        padding: 2.5rem 1rem 3.5rem;
+        min-height: 100vh;
+        background: var(--fc-bg);
+    }
 
-        <div class="card shadow-sm p-4">
-            <p class="small text-muted mb-3">
-                🔒 This information will be shared only with the Worker.
+    .fc-wrap {
+        max-width: 560px;
+        margin: 0 auto;
+    }
+
+    /* ── Page Header ── */
+    .fc-page-header {
+        margin-bottom: 1.75rem;
+    }
+
+    .fc-page-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: .3rem;
+    }
+
+    .fc-page-sub {
+        font-size: .875rem;
+        color: var(--fc-muted);
+        margin: 0;
+    }
+
+        .fc-page-sub strong {
+            color: var(--fc-text);
+            font-weight: 600;
+        }
+
+    /* ── Cards ── */
+    .fc-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    /* ── Summary Stats ── */
+    .fc-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        overflow: hidden;
+    }
+
+    .fc-stat {
+        background: var(--fc-blue-light);
+        padding: 1rem .75rem;
+        text-align: center;
+    }
+
+    .fc-stat-label {
+        font-size: .72rem;
+        font-weight: 600;
+        color: var(--fc-blue-mid);
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        margin-bottom: .3rem;
+    }
+
+    .fc-stat-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin: 0;
+    }
+
+    /* ── Section title ── */
+    .fc-section-title {
+        font-size: .8rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        letter-spacing: .4px;
+        text-transform: uppercase;
+        margin-bottom: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .fc-section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: var(--fc-blue-light);
+            border-radius: 2px;
+        }
+
+    /* ── Privacy note ── */
+    .fc-privacy-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: var(--fc-radius-sm);
+        padding: .7rem .9rem;
+        margin-bottom: 1.25rem;
+        font-size: .82rem;
+        color: #92400e;
+        line-height: 1.5;
+    }
+
+    /* ── Form ── */
+    .fc-label {
+        font-size: .82rem;
+        font-weight: 600;
+        color: var(--fc-text);
+        margin-bottom: .4rem;
+        display: block;
+    }
+
+    .fc-input {
+        width: 100%;
+        padding: .6rem .9rem;
+        font-size: .875rem;
+        color: var(--fc-text);
+        background: #fff;
+        border: 1.5px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        outline: none;
+        transition: border-color .15s, box-shadow .15s;
+        font-family: inherit;
+    }
+
+        .fc-input:focus {
+            border-color: var(--fc-blue);
+            box-shadow: 0 0 0 3px rgba(26,79,214,.1);
+        }
+
+        .fc-input::placeholder {
+            color: #b0b9cc;
+        }
+
+    .fc-field {
+        margin-bottom: 1.1rem;
+    }
+
+    .fc-error {
+        font-size: .78rem;
+        color: #dc2626;
+        margin-top: .3rem;
+        display: block;
+    }
+
+    /* ── Buttons ── */
+    .fc-btn-confirm {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        width: 100%;
+        padding: .7rem 1rem;
+        background: var(--fc-success);
+        color: #fff;
+        font-size: .9rem;
+        font-weight: 700;
+        border: none;
+        border-radius: var(--fc-radius-sm);
+        cursor: pointer;
+        transition: background .18s, transform .15s, box-shadow .15s;
+        margin-bottom: .65rem;
+    }
+
+        .fc-btn-confirm:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(22,163,74,.25);
+        }
+
+    .fc-btn-cancel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: .65rem 1rem;
+        background: transparent;
+        color: var(--fc-muted);
+        font-size: .875rem;
+        font-weight: 500;
+        border: 1.5px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        text-decoration: none;
+        transition: border-color .15s, color .15s, background .15s;
+    }
+
+        .fc-btn-cancel:hover {
+            border-color: var(--fc-blue);
+            color: var(--fc-blue);
+            background: var(--fc-blue-light);
+        }
+</style>
+
+<div class="fc-page">
+    <div class="fc-wrap">
+
+        <!-- Page Header -->
+        <div class="fc-page-header">
+            <h5 class="fc-page-title">Accept Proposal</h5>
+            <p class="fc-page-sub">
+                Request: <strong>@Model.RequestTitle</strong> —
+                Worker: <strong>@Model.WorkerName</strong>
             </p>
-
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Exact Address</label>
-                <input asp-for="CustomerExactAddress" class="form-control"
-                       placeholder="Building, Street, District..." />
-                <span asp-validation-for="CustomerExactAddress" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Direct Contact Number</label>
-                <input asp-for="CustomerContactNumber" class="form-control"
-                       placeholder="01xxxxxxxxx" />
-                <span asp-validation-for="CustomerContactNumber" class="text-danger small"></span>
-            </div>
-
-            <button type="submit" class="btn btn-success w-100 fw-bold">
-                ✔ Confirm & Accept Proposal
-            </button>
-            <a asp-action="ReceivedProposals" class="btn btn-outline-secondary w-100 mt-2">
-                Cancel
-            </a>
         </div>
-    </form>
+
+        <!-- Proposal Summary -->
+        <div class="fc-card" style="padding:0;overflow:hidden;">
+            <div class="fc-stats">
+                <div class="fc-stat">
+                    <div class="fc-stat-label">Labor Cost</div>
+                    <p class="fc-stat-value">@(Model.LaborCost?.ToString("0.00") ?? "—") <small style="font-size:.65rem;font-weight:500;">EGP</small></p>
+                </div>
+                <div class="fc-stat">
+                    <div class="fc-stat-label">Material Cost</div>
+                    <p class="fc-stat-value">@(Model.MaterialCost?.ToString("0.00") ?? "—") <small style="font-size:.65rem;font-weight:500;">EGP</small></p>
+                </div>
+                <div class="fc-stat">
+                    <div class="fc-stat-label">Duration</div>
+                    <p class="fc-stat-value">@(Model.DurationEstimate.HasValue ? $"{Model.DurationEstimate} days" : "—")</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form asp-action="AcceptProposal" method="post">
+            <input type="hidden" asp-for="ProposalId" />
+            <input type="hidden" asp-for="WorkerName" />
+            <input type="hidden" asp-for="RequestTitle" />
+            <input type="hidden" asp-for="LaborCost" />
+            <input type="hidden" asp-for="MaterialCost" />
+            <input type="hidden" asp-for="DurationEstimate" />
+
+            <div class="fc-card">
+                <div class="fc-section-title">Contact Details</div>
+
+                <!-- Privacy note -->
+                <div class="fc-privacy-note">
+                    🔒 This information will be shared only with the Worker.
+                </div>
+
+                <div class="fc-field">
+                    <label class="fc-label" asp-for="CustomerExactAddress">Exact Address</label>
+                    <input asp-for="CustomerExactAddress"
+                           class="fc-input"
+                           placeholder="Building, Street, District..." />
+                    <span asp-validation-for="CustomerExactAddress" class="fc-error"></span>
+                </div>
+
+                <div class="fc-field">
+                    <label class="fc-label" asp-for="CustomerContactNumber">Direct Contact Number</label>
+                    <input asp-for="CustomerContactNumber"
+                           class="fc-input"
+                           placeholder="01xxxxxxxxx" />
+                    <span asp-validation-for="CustomerContactNumber" class="fc-error"></span>
+                </div>
+
+                <button type="submit" class="fc-btn-confirm">
+                    ✔ Confirm &amp; Accept Proposal
+                </button>
+                <a asp-action="ReceivedProposals" class="fc-btn-cancel">
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+    </div>
 </div>

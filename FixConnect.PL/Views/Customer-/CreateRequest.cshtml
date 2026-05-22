@@ -1,0 +1,622 @@
+﻿@model FixConnect.PL.ViewModels.CreateRequestViewModel
+@{
+    ViewData["Title"] = "Create Request";
+    Layout = "_CustomerLayout";
+}
+
+@* ── Google Fonts loaded as <link> tags — NOT @import — to avoid Razor parsing them as C# ── *@
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+<style>
+    /* ─── Material Symbols base ─── */
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        font-family: 'Material Symbols Outlined';
+        font-style: normal;
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        vertical-align: middle;
+    }
+
+    /* ─── CSS Variables ─── */
+    :root {
+        --primary: #003d9b;
+        --primary-container: #0052cc;
+        --primary-fixed: #dae2ff;
+        --on-primary: #ffffff;
+        --on-primary-container: #c4d2ff;
+        --on-surface: #051a3e;
+        --on-surface-variant: #434654;
+        --surface: #faf9ff;
+        --surface-container: #e9edff;
+        --surface-container-low: #f1f3ff;
+        --surface-container-high: #e1e8ff;
+        --surface-container-highest: #d8e2ff;
+        --outline: #737685;
+        --outline-variant: #c3c6d6;
+        --secondary: #006d3d;
+        --secondary-container: #94f7b6;
+        --on-secondary: #ffffff;
+        --background: #faf9ff;
+    }
+
+    /* ─── Page wrapper ─── */
+    .cr-page {
+        font-family: 'Manrope', sans-serif;
+        background: var(--background);
+        padding: 0 0 3rem;
+    }
+
+    /* ─── Header ─── */
+    .cr-header {
+        margin-bottom: 2.5rem;
+    }
+
+        .cr-header h1 {
+            font-size: 40px;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            font-weight: 700;
+            color: var(--on-surface);
+            margin: 0 0 .5rem;
+        }
+
+        .cr-header p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--on-surface-variant);
+            margin: 0;
+        }
+
+    /* ─── Card ─── */
+    .cr-card {
+        background: #ffffff;
+        border: 1px solid var(--outline-variant);
+        border-radius: .25rem;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+
+    /* ─── Form grid ─── */
+    .cr-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .cr-col-full {
+        grid-column: 1 / -1;
+    }
+
+    .cr-col-half {
+        grid-column: span 1;
+    }
+
+    @@media (max-width: 640px) {
+        .cr-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cr-col-half {
+            grid-column: 1 / -1;
+        }
+    }
+
+    /* ─── Labels ─── */
+    .cr-label {
+        display: block;
+        font-size: 13px;
+        line-height: 1;
+        letter-spacing: .05em;
+        font-weight: 600;
+        color: var(--on-surface-variant);
+        margin-bottom: .5rem;
+        text-transform: uppercase;
+    }
+
+    /* ─── Inputs / Select / Textarea ─── */
+    .cr-input,
+    .cr-select,
+    .cr-textarea {
+        width: 100%;
+        border: 1px solid var(--outline-variant);
+        border-radius: .25rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 16px;
+        color: var(--on-surface);
+        background: transparent;
+        outline: none;
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+    .cr-input,
+    .cr-select {
+        height: 48px;
+        padding: 0 1rem;
+    }
+
+    .cr-textarea {
+        padding: 1rem;
+        resize: none;
+    }
+
+        .cr-input:focus,
+        .cr-select:focus,
+        .cr-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        .cr-input::placeholder,
+        .cr-textarea::placeholder {
+            color: var(--outline);
+        }
+
+    .cr-hint {
+        display: block;
+        font-size: 12px;
+        color: var(--outline);
+        margin-top: 4px;
+        font-style: italic;
+    }
+
+    .cr-validation {
+        display: block;
+        font-size: 12px;
+        color: #ba1a1a;
+        margin-top: 4px;
+    }
+
+    /* ─── Select wrapper (custom arrow) ─── */
+    .cr-select-wrap {
+        position: relative;
+    }
+
+        .cr-select-wrap .cr-select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 2.5rem;
+        }
+
+    .cr-select-icon {
+        position: absolute;
+        right: .75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--outline);
+        font-size: 20px;
+    }
+
+    /* ─── Visibility radio cards ─── */
+    .cr-visibility-group {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .cr-radio-card {
+        flex: 1;
+        cursor: pointer;
+    }
+
+        .cr-radio-card input[type="radio"] {
+            display: none;
+        }
+
+    .cr-radio-body {
+        padding: 1rem;
+        border: 1px solid var(--outline-variant);
+        border-radius: .25rem;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        transition: border-color .15s, background .15s;
+    }
+
+        .cr-radio-body:hover {
+            background: var(--surface-container-low);
+        }
+
+    .cr-radio-card input:checked + .cr-radio-body {
+        border-color: var(--primary);
+        background: rgba(218,226,255,.3);
+    }
+
+    .cr-radio-body .cr-radio-icon {
+        color: var(--on-surface-variant);
+        transition: color .15s;
+    }
+
+    .cr-radio-card input:checked + .cr-radio-body .cr-radio-icon {
+        color: var(--primary);
+    }
+
+    .cr-radio-body p.cr-radio-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--on-surface);
+        margin: 0 0 2px;
+    }
+
+    .cr-radio-body p.cr-radio-sub {
+        font-size: 12px;
+        color: var(--on-surface-variant);
+        margin: 0;
+    }
+
+    /* ─── Target-worker alert ─── */
+    .cr-alert-worker {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: .875rem 1rem;
+        background: #e8f0fe;
+        border: 1px solid #b8cfff;
+        border-radius: .25rem;
+        font-size: 14px;
+        color: var(--on-surface);
+    }
+
+        .cr-alert-worker .material-symbols-outlined {
+            color: var(--primary);
+        }
+
+    /* ─── File upload zone ─── */
+    .cr-upload-zone {
+        border: 2px dashed var(--outline-variant);
+        border-radius: .25rem;
+        padding: 48px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--on-surface-variant);
+        background: var(--surface-container-low);
+        transition: border-color .15s;
+        cursor: pointer;
+        position: relative;
+    }
+
+        .cr-upload-zone:hover {
+            border-color: rgba(0,61,155,.45);
+        }
+
+        .cr-upload-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cr-upload-zone .cr-upload-icon {
+            font-size: 40px;
+            color: var(--outline);
+            margin-bottom: .75rem;
+        }
+
+        .cr-upload-zone p {
+            margin: 0;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .cr-upload-zone .cr-upload-sub {
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+
+    /* ─── Actions bar ─── */
+    .cr-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 24px;
+        border-top: 1px solid var(--outline-variant);
+        margin-top: 8px;
+    }
+
+    .cr-btn-cancel {
+        padding: .75rem 1.5rem;
+        font-family: 'Manrope', sans-serif;
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--primary);
+        background: transparent;
+        border: none;
+        border-radius: .25rem;
+        cursor: pointer;
+        transition: background .15s;
+    }
+
+        .cr-btn-cancel:hover {
+            background: rgba(0,82,204,.07);
+        }
+
+    .cr-btn-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .75rem 2.5rem;
+        font-family: 'Manrope', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--on-primary);
+        background: var(--primary);
+        border: none;
+        border-radius: .25rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,61,155,.2);
+        transition: background .15s, transform .1s;
+    }
+
+        .cr-btn-submit:hover {
+            background: rgba(0,61,155,.88);
+        }
+
+        .cr-btn-submit:active {
+            transform: scale(.97);
+        }
+
+        .cr-btn-submit .material-symbols-outlined {
+            font-size: 18px;
+        }
+
+    /* ─── Trust bento ─── */
+    .cr-bento {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-top: 3rem;
+    }
+
+    @@media (max-width: 640px) {
+        .cr-bento {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .cr-bento-card {
+        background: #fff;
+        border: 1px solid var(--outline-variant);
+        border-radius: .25rem;
+        padding: 16px;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .cr-bento-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: .25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .cr-bento-icon.green {
+            background: var(--secondary-container);
+        }
+
+            .cr-bento-icon.green .material-symbols-outlined {
+                color: var(--secondary);
+            }
+
+        .cr-bento-icon.blue {
+            background: var(--primary-container);
+        }
+
+            .cr-bento-icon.blue .material-symbols-outlined {
+                color: var(--on-primary);
+            }
+
+        .cr-bento-icon.gray {
+            background: var(--surface-container);
+        }
+
+            .cr-bento-icon.gray .material-symbols-outlined {
+                color: var(--on-surface);
+            }
+
+    .cr-bento-card h4 {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--on-surface);
+        margin: 0 0 4px;
+    }
+
+    .cr-bento-card p {
+        font-size: 12px;
+        line-height: 1.6;
+        color: var(--on-surface-variant);
+        margin: 0;
+    }
+</style>
+
+<div class="cr-page">
+    <div style="max-width:800px; margin:0 auto; padding: 0 1.5rem;">
+
+        @* ── Page Header ── *@
+        <div class="cr-header">
+            <h1>Create New Request</h1>
+            <p>Describe the issue and we'll connect you with the right professionals.</p>
+        </div>
+
+        @* ── Form Card ── *@
+        <div class="cr-card">
+            <form asp-action="CreateRequest" method="post" enctype="multipart/form-data">
+
+                @* Hidden: TargetWorkerId — preserved from original *@
+                <input type="hidden" name="TargetWorkerId" value="@Model.TargetWorkerId" />
+
+                @* ── Alert: Sending to a specific worker ── *@
+                @if (!string.IsNullOrEmpty(Model.TargetWorkerName))
+                {
+                    <div class="cr-alert-worker" style="margin-bottom:24px;">
+                        <span class="material-symbols-outlined">person_pin</span>
+                        Sending directly to: <strong>@Model.TargetWorkerName</strong>
+                    </div>
+                }
+
+                <div class="cr-form-grid">
+
+                    @* ── Visibility (only when a specific worker is targeted) ── *@
+                    @if (Model.TargetWorkerId.HasValue)
+                    {
+                        <div class="cr-col-full">
+                            <span class="cr-label">Request Visibility</span>
+                            <div class="cr-visibility-group">
+                                <label class="cr-radio-card">
+                                    <input type="radio" name="IsPrivate" value="false"
+                                           @(!Model.IsPrivate ? "checked" : "") />
+                                    <div class="cr-radio-body">
+                                        <span class="material-symbols-outlined cr-radio-icon">public</span>
+                                        <div>
+                                            <p class="cr-radio-title">Public</p>
+                                            <p class="cr-radio-sub">Visible to all qualified workers</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="cr-radio-card">
+                                    <input type="radio" name="IsPrivate" value="true"
+                                           @(Model.IsPrivate ? "checked" : "") />
+                                    <div class="cr-radio-body">
+                                        <span class="material-symbols-outlined cr-radio-icon">lock</span>
+                                        <div>
+                                            <p class="cr-radio-title">Private</p>
+                                            <p class="cr-radio-sub">Send directly to this worker only</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    }
+
+                    @* ── Title ── *@
+                    <div class="cr-col-full">
+                        <label asp-for="Title" class="cr-label">Request Title</label>
+                        <input asp-for="Title"
+                               class="cr-input"
+                               type="text"
+                               placeholder="e.g., Leaking kitchen faucet" />
+                        <span asp-validation-for="Title" class="cr-validation"></span>
+                        <span class="cr-hint">Be concise and specific</span>
+                    </div>
+
+                    @* ── Specialty ── *@
+                    <div class="cr-col-half">
+                        <label asp-for="SpecialtyId" class="cr-label">Specialty (Optional)</label>
+                        <div class="cr-select-wrap">
+                            <select asp-for="SpecialtyId" class="cr-select">
+                                <option value="">— Any Specialty —</option>
+                                @foreach (var s in Model.Specialties)
+                                {
+                                    <option value="@s.SpecialtyId">@s.SpecialtyName</option>
+                                }
+                            </select>
+                            <span class="material-symbols-outlined cr-select-icon">expand_more</span>
+                        </div>
+                    </div>
+
+                    @* ── Region ── *@
+                    <div class="cr-col-half">
+                        <label asp-for="RegionId" class="cr-label">Region</label>
+                        <div class="cr-select-wrap">
+                            <select asp-for="RegionId" class="cr-select">
+                                <option value="">— Select Region —</option>
+                                @foreach (var r in Model.Regions)
+                                {
+                                    <option value="@r.RegionId">@r.RegionName</option>
+                                }
+                            </select>
+                            <span class="material-symbols-outlined cr-select-icon">location_on</span>
+                        </div>
+                    </div>
+
+                    @* ── Description ── *@
+                    <div class="cr-col-full">
+                        <label asp-for="Description" class="cr-label">Problem Description</label>
+                        <textarea asp-for="Description"
+                                  class="cr-textarea"
+                                  rows="5"
+                                  placeholder="Describe the issue in detail, including any sounds, smells, or visible damage..."></textarea>
+                    </div>
+
+                    @* ── Images upload ── *@
+                    <div class="cr-col-full">
+                        <span class="cr-label">Supporting Photos (Optional)</span>
+                        <div class="cr-upload-zone">
+                            <input name="Images"
+                                   type="file"
+                                   accept="image/*"
+                                   multiple />
+                            <span class="material-symbols-outlined cr-upload-icon">add_a_photo</span>
+                            <p>Click or drag photos here</p>
+                            <span class="cr-upload-sub">Upload up to 5 clear images of the problem area</span>
+                        </div>
+                    </div>
+
+                </div>@* /cr-form-grid *@
+
+                @* ── Action Buttons ── *@
+                <div class="cr-actions">
+                    <button type="button" class="cr-btn-cancel" onclick="history.back()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="cr-btn-submit">
+                        Post Request
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>@* /cr-card *@
+
+        @* ── Trust Bento ── *@
+        <div class="cr-bento">
+            <div class="cr-bento-card">
+                <div class="cr-bento-icon green">
+                    <span class="material-symbols-outlined">verified_user</span>
+                </div>
+                <div>
+                    <h4>Vetted Pros</h4>
+                    <p>Every professional undergoes a background check and certification verification.</p>
+                </div>
+            </div>
+            <div class="cr-bento-card">
+                <div class="cr-bento-icon blue">
+                    <span class="material-symbols-outlined">bolt</span>
+                </div>
+                <div>
+                    <h4>Fast Response</h4>
+                    <p>Public requests typically receive initial proposals within 2 hours.</p>
+                </div>
+            </div>
+            <div class="cr-bento-card">
+                <div class="cr-bento-icon gray">
+                    <span class="material-symbols-outlined">support_agent</span>
+                </div>
+                <div>
+                    <h4>24/7 Support</h4>
+                    <p>Our support team is always available to help facilitate your maintenance.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

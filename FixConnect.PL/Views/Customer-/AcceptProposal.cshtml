@@ -1,0 +1,67 @@
+﻿@model FixConnect.PL.ViewModels.AcceptProposalViewModel
+@{
+    ViewData["Title"] = "Accept Proposal";
+    Layout = "_CustomerLayout";
+}
+
+<div class="container py-4" style="max-width:580px">
+    <h5 class="fw-bold mb-1">Accept Proposal</h5>
+    <p class="text-muted small mb-4">
+        Request: <strong>@Model.RequestTitle</strong> —
+        Worker: <strong>@Model.WorkerName</strong>
+    </p>
+
+    <!-- Proposal Summary -->
+    <div class="card shadow-sm p-3 mb-4 bg-light">
+        <div class="row text-center">
+            <div class="col-4">
+                <p class="small text-muted mb-0">Labor Cost</p>
+                <p class="fw-bold mb-0">@(Model.LaborCost?.ToString("0.00") ?? "—") EGP</p>
+            </div>
+            <div class="col-4">
+                <p class="small text-muted mb-0">Material Cost</p>
+                <p class="fw-bold mb-0">@(Model.MaterialCost?.ToString("0.00") ?? "—") EGP</p>
+            </div>
+            <div class="col-4">
+                <p class="small text-muted mb-0">Duration</p>
+                <p class="fw-bold mb-0">@(Model.DurationEstimate.HasValue ? $"{Model.DurationEstimate} days" : "—")</p>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="AcceptProposal" method="post">
+        <input type="hidden" asp-for="ProposalId" />
+        <input type="hidden" asp-for="WorkerName" />
+        <input type="hidden" asp-for="RequestTitle" />
+        <input type="hidden" asp-for="LaborCost" />
+        <input type="hidden" asp-for="MaterialCost" />
+        <input type="hidden" asp-for="DurationEstimate" />
+
+        <div class="card shadow-sm p-4">
+            <p class="small text-muted mb-3">
+                🔒 This information will be shared only with the Worker.
+            </p>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Exact Address</label>
+                <input asp-for="CustomerExactAddress" class="form-control"
+                       placeholder="Building, Street, District..." />
+                <span asp-validation-for="CustomerExactAddress" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Direct Contact Number</label>
+                <input asp-for="CustomerContactNumber" class="form-control"
+                       placeholder="01xxxxxxxxx" />
+                <span asp-validation-for="CustomerContactNumber" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 fw-bold">
+                ✔ Confirm & Accept Proposal
+            </button>
+            <a asp-action="ReceivedProposals" class="btn btn-outline-secondary w-100 mt-2">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
