@@ -16,10 +16,8 @@
         --fc-border: #dde4f0;
         --fc-green: #16a34a;
         --fc-green-bg: #dcfce7;
-        --fc-green-bdr: #86efac;
         --fc-warning: #d97706;
         --fc-warning-bg: #fef3c7;
-        --fc-warning-bdr: #fde68a;
         --fc-star-on: #f5a623;
         --fc-star-off: #dde4f0;
         --fc-radius: 14px;
@@ -35,69 +33,95 @@
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
-    /* ══ Layout ══ */
-    .fc-layout {
-        display: flex;
-        gap: 1.5rem;
-        align-items: flex-start;
+    .fc-container {
         max-width: 1280px;
         margin: 0 auto;
         padding: 0 1.25rem;
     }
 
-    .fc-feed {
-        flex: 1 1 auto;
-        min-width: 0;
-        width: calc(100% - 290px);
-        max-width: none;
-        margin-right :5%;
+    /* ══ Hero Banner ══ */
+    .fc-hero {
+        border-radius: var(--fc-radius);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        position: relative;
+        height: 220px;
+        box-shadow: var(--fc-shadow-md);
+    }
+
+        .fc-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+    .fc-hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(26,79,214,.82) 0%, rgba(26,79,214,.28) 100%);
+        display: flex;
+        align-items: center;
+        padding: 0 2.5rem;
+    }
+
+    .fc-hero-text h2 {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: .35rem;
+        letter-spacing: -.3px;
+    }
+
+    .fc-hero-text p {
+        color: rgba(255,255,255,.82);
+        font-size: .88rem;
+        margin-bottom: 1.1rem;
+        margin-top: 0;
+    }
+
+    .fc-hero-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: .65rem 1.75rem;
+        background: #fff;
+        color: var(--fc-blue);
+        font-size: .9rem;
+        font-weight: 700;
+        border-radius: 25px;
+        text-decoration: none;
+        box-shadow: 0 4px 16px rgba(0,0,0,.18);
+        transition: transform .15s, box-shadow .15s;
+        letter-spacing: -.1px;
+    }
+
+        .fc-hero-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,.22);
+            color: var(--fc-blue);
+        }
+
+    /* ══ Layout ══ */
+    .fc-layout {
+        display: flex;
+        gap: 1.25rem;
+        align-items: flex-start;
     }
 
     .fc-right {
-        width: 290px;
+        width: 270px;
         flex-shrink: 0;
         position: sticky;
-        top: 2rem;
+        top: 1.5rem;
+        order: 2;
     }
 
-    /* ══ Create Request Button ══ */
-    .fc-create-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-        padding: 1rem 1.5rem;
-        background: var(--fc-blue);
-        color: #fff;
-        font-size: .95rem;
-        font-weight: 700;
-        border-radius: var(--fc-radius);
-        text-decoration: none;
-        margin-bottom: 1.1rem;
-        transition: background .18s, transform .15s, box-shadow .15s;
-        box-shadow: 0 4px 16px rgba(26,79,214,.22);
-        letter-spacing: -.2px;
+    .fc-feed {
+        flex: 1;
+        min-width: 0;
+        order: 1;
     }
-
-        .fc-create-btn:hover {
-            background: var(--fc-blue-mid);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(26,79,214,.28);
-        }
-
-        .fc-create-btn .plus {
-            width: 26px;
-            height: 26px;
-            background: rgba(255,255,255,.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
 
     /* ══ Search Card ══ */
     .fc-search-card {
@@ -203,15 +227,14 @@
         margin-bottom: .85rem;
     }
 
-    /* ══ Workers Grid — 3 columns fixed ══ */
+    /* ══ Workers Grid ══ */
     .fc-workers-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); 
-        /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */
+        grid-template-columns: repeat(3, 1fr);
         gap: 1rem;
     }
 
-    /* ══ Worker Card — fixed height layout ══ */
+    /* ══ Worker Card ══ */
     .fc-worker-card {
         background: var(--fc-card);
         border: 1px solid var(--fc-border);
@@ -224,7 +247,6 @@
         height: 300px;
         transition: box-shadow .2s, transform .2s;
         overflow: hidden;
-        padding: 0;
     }
 
         .fc-worker-card:hover {
@@ -232,7 +254,6 @@
             transform: translateY(-3px);
         }
 
-    /* Photo section — fixed height, photo centered inside */
     .fc-worker-photo-wrap {
         width: 100%;
         height: 90px;
@@ -241,9 +262,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: visible;
-        position: relative;
-        z-index: 1;
     }
 
         .fc-worker-photo-wrap img {
@@ -253,13 +271,9 @@
             object-fit: cover;
             border: 3px solid #fff;
             box-shadow: 0 2px 10px rgba(26,79,214,.18);
-            /* centered in the banner — no overlap */
-            position: static;
-            transform: none;
             margin-top: 10px;
         }
 
-    /* Card body */
     .fc-worker-body {
         flex: 1;
         display: flex;
@@ -311,7 +325,6 @@
             color: var(--fc-star-off);
         }
 
-    /* Availability */
     .fc-avail {
         display: inline-block;
         padding: 2px 9px;
@@ -319,7 +332,6 @@
         font-size: .68rem;
         font-weight: 700;
         margin-bottom: .5rem;
-        letter-spacing: .2px;
     }
 
         .fc-avail.available {
@@ -337,7 +349,6 @@
             color: var(--fc-muted);
         }
 
-    /* Regions */
     .fc-worker-regions {
         display: flex;
         flex-wrap: wrap;
@@ -366,7 +377,6 @@
         font-size: .63rem;
     }
 
-    /* Card actions */
     .fc-worker-actions {
         display: flex;
         gap: 6px;
@@ -412,7 +422,7 @@
             color: #fff;
         }
 
-    /* ══ Empty state ══ */
+    /* ══ Empty ══ */
     .fc-empty {
         text-align: center;
         padding: 3.5rem 1rem;
@@ -446,12 +456,7 @@
         box-shadow: var(--fc-shadow);
         padding: 1.1rem;
         margin-bottom: 1rem;
-        transition: box-shadow .2s;
     }
-
-        .fc-right-card:hover {
-            box-shadow: var(--fc-shadow-md);
-        }
 
     .fc-mini-item {
         background: var(--fc-bg);
@@ -538,19 +543,13 @@
         color: var(--fc-muted);
         text-decoration: none;
         margin-top: .6rem;
-        transition: color .15s;
     }
 
         .fc-view-all:hover {
             color: var(--fc-blue);
         }
 
-    /* ══ Responsive ══ */
     @@media (max-width: 1024px) {
-        .fc-workers-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
         .fc-right {
             width: 240px;
         }
@@ -564,6 +563,11 @@
         .fc-right {
             width: 100%;
             position: static;
+            order: 1;
+        }
+
+        .fc-feed {
+            order: 2;
         }
 
         .fc-workers-grid {
@@ -576,220 +580,216 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
-        .fc-worker-card {
-            height: 300px;
+        .fc-hero {
+            height: 170px;
         }
 
-        .fc-search-row {
-            flex-direction: column;
-        }
-
-        .fc-search-input, .fc-region-wrap {
-            width: 100%;
-        }
-    }
-
-    @@media (max-width: 400px) {
-        .fc-workers-grid {
-            grid-template-columns: 1fr 1fr;
+        .fc-hero-text h2 {
+            font-size: 1.1rem;
         }
     }
 </style>
 
 <div class="fc-page">
-    <div class="fc-layout">
+    <div class="fc-container">
 
-        <!-- ══ Feed Column ══ -->
-        <div class="fc-feed">
-
-            <!-- Create Request Button -->
-            <a asp-action="CreateRequest" class="fc-create-btn">
-                <span class="plus">+</span>
-                Create New Request
-            </a>
-
-            <!-- Search Card -->
-            <div class="fc-search-card">
-                <form method="get" asp-action="Index">
-                    <div class="fc-search-row">
-                        <input type="text" name="search"
-                               value="@Model.SearchQuery"
-                               class="fc-search-input"
-                               placeholder="Search worker by name..." />
-
-                        <div class="fc-region-wrap">
-                            <input type="text"
-                                   id="regionSearchInput"
-                                   name="regionSearch"
-                                   value="@Model.RegionSearch"
-                                   class="fc-search-input"
-                                   style="width:100%"
-                                   placeholder="Filter by region..."
-                                   autocomplete="off" />
-                            <div id="regionDropdown" class="fc-region-dropdown"></div>
-                        </div>
-
-                        <select name="specialtyId" class="fc-search-input" style="cursor:pointer;flex:1;min-width:130px;">
-                            <option value="">All Specialties</option>
-                            @foreach (var s in Model.Specialties)
-                            {
-                                <option value="@s.SpecialtyId"
-                                        selected="@(Model.SelectedSpecialtyId == s.SpecialtyId)">
-                                    @s.SpecialtyName
-                                </option>
-                            }
-                        </select>
-
-                        <button type="submit" class="fc-search-btn">Search</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Workers Grid -->
-            <div class="fc-section-label">
-                Available Workers (@Model.Workers.Count)
-            </div>
-
-            <div class="fc-workers-grid">
-                @if (!Model.Workers.Any())
-                {
-                    <div class="fc-empty">
-                        <div class="fc-empty-icon">🔍</div>
-                        <p>No workers found. Try different filters.</p>
-                    </div>
-                }
-                else
-                {
-                    @foreach (var w in Model.Workers)
-                    {
-                        var availClass = w.AvailabilityStatus == "Available" ? "available"
-                        : w.AvailabilityStatus == "Busy" ? "busy"
-                        : "offline";
-                        <div class="fc-worker-card">
-
-                            <!-- Photo section (fixed 100px) -->
-                            <div class="fc-worker-photo-wrap">
-                                <img src="@(w.PhotoUrl ?? "/uploads/ProfilePictures/default.png")"
-                                     alt="@w.FullName" />
-                            </div>
-
-                            <!-- Body (fills remaining height) -->
-                            <div class="fc-worker-body">
-
-                                <div class="fc-worker-name">
-                                    @w.FullName
-                                    @if (w.IsVerified)
-                                    {
-                                        <span class="fc-verified-dot">✔</span>
-                                    }
-                                </div>
-
-                                <div class="fc-worker-specialty">@(w.SpecialtyName ?? "General")</div>
-
-                                <div class="fc-worker-stars">
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        <span class="@(i <= (int)w.AvgRating ? "s-on" : "s-off")">★</span>
-                                    }
-                                </div>
-
-                                <span class="fc-avail @availClass">@w.AvailabilityStatus</span>
-
-                                <div class="fc-worker-regions">
-                                    @foreach (var region in w.Regions.Take(2))
-                                    {
-                                        <span class="fc-region-chip">@region</span>
-                                    }
-                                    @if (w.Regions.Count > 2)
-                                    {
-                                        <span class="fc-region-more">+@(w.Regions.Count - 2)</span>
-                                    }
-                                </div>
-
-                                <div class="fc-worker-actions">
-                                    <a asp-action="WorkerProfile"
-                                       asp-route-id="@w.UserId"
-                                       class="fc-btn-view">View</a>
-                                    <a asp-action="CreateRequest"
-                                       asp-route-workerId="@w.UserId"
-                                       class="fc-btn-req">Request</a>
-                                </div>
-
-                            </div>
-                        </div>
-                    }
-                }
+        <!-- ══ Hero Banner ══ -->
+        <div class="fc-hero">
+            <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1400&q=80"
+                 alt="Home maintenance professionals" />
+            <div class="fc-hero-overlay">
+                <div class="fc-hero-text">
+                    <h2>Find Trusted Home Professionals</h2>
+                    <p>Browse verified workers in your area — plumbers, electricians, painters & more.</p>
+                    <a asp-action="CreateRequest" class="fc-hero-btn">
+                        📋 Post a New Request
+                    </a>
+                </div>
             </div>
         </div>
 
-        <!-- ══ Right Column ══ -->
-        <div class="fc-right">
+        <div class="fc-layout">
 
-            <!-- Latest Active Job -->
-            <div class="fc-right-title">⚡ Latest Active Job</div>
-            <div class="fc-right-card">
-                @if (Model.LatestActiveJob != null)
-                {
-                    <div class="fc-mini-item">
-                        <div class="fc-mini-title">@Model.LatestActiveJob.RequestTitle</div>
-                        <div class="fc-mini-meta">🔨 @Model.LatestActiveJob.WorkerName</div>
-                        <div class="fc-mini-meta">💰 @Model.LatestActiveJob.LiveInvoiceTotal.ToString("0.00") EGP</div>
-                        <a asp-action="Jobs" class="fc-mini-link">View Jobs →</a>
-                    </div>
-                }
-                else
-                {
-                    <div class="fc-no-item">No active jobs.</div>
-                }
-            </div>
+            <!-- ══ Feed Column ══ -->
+            <div class="fc-feed">
 
-            <!-- Pending Requests -->
-            <div class="fc-right-title">📋 Pending Requests (@Model.PendingRequests.Count)</div>
-            <div class="fc-right-card">
-                @if (!Model.PendingRequests.Any())
-                {
-                    <div class="fc-no-item">No pending requests.</div>
-                }
-                else
-                {
-                    @foreach (var r in Model.PendingRequests)
-                    {
-                        <div class="fc-mini-item">
-                            <div class="fc-mini-title">@r.Title</div>
-                            <div class="fc-mini-meta">
-                                📍 @r.RegionName
-                                @if (!string.IsNullOrEmpty(r.SpecialtyName))
+                <!-- Search Card -->
+                <div class="fc-search-card">
+                    <form method="get" asp-action="Index">
+                        <div class="fc-search-row">
+                            <input type="text" name="search"
+                                   value="@Model.SearchQuery"
+                                   class="fc-search-input"
+                                   placeholder="Search worker by name..." />
+
+                            <div class="fc-region-wrap">
+                                <input type="text"
+                                       id="regionSearchInput"
+                                       name="regionSearch"
+                                       value="@Model.RegionSearch"
+                                       class="fc-search-input"
+                                       style="width:100%"
+                                       placeholder="Filter by region..."
+                                       autocomplete="off" />
+                                <div id="regionDropdown" class="fc-region-dropdown"></div>
+                            </div>
+
+                            <select name="specialtyId"
+                                    class="fc-search-input"
+                                    style="cursor:pointer;flex:1;min-width:130px;">
+                                <option value="">All Specialties</option>
+                                @foreach (var s in Model.Specialties)
                                 {
-                                    <span>· @r.SpecialtyName</span>
+                                    <option value="@s.SpecialtyId"
+                                            selected="@(Model.SelectedSpecialtyId == s.SpecialtyId)">
+                                        @s.SpecialtyName
+                                    </option>
                                 }
-                            </div>
-                            <div class="fc-mini-row">
-                                <span class="fc-mini-date">@r.CreatedAt.ToString("dd MMM")</span>
-                                <a asp-action="RequestProposals"
-                                   asp-route-requestId="@r.RequestId"
-                                   class="fc-proposals-btn">
-                                    📨 @r.ProposalCount
-                                </a>
-                            </div>
+                            </select>
+
+                            <button type="submit" class="fc-search-btn">Search</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Workers Grid -->
+                <div class="fc-section-label">
+                    Available Workers (@Model.Workers.Count)
+                </div>
+
+                <div class="fc-workers-grid">
+                    @if (!Model.Workers.Any())
+                    {
+                        <div class="fc-empty">
+                            <div class="fc-empty-icon">🔍</div>
+                            <p>No workers found. Try different filters.</p>
                         </div>
                     }
-                    <a asp-action="MyRequests" class="fc-view-all">View all requests →</a>
-                }
+                    else
+                    {
+                        @foreach (var w in Model.Workers)
+                        {
+                            var availClass = w.AvailabilityStatus == "Available" ? "available"
+                            : w.AvailabilityStatus == "Busy" ? "busy"
+                            : "offline";
+                            <div class="fc-worker-card">
+                                <div class="fc-worker-photo-wrap">
+                                    <img src="@(w.PhotoUrl ?? "/uploads/ProfilePictures/default.png")"
+                                         alt="@w.FullName" />
+                                </div>
+                                <div class="fc-worker-body">
+                                    <div class="fc-worker-name">
+                                        @w.FullName
+                                        @if (w.IsVerified)
+                                        {
+                                            <span class="fc-verified-dot">✔</span>
+                                        }
+                                    </div>
+                                    <div class="fc-worker-specialty">
+                                        @(w.SpecialtyName ?? "General")
+                                    </div>
+                                    <div class="fc-worker-stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <span class="@(i <= (int)w.AvgRating ? "s-on" : "s-off")">★</span>
+                                        }
+                                    </div>
+                                    <span class="fc-avail @availClass">@w.AvailabilityStatus</span>
+                                    <div class="fc-worker-regions">
+                                        @foreach (var region in w.Regions.Take(2))
+                                        {
+                                            <span class="fc-region-chip">@region</span>
+                                        }
+                                        @if (w.Regions.Count > 2)
+                                        {
+                                            <span class="fc-region-more">+@(w.Regions.Count - 2)</span>
+                                        }
+                                    </div>
+                                    <div class="fc-worker-actions">
+                                        <a asp-action="WorkerProfile"
+                                           asp-route-id="@w.UserId"
+                                           class="fc-btn-view">View</a>
+                                        <a asp-action="CreateRequest"
+                                           asp-route-workerId="@w.UserId"
+                                           class="fc-btn-req">Request</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
             </div>
 
+            <!-- ══ Right Column ══ -->
+            <div class="fc-right">
+
+                <div class="fc-right-title">⚡ Latest Active Job</div>
+                <div class="fc-right-card">
+                    @if (Model.LatestActiveJob != null)
+                    {
+                        <div class="fc-mini-item">
+                            <div class="fc-mini-title">@Model.LatestActiveJob.RequestTitle</div>
+                            <div class="fc-mini-meta">🔨 @Model.LatestActiveJob.WorkerName</div>
+                            <div class="fc-mini-meta">
+                                💰 @Model.LatestActiveJob.LiveInvoiceTotal.ToString("0.00") EGP
+                            </div>
+                            <a asp-action="Jobs" class="fc-mini-link">View Jobs →</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="fc-no-item">No active jobs.</div>
+                    }
+                </div>
+
+                <div class="fc-right-title">
+                    📋 Pending Requests (@Model.PendingRequests.Count)
+                </div>
+                <div class="fc-right-card">
+                    @if (!Model.PendingRequests.Any())
+                    {
+                        <div class="fc-no-item">No pending requests.</div>
+                    }
+                    else
+                    {
+                        @foreach (var r in Model.PendingRequests)
+                        {
+                            <div class="fc-mini-item">
+                                <div class="fc-mini-title">@r.Title</div>
+                                <div class="fc-mini-meta">
+                                    📍 @r.RegionName
+                                    @if (!string.IsNullOrEmpty(r.SpecialtyName))
+                                    {
+                                        <span>· @r.SpecialtyName</span>
+                                    }
+                                </div>
+                                <div class="fc-mini-row">
+                                    <span class="fc-mini-date">@r.CreatedAt.ToString("dd MMM")</span>
+                                    <a asp-action="RequestProposals"
+                                       asp-route-requestId="@r.RequestId"
+                                       class="fc-proposals-btn">
+                                        📨 @r.ProposalCount
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        <a asp-action="MyRequests" class="fc-view-all">View all requests →</a>
+                    }
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    /* ── Region autocomplete ── */
     const regionInput    = document.getElementById('regionSearchInput');
     const regionDropdown = document.getElementById('regionDropdown');
 
     const allRegions = [
         @foreach (var r in Model.Regions)
         {
-                    <text>{ name: "@Html.Raw(r.RegionName)" },</text>
+                <text>{ name: "@Html.Raw(r.RegionName)" },</text>
         }
     ];
 
@@ -802,7 +802,7 @@
         if (!filtered.length) { regionDropdown.style.display = 'none'; return; }
 
         filtered.forEach(r => {
-            const div = document.createElement('div');
+            const div       = document.createElement('div');
             div.className   = 'fc-region-option';
             div.textContent = r.name;
             div.addEventListener('click', () => {

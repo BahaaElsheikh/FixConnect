@@ -336,6 +336,7 @@
         position: relative;
     }
 
+    /* هنا حطينا الـ @@ مرتين لحل مشكلة الـ Razor */
     @@keyframes fcIn {
         from {
             transform: scale(.93);
@@ -378,6 +379,7 @@
             background: rgba(0,0,0,.85);
         }
 
+    /* هنا حطينا الـ @@ مرتين للـ media queries */
     @@media (max-width: 700px) {
         .fc-grid {
             grid-template-columns: 1fr;
@@ -464,20 +466,26 @@
                         <!-- Footer -->
                         <div class="fc-card-footer">
                             <span class="fc-req-date">@r.CreatedAt.ToString("dd MMM yyyy")</span>
+
                             <div class="fc-card-actions">
                                 <a asp-action="RequestProposals"
                                    asp-route-requestId="@r.RequestId"
                                    class="fc-btn-proposals">
                                     📨 @r.ProposalCount
                                 </a>
-                                <a asp-action="EditRequest"
-                                   asp-route-id="@r.RequestId"
-                                   class="fc-btn-edit">Edit</a>
-                                <form asp-action="DeleteRequest" method="post"
-                                      onsubmit="return confirm('Delete this request?')">
-                                    <input type="hidden" name="requestId" value="@r.RequestId" />
-                                    <button type="submit" class="fc-btn-delete">🗑</button>
-                                </form>
+
+                                @if (r.Status != "Completed")
+                                {
+                                    <a asp-action="EditRequest"
+                                       asp-route-id="@r.RequestId"
+                                       class="fc-btn-edit">Edit</a>
+
+                                    <form asp-action="DeleteRequest" method="post"
+                                          onsubmit="return confirm('Delete this request?')">
+                                        <input type="hidden" name="requestId" value="@r.RequestId" />
+                                        <button type="submit" class="fc-btn-delete">🗑</button>
+                                    </form>
+                                }
                             </div>
                         </div>
 

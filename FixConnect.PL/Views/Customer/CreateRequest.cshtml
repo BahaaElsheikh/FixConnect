@@ -4,262 +4,289 @@
     Layout = "_CustomerLayout";
 }
 
+@* ── Google Fonts loaded as <link> tags — NOT @import — to avoid Razor parsing them as C# ── *@
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
 <style>
+    /* ─── Material Symbols base ─── */
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        font-family: 'Material Symbols Outlined';
+        font-style: normal;
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        vertical-align: middle;
+    }
+
+    /* ─── CSS Variables ─── */
     :root {
-        --fc-blue: #1a4fd6;
-        --fc-blue-light: #e8effe;
-        --fc-blue-mid: #3b6fe8;
-        --fc-bg: #f0f4fb;
-        --fc-card: #ffffff;
-        --fc-text: #1a1f36;
-        --fc-muted: #6b7a99;
-        --fc-border: #dde4f0;
-        --fc-green: #16a34a;
-        --fc-green-bg: #dcfce7;
-        --fc-green-bdr: #86efac;
-        --fc-danger: #dc2626;
-        --fc-radius: 14px;
-        --fc-radius-sm: 8px;
-        --fc-shadow: 0 2px 16px rgba(26,79,214,.08);
-        --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
+        --primary: #003d9b;
+        --primary-container: #0052cc;
+        --primary-fixed: #dae2ff;
+        --on-primary: #ffffff;
+        --on-primary-container: #c4d2ff;
+        --on-surface: #051a3e;
+        --on-surface-variant: #434654;
+        --surface: #faf9ff;
+        --surface-container: #e9edff;
+        --surface-container-low: #f1f3ff;
+        --surface-container-high: #e1e8ff;
+        --surface-container-highest: #d8e2ff;
+        --outline: #737685;
+        --outline-variant: #c3c6d6;
+        --secondary: #006d3d;
+        --secondary-container: #94f7b6;
+        --on-secondary: #ffffff;
+        --background: #faf9ff;
     }
 
-    .fc-page {
-        background: var(--fc-bg);
-        min-height: 100vh;
-        padding: 2.5rem 1rem 3.5rem;
-        font-family: 'Segoe UI', system-ui, sans-serif;
+    /* ─── Page wrapper ─── */
+    .cr-page {
+        font-family: 'Manrope', sans-serif;
+        background: var(--background);
+        padding: 0 0 3rem;
     }
 
-    .fc-wrap {
-        max-width: 760px;
-        margin: 0 auto;
+    /* ─── Header ─── */
+    .cr-header {
+        margin-bottom: 2.5rem;
     }
 
-    /* ── Page Header ── */
-    .fc-page-title {
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: var(--fc-text);
-        letter-spacing: -.4px;
-        margin-bottom: .3rem;
-    }
-
-    .fc-page-sub {
-        font-size: .9rem;
-        color: var(--fc-muted);
-        margin-bottom: 1.75rem;
-    }
-
-    /* ── Main Card ── */
-    .fc-card {
-        background: var(--fc-card);
-        border: 1px solid var(--fc-border);
-        border-radius: var(--fc-radius);
-        box-shadow: var(--fc-shadow);
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-    }
-
-    /* ── Section title ── */
-    .fc-section-title {
-        font-size: .75rem;
-        font-weight: 700;
-        color: var(--fc-text);
-        letter-spacing: .5px;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-        .fc-section-title::after {
-            content: '';
-            flex: 1;
-            height: 2px;
-            background: var(--fc-blue-light);
-            border-radius: 2px;
+        .cr-header h1 {
+            font-size: 40px;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            font-weight: 700;
+            color: var(--on-surface);
+            margin: 0 0 .5rem;
         }
 
-    /* ── Worker Alert ── */
-    .fc-worker-alert {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: .85rem 1.1rem;
-        background: var(--fc-blue-light);
-        border: 1px solid #c5d6f8;
-        border-radius: var(--fc-radius-sm);
-        font-size: .875rem;
-        color: var(--fc-text);
-        margin-bottom: 1.5rem;
+        .cr-header p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--on-surface-variant);
+            margin: 0;
+        }
+
+    /* ─── Card ─── */
+    .cr-card {
+        background: #ffffff;
+        border: 1px solid var(--outline-variant);
+        border-radius: .25rem;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.06);
     }
 
-    .fc-worker-alert-icon {
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-
-    .fc-worker-alert strong {
-        color: var(--fc-blue);
-        font-weight: 700;
-    }
-
-    /* ── Form Grid ── */
-    .fc-form-grid {
+    /* ─── Form grid ─── */
+    .cr-form-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
+        gap: 24px;
     }
 
-    .fc-col-full {
+    .cr-col-full {
         grid-column: 1 / -1;
     }
 
-    .fc-col-half {
+    .cr-col-half {
         grid-column: span 1;
     }
 
-    /* ── Fields ── */
-    .fc-field {
-        display: flex;
-        flex-direction: column;
+    @@media (max-width: 640px) {
+        .cr-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cr-col-half {
+            grid-column: 1 / -1;
+        }
     }
 
-    .fc-label {
-        font-size: .75rem;
-        font-weight: 700;
-        color: var(--fc-muted);
-        letter-spacing: .4px;
+    /* ─── Labels ─── */
+    .cr-label {
+        display: block;
+        font-size: 13px;
+        line-height: 1;
+        letter-spacing: .05em;
+        font-weight: 600;
+        color: var(--on-surface-variant);
+        margin-bottom: .5rem;
         text-transform: uppercase;
-        margin-bottom: .4rem;
     }
 
-    .fc-input, .fc-select, .fc-textarea {
+    /* ─── Inputs / Select / Textarea ─── */
+    .cr-input,
+    .cr-select,
+    .cr-textarea {
         width: 100%;
-        padding: .65rem .9rem;
-        font-size: .9rem;
-        color: var(--fc-text);
-        background: #fff;
-        border: 1.5px solid var(--fc-border);
-        border-radius: var(--fc-radius-sm);
+        border: 1px solid var(--outline-variant);
+        border-radius: .25rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 16px;
+        color: var(--on-surface);
+        background: transparent;
         outline: none;
-        font-family: inherit;
         transition: border-color .15s, box-shadow .15s;
     }
 
-        .fc-input:focus, .fc-select:focus, .fc-textarea:focus {
-            border-color: var(--fc-blue);
-            box-shadow: 0 0 0 3px rgba(26,79,214,.1);
-        }
-
-        .fc-input::placeholder, .fc-textarea::placeholder {
-            color: #b0b9cc;
-        }
-
-    .fc-textarea {
-        resize: vertical;
-        min-height: 110px;
+    .cr-input,
+    .cr-select {
+        height: 48px;
+        padding: 0 1rem;
     }
 
-    .fc-select {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7a99' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right .9rem center;
-        padding-right: 2.25rem;
-        cursor: pointer;
+    .cr-textarea {
+        padding: 1rem;
+        resize: none;
     }
 
-    .fc-hint {
-        font-size: .73rem;
-        color: var(--fc-muted);
-        margin-top: .3rem;
+        .cr-input:focus,
+        .cr-select:focus,
+        .cr-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        .cr-input::placeholder,
+        .cr-textarea::placeholder {
+            color: var(--outline);
+        }
+
+    .cr-hint {
+        display: block;
+        font-size: 12px;
+        color: var(--outline);
+        margin-top: 4px;
         font-style: italic;
     }
 
-    .fc-error {
-        font-size: .75rem;
-        color: var(--fc-danger);
-        margin-top: .3rem;
+    .cr-validation {
+        display: block;
+        font-size: 12px;
+        color: #ba1a1a;
+        margin-top: 4px;
     }
 
-    /* ── Visibility Radio Cards ── */
-    .fc-visibility-group {
+    /* ─── Select wrapper (custom arrow) ─── */
+    .cr-select-wrap {
+        position: relative;
+    }
+
+        .cr-select-wrap .cr-select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 2.5rem;
+        }
+
+    .cr-select-icon {
+        position: absolute;
+        right: .75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--outline);
+        font-size: 20px;
+    }
+
+    /* ─── Visibility radio cards ─── */
+    .cr-visibility-group {
         display: flex;
-        gap: .85rem;
+        gap: 1rem;
     }
 
-    .fc-radio-card {
+    .cr-radio-card {
         flex: 1;
         cursor: pointer;
     }
 
-        .fc-radio-card input[type="radio"] {
+        .cr-radio-card input[type="radio"] {
             display: none;
         }
 
-    .fc-radio-body {
-        padding: .9rem 1rem;
-        border: 1.5px solid var(--fc-border);
-        border-radius: var(--fc-radius-sm);
+    .cr-radio-body {
+        padding: 1rem;
+        border: 1px solid var(--outline-variant);
+        border-radius: .25rem;
         display: flex;
         align-items: center;
         gap: .75rem;
         transition: border-color .15s, background .15s;
-        background: #fff;
     }
 
-        .fc-radio-body:hover {
-            background: var(--fc-blue-light);
-            border-color: #c5d6f8;
+        .cr-radio-body:hover {
+            background: var(--surface-container-low);
         }
 
-    .fc-radio-card input:checked + .fc-radio-body {
-        border-color: var(--fc-blue);
-        background: var(--fc-blue-light);
+    .cr-radio-card input:checked + .cr-radio-body {
+        border-color: var(--primary);
+        background: rgba(218,226,255,.3);
     }
 
-    .fc-radio-icon {
-        font-size: 1.3rem;
-        flex-shrink: 0;
+    .cr-radio-body .cr-radio-icon {
+        color: var(--on-surface-variant);
+        transition: color .15s;
     }
 
-    .fc-radio-title {
-        font-size: .875rem;
-        font-weight: 700;
-        color: var(--fc-text);
-        margin-bottom: 2px;
+    .cr-radio-card input:checked + .cr-radio-body .cr-radio-icon {
+        color: var(--primary);
     }
 
-    .fc-radio-sub {
-        font-size: .75rem;
-        color: var(--fc-muted);
+    .cr-radio-body p.cr-radio-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--on-surface);
+        margin: 0 0 2px;
     }
 
-    /* ── Upload Zone ── */
-    .fc-upload-zone {
-        border: 2px dashed var(--fc-border);
-        border-radius: var(--fc-radius-sm);
-        padding: 2.5rem 1.5rem;
+    .cr-radio-body p.cr-radio-sub {
+        font-size: 12px;
+        color: var(--on-surface-variant);
+        margin: 0;
+    }
+
+    /* ─── Target-worker alert ─── */
+    .cr-alert-worker {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: .875rem 1rem;
+        background: #e8f0fe;
+        border: 1px solid #b8cfff;
+        border-radius: .25rem;
+        font-size: 14px;
+        color: var(--on-surface);
+    }
+
+        .cr-alert-worker .material-symbols-outlined {
+            color: var(--primary);
+        }
+
+    /* ─── File upload zone ─── */
+    .cr-upload-zone {
+        border: 2px dashed var(--outline-variant);
+        border-radius: .25rem;
+        padding: 48px 24px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background: var(--fc-bg);
+        color: var(--on-surface-variant);
+        background: var(--surface-container-low);
+        transition: border-color .15s;
         cursor: pointer;
         position: relative;
-        transition: border-color .15s, background .15s;
-        text-align: center;
     }
 
-        .fc-upload-zone:hover {
-            border-color: var(--fc-blue);
-            background: var(--fc-blue-light);
+        .cr-upload-zone:hover {
+            border-color: rgba(0,61,155,.45);
         }
 
-        .fc-upload-zone input[type="file"] {
+        .cr-upload-zone input[type="file"] {
             position: absolute;
             inset: 0;
             opacity: 0;
@@ -268,228 +295,205 @@
             height: 100%;
         }
 
-    .fc-upload-icon {
-        font-size: 2rem;
-        margin-bottom: .6rem;
-    }
+        .cr-upload-zone .cr-upload-icon {
+            font-size: 40px;
+            color: var(--outline);
+            margin-bottom: .75rem;
+        }
 
-    .fc-upload-title {
-        font-size: .9rem;
-        font-weight: 600;
-        color: var(--fc-text);
-        margin-bottom: .25rem;
-    }
+        .cr-upload-zone p {
+            margin: 0;
+            font-weight: 600;
+            font-size: 15px;
+        }
 
-    .fc-upload-sub {
-        font-size: .78rem;
-        color: var(--fc-muted);
-    }
+        .cr-upload-zone .cr-upload-sub {
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
 
-    /* Preview thumbnails */
-    .fc-preview-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: .85rem;
-    }
-
-    .fc-preview-thumb {
-        width: 70px;
-        height: 70px;
-        object-fit: cover;
-        border-radius: 7px;
-        border: 1.5px solid var(--fc-border);
-    }
-
-    /* ── Actions ── */
-    .fc-actions {
+    /* ─── Actions bar ─── */
+    .cr-actions {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--fc-border);
-        margin-top: .5rem;
-        gap: .75rem;
+        padding-top: 24px;
+        border-top: 1px solid var(--outline-variant);
+        margin-top: 8px;
     }
 
-    .fc-btn-cancel {
-        padding: .65rem 1.25rem;
-        font-size: .875rem;
+    .cr-btn-cancel {
+        padding: .75rem 1.5rem;
+        font-family: 'Manrope', sans-serif;
         font-weight: 600;
-        color: var(--fc-muted);
+        font-size: 15px;
+        color: var(--primary);
         background: transparent;
-        border: 1.5px solid var(--fc-border);
-        border-radius: var(--fc-radius-sm);
+        border: none;
+        border-radius: .25rem;
         cursor: pointer;
-        font-family: inherit;
-        transition: all .15s;
-        text-decoration: none;
-        display: inline-block;
+        transition: background .15s;
     }
 
-        .fc-btn-cancel:hover {
-            border-color: var(--fc-blue);
-            color: var(--fc-blue);
-            background: var(--fc-blue-light);
+        .cr-btn-cancel:hover {
+            background: rgba(0,82,204,.07);
         }
 
-    .fc-btn-submit {
+    .cr-btn-submit {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: .7rem 2rem;
-        font-size: .9rem;
+        gap: .5rem;
+        padding: .75rem 2.5rem;
+        font-family: 'Manrope', sans-serif;
         font-weight: 700;
-        color: #fff;
-        background: var(--fc-blue);
+        font-size: 15px;
+        color: var(--on-primary);
+        background: var(--primary);
         border: none;
-        border-radius: var(--fc-radius-sm);
+        border-radius: .25rem;
         cursor: pointer;
-        font-family: inherit;
-        transition: background .18s, transform .15s, box-shadow .15s;
-        box-shadow: 0 4px 14px rgba(26,79,214,.25);
+        box-shadow: 0 4px 12px rgba(0,61,155,.2);
+        transition: background .15s, transform .1s;
     }
 
-        .fc-btn-submit:hover {
-            background: var(--fc-blue-mid);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(26,79,214,.3);
+        .cr-btn-submit:hover {
+            background: rgba(0,61,155,.88);
         }
 
-    /* ── Trust Cards ── */
-    .fc-trust-grid {
+        .cr-btn-submit:active {
+            transform: scale(.97);
+        }
+
+        .cr-btn-submit .material-symbols-outlined {
+            font-size: 18px;
+        }
+
+    /* ─── Trust bento ─── */
+    .cr-bento {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-        margin-top: .25rem;
-    }
-
-    .fc-trust-card {
-        background: var(--fc-card);
-        border: 1px solid var(--fc-border);
-        border-radius: var(--fc-radius);
-        box-shadow: var(--fc-shadow);
-        padding: 1.1rem 1rem;
-        display: flex;
-        align-items: flex-start;
-        gap: .85rem;
-        transition: box-shadow .2s, transform .2s;
-    }
-
-        .fc-trust-card:hover {
-            box-shadow: var(--fc-shadow-md);
-            transform: translateY(-2px);
-        }
-
-    .fc-trust-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: var(--fc-radius-sm);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-
-        .fc-trust-icon.green {
-            background: var(--fc-green-bg);
-        }
-
-        .fc-trust-icon.blue {
-            background: var(--fc-blue-light);
-        }
-
-        .fc-trust-icon.gray {
-            background: #f1f5f9;
-        }
-
-    .fc-trust-title {
-        font-size: .83rem;
-        font-weight: 700;
-        color: var(--fc-text);
-        margin-bottom: 3px;
-    }
-
-    .fc-trust-desc {
-        font-size: .75rem;
-        color: var(--fc-muted);
-        line-height: 1.55;
-        margin: 0;
+        gap: 24px;
+        margin-top: 3rem;
     }
 
     @@media (max-width: 640px) {
-        .fc-form-grid {
+        .cr-bento {
             grid-template-columns: 1fr;
         }
+    }
 
-        .fc-col-half {
-            grid-column: 1 / -1;
+    .cr-bento-card {
+        background: #fff;
+        border: 1px solid var(--outline-variant);
+        border-radius: .25rem;
+        padding: 16px;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .cr-bento-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: .25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .cr-bento-icon.green {
+            background: var(--secondary-container);
         }
 
-        .fc-visibility-group {
-            flex-direction: column;
+            .cr-bento-icon.green .material-symbols-outlined {
+                color: var(--secondary);
+            }
+
+        .cr-bento-icon.blue {
+            background: var(--primary-container);
         }
 
-        .fc-trust-grid {
-            grid-template-columns: 1fr;
+            .cr-bento-icon.blue .material-symbols-outlined {
+                color: var(--on-primary);
+            }
+
+        .cr-bento-icon.gray {
+            background: var(--surface-container);
         }
 
-        .fc-card {
-            padding: 1.25rem;
-        }
+            .cr-bento-icon.gray .material-symbols-outlined {
+                color: var(--on-surface);
+            }
+
+    .cr-bento-card h4 {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--on-surface);
+        margin: 0 0 4px;
+    }
+
+    .cr-bento-card p {
+        font-size: 12px;
+        line-height: 1.6;
+        color: var(--on-surface-variant);
+        margin: 0;
     }
 </style>
 
-<div class="fc-page">
-    <div class="fc-wrap">
+<div class="cr-page">
+    <div style="max-width:800px; margin:0 auto; padding: 0 1.5rem;">
 
-        <!-- Header -->
-        <div class="fc-page-title">🛠 Create New Request</div>
-        <p class="fc-page-sub">Describe your issue and we'll connect you with the right professionals.</p>
+        @* ── Page Header ── *@
+        <div class="cr-header">
+            <h1>Create New Request</h1>
+            <p>Describe the issue and we'll connect you with the right professionals.</p>
+        </div>
 
-        <!-- Main Form Card -->
-        <div class="fc-card">
+        @* ── Form Card ── *@
+        <div class="cr-card">
             <form asp-action="CreateRequest" method="post" enctype="multipart/form-data">
 
+                @* Hidden: TargetWorkerId — preserved from original *@
                 <input type="hidden" name="TargetWorkerId" value="@Model.TargetWorkerId" />
 
-                <!-- Worker Alert -->
+                @* ── Alert: Sending to a specific worker ── *@
                 @if (!string.IsNullOrEmpty(Model.TargetWorkerName))
                 {
-                    <div class="fc-worker-alert">
-                        <span class="fc-worker-alert-icon">👤</span>
+                    <div class="cr-alert-worker" style="margin-bottom:24px;">
+                        <span class="material-symbols-outlined">person_pin</span>
                         Sending directly to: <strong>@Model.TargetWorkerName</strong>
                     </div>
                 }
 
-                <div class="fc-form-grid">
+                <div class="cr-form-grid">
 
-                    <!-- Visibility (only when worker targeted) -->
+                    @* ── Visibility (only when a specific worker is targeted) ── *@
                     @if (Model.TargetWorkerId.HasValue)
                     {
-                        <div class="fc-col-full fc-field">
-                            <div class="fc-section-title">Request Visibility</div>
-                            <div class="fc-visibility-group">
-                                <label class="fc-radio-card">
+                        <div class="cr-col-full">
+                            <span class="cr-label">Request Visibility</span>
+                            <div class="cr-visibility-group">
+                                <label class="cr-radio-card">
                                     <input type="radio" name="IsPrivate" value="false"
                                            @(!Model.IsPrivate ? "checked" : "") />
-                                    <div class="fc-radio-body">
-                                        <span class="fc-radio-icon">🌐</span>
+                                    <div class="cr-radio-body">
+                                        <span class="material-symbols-outlined cr-radio-icon">public</span>
                                         <div>
-                                            <div class="fc-radio-title">Public</div>
-                                            <div class="fc-radio-sub">Visible to all qualified workers</div>
+                                            <p class="cr-radio-title">Public</p>
+                                            <p class="cr-radio-sub">Visible to all qualified workers</p>
                                         </div>
                                     </div>
                                 </label>
-                                <label class="fc-radio-card">
+                                <label class="cr-radio-card">
                                     <input type="radio" name="IsPrivate" value="true"
                                            @(Model.IsPrivate ? "checked" : "") />
-                                    <div class="fc-radio-body">
-                                        <span class="fc-radio-icon">🔒</span>
+                                    <div class="cr-radio-body">
+                                        <span class="material-symbols-outlined cr-radio-icon">lock</span>
                                         <div>
-                                            <div class="fc-radio-title">Private</div>
-                                            <div class="fc-radio-sub">Send directly to this worker only</div>
+                                            <p class="cr-radio-title">Private</p>
+                                            <p class="cr-radio-sub">Send directly to this worker only</p>
                                         </div>
                                     </div>
                                 </label>
@@ -497,98 +501,113 @@
                         </div>
                     }
 
-                    <!-- Title -->
-                    <div class="fc-col-full fc-field">
-                        <div class="fc-section-title">Request Details</div>
-                        <label asp-for="Title" class="fc-label">Request Title</label>
-                        <input asp-for="Title" class="fc-input" type="text"
+                    @* ── Title ── *@
+                    <div class="cr-col-full">
+                        <label asp-for="Title" class="cr-label">Request Title</label>
+                        <input asp-for="Title"
+                               class="cr-input"
+                               type="text"
                                placeholder="e.g., Leaking kitchen faucet" />
-                        <span asp-validation-for="Title" class="fc-error"></span>
-                        <span class="fc-hint">Be concise and specific</span>
+                        <span asp-validation-for="Title" class="cr-validation"></span>
+                        <span class="cr-hint">Be concise and specific</span>
                     </div>
 
-                    <!-- Specialty -->
-                    <div class="fc-col-half fc-field">
-                        <label asp-for="SpecialtyId" class="fc-label">Specialty (Optional)</label>
-                        <select asp-for="SpecialtyId" class="fc-select">
-                            <option value="">— Any Specialty —</option>
-                            @foreach (var s in Model.Specialties)
-                            {
-                                <option value="@s.SpecialtyId">@s.SpecialtyName</option>
-                            }
-                        </select>
-                    </div>
-
-                    <!-- Region -->
-                    <div class="fc-col-half fc-field">
-                        <label asp-for="RegionId" class="fc-label">Region</label>
-                        <select asp-for="RegionId" class="fc-select">
-                            <option value="">— Select Region —</option>
-                            @foreach (var r in Model.Regions)
-                            {
-                                <option value="@r.RegionId">@r.RegionName</option>
-                            }
-                        </select>
-                        <span asp-validation-for="RegionId" class="fc-error"></span>
-                    </div>
-
-                    <!-- Description -->
-                    <div class="fc-col-full fc-field">
-                        <label asp-for="Description" class="fc-label">Problem Description</label>
-                        <textarea asp-for="Description" class="fc-textarea" rows="5"
-                                  placeholder="Describe the issue in detail — any sounds, smells, or visible damage..."></textarea>
-                        <span asp-validation-for="Description" class="fc-error"></span>
-                    </div>
-
-                    <!-- Image Upload -->
-                    <div class="fc-col-full fc-field">
-                        <div class="fc-section-title">Supporting Photos</div>
-                        <div class="fc-upload-zone" id="uploadZone">
-                            <input name="Images" type="file" accept="image/*" multiple
-                                   id="imageInput" onchange="previewImages(this)" />
-                            <div class="fc-upload-icon">📸</div>
-                            <div class="fc-upload-title">Click or drag photos here</div>
-                            <div class="fc-upload-sub">Up to 5 clear images of the problem area (JPG, PNG)</div>
+                    @* ── Specialty ── *@
+                    <div class="cr-col-half">
+                        <label asp-for="SpecialtyId" class="cr-label">Specialty (Optional)</label>
+                        <div class="cr-select-wrap">
+                            <select asp-for="SpecialtyId" class="cr-select">
+                                <option value="">— Any Specialty —</option>
+                                @foreach (var s in Model.Specialties)
+                                {
+                                    <option value="@s.SpecialtyId">@s.SpecialtyName</option>
+                                }
+                            </select>
+                            <span class="material-symbols-outlined cr-select-icon">expand_more</span>
                         </div>
-                        <div class="fc-preview-row" id="previewRow"></div>
                     </div>
 
-                </div>
+                    @* ── Region ── *@
+                    <div class="cr-col-half">
+                        <label asp-for="RegionId" class="cr-label">Region</label>
+                        <div class="cr-select-wrap">
+                            <select asp-for="RegionId" class="cr-select">
+                                <option value="">— Select Region —</option>
+                                @foreach (var r in Model.Regions)
+                                {
+                                    <option value="@r.RegionId">@r.RegionName</option>
+                                }
+                            </select>
+                            <span class="material-symbols-outlined cr-select-icon">location_on</span>
+                        </div>
+                    </div>
 
-                <!-- Actions -->
-                <div class="fc-actions">
-                    <button type="button" class="fc-btn-cancel" onclick="history.back()">
+                    @* ── Description ── *@
+                    <div class="cr-col-full">
+                        <label asp-for="Description" class="cr-label">Problem Description</label>
+                        <textarea asp-for="Description"
+                                  class="cr-textarea"
+                                  rows="5"
+                                  placeholder="Describe the issue in detail, including any sounds, smells, or visible damage..."></textarea>
+                    </div>
+
+                    @* ── Images upload ── *@
+                    <div class="cr-col-full">
+                        <span class="cr-label">Supporting Photos (Optional)</span>
+                        <div class="cr-upload-zone">
+                            <input name="Images"
+                                   type="file"
+                                   accept="image/*"
+                                   multiple />
+                            <span class="material-symbols-outlined cr-upload-icon">add_a_photo</span>
+                            <p>Click or drag photos here</p>
+                            <span class="cr-upload-sub">Upload up to 5 clear images of the problem area</span>
+                        </div>
+                    </div>
+
+                </div>@* /cr-form-grid *@
+
+                @* ── Action Buttons ── *@
+                <div class="cr-actions">
+                    <button type="button" class="cr-btn-cancel" onclick="history.back()">
                         Cancel
                     </button>
-                    <button type="submit" class="fc-btn-submit">
-                        📤 Post Request
+                    <button type="submit" class="cr-btn-submit">
+                        Post Request
+                        <span class="material-symbols-outlined">send</span>
                     </button>
                 </div>
 
             </form>
-        </div>
+        </div>@* /cr-card *@
 
-        <!-- Trust Cards -->
-        <div class="fc-trust-grid">
-            <div class="fc-trust-card">
-                <div class="fc-trust-icon green">✅</div>
+        @* ── Trust Bento ── *@
+        <div class="cr-bento">
+            <div class="cr-bento-card">
+                <div class="cr-bento-icon green">
+                    <span class="material-symbols-outlined">verified_user</span>
+                </div>
                 <div>
-                    <div class="fc-trust-title">Vetted Pros</div>
-                    <p class="fc-trust-desc">Every professional undergoes background checks and certification verification.</p>
+                    <h4>Vetted Pros</h4>
+                    <p>Every professional undergoes a background check and certification verification.</p>
                 </div>
             </div>
-            <div class="fc-trust-card">
-                <div class="fc-trust-icon blue">⚡</div>
+            <div class="cr-bento-card">
+                <div class="cr-bento-icon blue">
+                    <span class="material-symbols-outlined">bolt</span>
+                </div>
                 <div>
-                    <div class="fc-trust-title">Fast Response</div>
-                    <p class="fc-trust-desc">Public requests typically receive initial proposals within 2 hours.</p>
+                    <h4>Fast Response</h4>
+                    <p>Public requests typically receive initial proposals within 2 hours.</p>
                 </div>
             </div>
-            <div class="fc-trust-card">
-                <div class="fc-trust-icon gray">🎧</div>
+            <div class="cr-bento-card">
+                <div class="cr-bento-icon gray">
+                    <span class="material-symbols-outlined">support_agent</span>
+                </div>
                 <div>
-                    <div class="fc-trust-title">24/7 Support</div>
-                    <p class="fc-trust-desc">Our support team is always available to help facilitate your maintenance.</p>
+                    <h4>24/7 Support</h4>
+                    <p>Our support team is always available to help facilitate your maintenance.</p>
                 </div>
             </div>
         </div>
@@ -597,29 +616,7 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        function previewImages(input) {
-            const row = document.getElementById('previewRow');
-            row.innerHTML = '';
-            const files = Array.from(input.files).slice(0, 5);
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'fc-preview-thumb';
-                    row.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            });
-
-            // Update upload zone text
-            const zone = document.getElementById('uploadZone');
-            if (files.length > 0) {
-                zone.style.borderColor = 'var(--fc-blue)';
-                zone.style.background  = 'var(--fc-blue-light)';
-            }
-        }
-    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

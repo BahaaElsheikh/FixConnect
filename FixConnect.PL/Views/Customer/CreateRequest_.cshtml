@@ -1,0 +1,625 @@
+﻿@model FixConnect.PL.ViewModels.CreateRequestViewModel
+@{
+    ViewData["Title"] = "Create Request";
+    Layout = "_CustomerLayout";
+}
+
+<style>
+    :root {
+        --fc-blue: #1a4fd6;
+        --fc-blue-light: #e8effe;
+        --fc-blue-mid: #3b6fe8;
+        --fc-bg: #f0f4fb;
+        --fc-card: #ffffff;
+        --fc-text: #1a1f36;
+        --fc-muted: #6b7a99;
+        --fc-border: #dde4f0;
+        --fc-green: #16a34a;
+        --fc-green-bg: #dcfce7;
+        --fc-green-bdr: #86efac;
+        --fc-danger: #dc2626;
+        --fc-radius: 14px;
+        --fc-radius-sm: 8px;
+        --fc-shadow: 0 2px 16px rgba(26,79,214,.08);
+        --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
+    }
+
+    .fc-page {
+        background: var(--fc-bg);
+        min-height: 100vh;
+        padding: 2.5rem 1rem 3.5rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .fc-wrap {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    /* ── Page Header ── */
+    .fc-page-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--fc-text);
+        letter-spacing: -.4px;
+        margin-bottom: .3rem;
+    }
+
+    .fc-page-sub {
+        font-size: .9rem;
+        color: var(--fc-muted);
+        margin-bottom: 1.75rem;
+    }
+
+    /* ── Main Card ── */
+    .fc-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ── Section title ── */
+    .fc-section-title {
+        font-size: .75rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .fc-section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: var(--fc-blue-light);
+            border-radius: 2px;
+        }
+
+    /* ── Worker Alert ── */
+    .fc-worker-alert {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: .85rem 1.1rem;
+        background: var(--fc-blue-light);
+        border: 1px solid #c5d6f8;
+        border-radius: var(--fc-radius-sm);
+        font-size: .875rem;
+        color: var(--fc-text);
+        margin-bottom: 1.5rem;
+    }
+
+    .fc-worker-alert-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .fc-worker-alert strong {
+        color: var(--fc-blue);
+        font-weight: 700;
+    }
+
+    /* ── Form Grid ── */
+    .fc-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .fc-col-full {
+        grid-column: 1 / -1;
+    }
+
+    .fc-col-half {
+        grid-column: span 1;
+    }
+
+    /* ── Fields ── */
+    .fc-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .fc-label {
+        font-size: .75rem;
+        font-weight: 700;
+        color: var(--fc-muted);
+        letter-spacing: .4px;
+        text-transform: uppercase;
+        margin-bottom: .4rem;
+    }
+
+    .fc-input, .fc-select, .fc-textarea {
+        width: 100%;
+        padding: .65rem .9rem;
+        font-size: .9rem;
+        color: var(--fc-text);
+        background: #fff;
+        border: 1.5px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        outline: none;
+        font-family: inherit;
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+        .fc-input:focus, .fc-select:focus, .fc-textarea:focus {
+            border-color: var(--fc-blue);
+            box-shadow: 0 0 0 3px rgba(26,79,214,.1);
+        }
+
+        .fc-input::placeholder, .fc-textarea::placeholder {
+            color: #b0b9cc;
+        }
+
+    .fc-textarea {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+    .fc-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7a99' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right .9rem center;
+        padding-right: 2.25rem;
+        cursor: pointer;
+    }
+
+    .fc-hint {
+        font-size: .73rem;
+        color: var(--fc-muted);
+        margin-top: .3rem;
+        font-style: italic;
+    }
+
+    .fc-error {
+        font-size: .75rem;
+        color: var(--fc-danger);
+        margin-top: .3rem;
+    }
+
+    /* ── Visibility Radio Cards ── */
+    .fc-visibility-group {
+        display: flex;
+        gap: .85rem;
+    }
+
+    .fc-radio-card {
+        flex: 1;
+        cursor: pointer;
+    }
+
+        .fc-radio-card input[type="radio"] {
+            display: none;
+        }
+
+    .fc-radio-body {
+        padding: .9rem 1rem;
+        border: 1.5px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        transition: border-color .15s, background .15s;
+        background: #fff;
+    }
+
+        .fc-radio-body:hover {
+            background: var(--fc-blue-light);
+            border-color: #c5d6f8;
+        }
+
+    .fc-radio-card input:checked + .fc-radio-body {
+        border-color: var(--fc-blue);
+        background: var(--fc-blue-light);
+    }
+
+    .fc-radio-icon {
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .fc-radio-title {
+        font-size: .875rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: 2px;
+    }
+
+    .fc-radio-sub {
+        font-size: .75rem;
+        color: var(--fc-muted);
+    }
+
+    /* ── Upload Zone ── */
+    .fc-upload-zone {
+        border: 2px dashed var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        padding: 2.5rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--fc-bg);
+        cursor: pointer;
+        position: relative;
+        transition: border-color .15s, background .15s;
+        text-align: center;
+    }
+
+        .fc-upload-zone:hover {
+            border-color: var(--fc-blue);
+            background: var(--fc-blue-light);
+        }
+
+        .fc-upload-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+    .fc-upload-icon {
+        font-size: 2rem;
+        margin-bottom: .6rem;
+    }
+
+    .fc-upload-title {
+        font-size: .9rem;
+        font-weight: 600;
+        color: var(--fc-text);
+        margin-bottom: .25rem;
+    }
+
+    .fc-upload-sub {
+        font-size: .78rem;
+        color: var(--fc-muted);
+    }
+
+    /* Preview thumbnails */
+    .fc-preview-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: .85rem;
+    }
+
+    .fc-preview-thumb {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 7px;
+        border: 1.5px solid var(--fc-border);
+    }
+
+    /* ── Actions ── */
+    .fc-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--fc-border);
+        margin-top: .5rem;
+        gap: .75rem;
+    }
+
+    .fc-btn-cancel {
+        padding: .65rem 1.25rem;
+        font-size: .875rem;
+        font-weight: 600;
+        color: var(--fc-muted);
+        background: transparent;
+        border: 1.5px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        cursor: pointer;
+        font-family: inherit;
+        transition: all .15s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .fc-btn-cancel:hover {
+            border-color: var(--fc-blue);
+            color: var(--fc-blue);
+            background: var(--fc-blue-light);
+        }
+
+    .fc-btn-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: .7rem 2rem;
+        font-size: .9rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--fc-blue);
+        border: none;
+        border-radius: var(--fc-radius-sm);
+        cursor: pointer;
+        font-family: inherit;
+        transition: background .18s, transform .15s, box-shadow .15s;
+        box-shadow: 0 4px 14px rgba(26,79,214,.25);
+    }
+
+        .fc-btn-submit:hover {
+            background: var(--fc-blue-mid);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26,79,214,.3);
+        }
+
+    /* ── Trust Cards ── */
+    .fc-trust-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: .25rem;
+    }
+
+    .fc-trust-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        padding: 1.1rem 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: .85rem;
+        transition: box-shadow .2s, transform .2s;
+    }
+
+        .fc-trust-card:hover {
+            box-shadow: var(--fc-shadow-md);
+            transform: translateY(-2px);
+        }
+
+    .fc-trust-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: var(--fc-radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+        .fc-trust-icon.green {
+            background: var(--fc-green-bg);
+        }
+
+        .fc-trust-icon.blue {
+            background: var(--fc-blue-light);
+        }
+
+        .fc-trust-icon.gray {
+            background: #f1f5f9;
+        }
+
+    .fc-trust-title {
+        font-size: .83rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: 3px;
+    }
+
+    .fc-trust-desc {
+        font-size: .75rem;
+        color: var(--fc-muted);
+        line-height: 1.55;
+        margin: 0;
+    }
+
+    @@media (max-width: 640px) {
+        .fc-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .fc-col-half {
+            grid-column: 1 / -1;
+        }
+
+        .fc-visibility-group {
+            flex-direction: column;
+        }
+
+        .fc-trust-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .fc-card {
+            padding: 1.25rem;
+        }
+    }
+</style>
+
+<div class="fc-page">
+    <div class="fc-wrap">
+
+        <!-- Header -->
+        <div class="fc-page-title">🛠 Create New Request</div>
+        <p class="fc-page-sub">Describe your issue and we'll connect you with the right professionals.</p>
+
+        <!-- Main Form Card -->
+        <div class="fc-card">
+            <form asp-action="CreateRequest" method="post" enctype="multipart/form-data">
+
+                <input type="hidden" name="TargetWorkerId" value="@Model.TargetWorkerId" />
+
+                <!-- Worker Alert -->
+                @if (!string.IsNullOrEmpty(Model.TargetWorkerName))
+                {
+                    <div class="fc-worker-alert">
+                        <span class="fc-worker-alert-icon">👤</span>
+                        Sending directly to: <strong>@Model.TargetWorkerName</strong>
+                    </div>
+                }
+
+                <div class="fc-form-grid">
+
+                    <!-- Visibility (only when worker targeted) -->
+                    @if (Model.TargetWorkerId.HasValue)
+                    {
+                        <div class="fc-col-full fc-field">
+                            <div class="fc-section-title">Request Visibility</div>
+                            <div class="fc-visibility-group">
+                                <label class="fc-radio-card">
+                                    <input type="radio" name="IsPrivate" value="false"
+                                           @(!Model.IsPrivate ? "checked" : "") />
+                                    <div class="fc-radio-body">
+                                        <span class="fc-radio-icon">🌐</span>
+                                        <div>
+                                            <div class="fc-radio-title">Public</div>
+                                            <div class="fc-radio-sub">Visible to all qualified workers</div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="fc-radio-card">
+                                    <input type="radio" name="IsPrivate" value="true"
+                                           @(Model.IsPrivate ? "checked" : "") />
+                                    <div class="fc-radio-body">
+                                        <span class="fc-radio-icon">🔒</span>
+                                        <div>
+                                            <div class="fc-radio-title">Private</div>
+                                            <div class="fc-radio-sub">Send directly to this worker only</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Title -->
+                    <div class="fc-col-full fc-field">
+                        <div class="fc-section-title">Request Details</div>
+                        <label asp-for="Title" class="fc-label">Request Title</label>
+                        <input asp-for="Title" class="fc-input" type="text"
+                               placeholder="e.g., Leaking kitchen faucet" />
+                        <span asp-validation-for="Title" class="fc-error"></span>
+                        <span class="fc-hint">Be concise and specific</span>
+                    </div>
+
+                    <!-- Specialty -->
+                    <div class="fc-col-half fc-field">
+                        <label asp-for="SpecialtyId" class="fc-label">Specialty (Optional)</label>
+                        <select asp-for="SpecialtyId" class="fc-select">
+                            <option value="">— Any Specialty —</option>
+                            @foreach (var s in Model.Specialties)
+                            {
+                                <option value="@s.SpecialtyId">@s.SpecialtyName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Region -->
+                    <div class="fc-col-half fc-field">
+                        <label asp-for="RegionId" class="fc-label">Region</label>
+                        <select asp-for="RegionId" class="fc-select">
+                            <option value="">— Select Region —</option>
+                            @foreach (var r in Model.Regions)
+                            {
+                                <option value="@r.RegionId">@r.RegionName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="RegionId" class="fc-error"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="fc-col-full fc-field">
+                        <label asp-for="Description" class="fc-label">Problem Description</label>
+                        <textarea asp-for="Description" class="fc-textarea" rows="5"
+                                  placeholder="Describe the issue in detail — any sounds, smells, or visible damage..."></textarea>
+                        <span asp-validation-for="Description" class="fc-error"></span>
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div class="fc-col-full fc-field">
+                        <div class="fc-section-title">Supporting Photos</div>
+                        <div class="fc-upload-zone" id="uploadZone">
+                            <input name="Images" type="file" accept="image/*" multiple
+                                   id="imageInput" onchange="previewImages(this)" />
+                            <div class="fc-upload-icon">📸</div>
+                            <div class="fc-upload-title">Click or drag photos here</div>
+                            <div class="fc-upload-sub">Up to 5 clear images of the problem area (JPG, PNG)</div>
+                        </div>
+                        <div class="fc-preview-row" id="previewRow"></div>
+                    </div>
+
+                </div>
+
+                <!-- Actions -->
+                <div class="fc-actions">
+                    <button type="button" class="fc-btn-cancel" onclick="history.back()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="fc-btn-submit">
+                        📤 Post Request
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Trust Cards -->
+        <div class="fc-trust-grid">
+            <div class="fc-trust-card">
+                <div class="fc-trust-icon green">✅</div>
+                <div>
+                    <div class="fc-trust-title">Vetted Pros</div>
+                    <p class="fc-trust-desc">Every professional undergoes background checks and certification verification.</p>
+                </div>
+            </div>
+            <div class="fc-trust-card">
+                <div class="fc-trust-icon blue">⚡</div>
+                <div>
+                    <div class="fc-trust-title">Fast Response</div>
+                    <p class="fc-trust-desc">Public requests typically receive initial proposals within 2 hours.</p>
+                </div>
+            </div>
+            <div class="fc-trust-card">
+                <div class="fc-trust-icon gray">🎧</div>
+                <div>
+                    <div class="fc-trust-title">24/7 Support</div>
+                    <p class="fc-trust-desc">Our support team is always available to help facilitate your maintenance.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImages(input) {
+            const row = document.getElementById('previewRow');
+            row.innerHTML = '';
+            const files = Array.from(input.files).slice(0, 5);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'fc-preview-thumb';
+                    row.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Update upload zone text
+            const zone = document.getElementById('uploadZone');
+            if (files.length > 0) {
+                zone.style.borderColor = 'var(--fc-blue)';
+                zone.style.background  = 'var(--fc-blue-light)';
+            }
+        }
+    </script>
+}
