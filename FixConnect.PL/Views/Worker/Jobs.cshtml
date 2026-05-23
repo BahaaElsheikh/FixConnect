@@ -152,7 +152,7 @@
         </div>
 
         <div class="cards-grid">
-            @foreach (var job in Model.Jobs.Where(j => j.Status == "Active"))
+            @foreach (var job in Model.Jobs)
             {
                 <div class="job-card">
                     <div class="job-header">

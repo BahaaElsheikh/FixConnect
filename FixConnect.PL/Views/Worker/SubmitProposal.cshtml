@@ -219,7 +219,8 @@
                                     <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Labor Cost (EGP)</label>
                                     <div class="relative">
                                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary font-body-md">EGP</span>
-                                        <input asp-for="LaborCost" id="input-labor" class="w-full form-input rounded-xl pl-14 pr-4 py-3 font-body-md text-body-md" placeholder="0.00" type="number" min="0" />
+                                        <!-- ضفنا هنا oninput -->
+                                        <input asp-for="LaborCost" id="input-labor" oninput="calculateBid()" class="w-full form-input rounded-xl pl-14 pr-4 py-3 font-body-md text-body-md" placeholder="0.00" type="number" min="0" />
                                     </div>
                                     <span asp-validation-for="LaborCost" class="text-error text-[12px] block mt-1"></span>
                                 </div>
@@ -228,7 +229,8 @@
                                     <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Material Cost (EGP)</label>
                                     <div class="relative">
                                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary font-body-md">EGP</span>
-                                        <input asp-for="MaterialCost" id="input-material" class="w-full form-input rounded-xl pl-14 pr-4 py-3 font-body-md text-body-md" placeholder="0.00" type="number" min="0" />
+                                        <!-- ضفنا هنا oninput -->
+                                        <input asp-for="MaterialCost" id="input-material" oninput="calculateBid()" class="w-full form-input rounded-xl pl-14 pr-4 py-3 font-body-md text-body-md" placeholder="0.00" type="number" min="0" />
                                     </div>
                                     <span asp-validation-for="MaterialCost" class="text-error text-[12px] block mt-1"></span>
                                 </div>
@@ -292,12 +294,35 @@
 </div>
 
 <script>
+
+    // خليناها دالة عامة عشان تشتغل أول ما المستخدم يكتب في الـ input علطول
+    function calculateBid() {
+        const laborInput = document.getElementById("input-labor");
+        const materialInput = document.getElementById("input-material");
+        const displayGross = document.getElementById("display-gross");
+        const displayFee = document.getElementById("display-fee");
+        const displayNet = document.getElementById("display-net");
+
+        // التأكد إن العناصر موجودة في الصفحة منعاً لأي خطأ يوقف الاسكريبت
+        if (!laborInput || !materialInput || !displayGross || !displayFee || !displayNet) return;
+
+        const labor = parseFloat(laborInput.value) || 0;
+        const material = parseFloat(materialInput.value) || 0;
+
+        const gross = labor + material;
+        const fee = labor * 0.10; // الـ 10% على عمالة الـ الأسطى بس
+        const net = gross - fee;
+
+        displayGross.innerText = gross.toLocaleString() + " EGP";
+        displayFee.innerText = "- " + fee.toLocaleString() + " EGP";
+        displayNet.innerText = net.toLocaleString() + " EGP";
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
-        // --- Date Picker Sync for Current Year ---
+        // --- Date Picker Sync ---
         const startTimeInput = document.getElementById("input-start-time");
         if (startTimeInput && !startTimeInput.value) {
             const now = new Date();
-            // Force compliance with current year context
             now.setFullYear(2026);
 
             const year = now.getFullYear();
@@ -309,28 +334,7 @@
             startTimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
         }
 
-        // --- Interactive Financial Calculation Logic ---
-        const laborInput = document.getElementById("input-labor");
-        const materialInput = document.getElementById("input-material");
-        const displayGross = document.getElementById("display-gross");
-        const displayFee = document.getElementById("display-fee");
-        const displayNet = document.getElementById("display-net");
-
-        function calculateBid() {
-            const labor = parseFloat(laborInput.value) || 0;
-            const material = parseFloat(materialInput.value) || 0;
-
-            const gross = labor + material;
-            const fee = gross * 0.10;
-            const net = gross - fee;
-
-            displayGross.innerText = gross.toLocaleString() + " EGP";
-            displayFee.innerText = "- " + fee.toLocaleString() + " EGP";
-            displayNet.innerText = net.toLocaleString() + " EGP";
-        }
-
-        laborInput.addEventListener("input", calculateBid);
-        materialInput.addEventListener("input", calculateBid);
-        calculateBid(); // Initial load run
+        // تشغيل الحسبة لأول مرة عشان لو البيانات جاية من الـ Database في حالة الـ Edit
+        calculateBid();
     });
 </script>
