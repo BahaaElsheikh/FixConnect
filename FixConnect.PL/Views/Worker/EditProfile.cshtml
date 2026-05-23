@@ -149,6 +149,8 @@
                         <span asp-validation-for="Phone" class="text-error text-xs"></span>
                     </div>
 
+
+
                     <div class="space-y-2 md:col-span-2">
                         <label asp-for="SpecialtyId" class="font-label-md font-semibold text-sm text-on-surface-variant block">Specialty</label>
                         <div class="relative">
@@ -175,6 +177,47 @@
                     <span asp-validation-for="Bio" class="text-error text-xs"></span>
                 </div>
             </section>
+
+
+
+            <section class="glass-panel rounded-xl p-6">
+                <h3 class="font-headline-md text-lg font-semibold text-on-surface mb-6 pb-4 border-b border-outline-variant flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
+                    ID Verification
+                </h3>
+
+                @if (!Model.HasPendingVerification)
+                {
+                    <p class="text-sm text-on-surface-variant mb-5">Upload your national ID to get a Verified badge and build trust with clients.</p>
+                    <div class="space-y-4">
+                        <label asp-for="IdFrontImage" class="block w-full p-4 border-2 border-dashed border-outline-variant rounded-lg text-center hover:bg-surface-container-low hover:border-primary transition-colors cursor-pointer group">
+                            <span class="material-symbols-outlined text-on-surface-variant mb-2 group-hover:text-primary transition-colors">badge</span>
+                            <p class="font-label-md font-semibold text-sm text-on-surface">Upload ID Front</p>
+                            <p class="font-caption text-xs font-medium text-on-surface-variant mt-1">Image format</p>
+                            <input asp-for="IdFrontImage" type="file" class="hidden" accept="image/*" />
+                        </label>
+
+                        <label asp-for="IdBackImage" class="block w-full p-4 border-2 border-dashed border-outline-variant rounded-lg text-center hover:bg-surface-container-low hover:border-primary transition-colors cursor-pointer group">
+                            <span class="material-symbols-outlined text-on-surface-variant mb-2 group-hover:text-primary transition-colors">credit_card</span>
+                            <p class="font-label-md font-semibold text-sm text-on-surface">Upload ID Back</p>
+                            <p class="font-caption text-xs font-medium text-on-surface-variant mt-1">Image format</p>
+                            <input asp-for="IdBackImage" type="file" class="hidden" accept="image/*" />
+                        </label>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 rounded-lg bg-surface-container-high border border-outline-variant flex flex-col items-center text-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-4xl">hourglass_top</span>
+                        <div>
+                            <h6 class="font-label-md font-bold text-on-surface mb-1">Verification in Progress</h6>
+                            <p class="text-sm text-on-surface-variant">Your documents are currently under review. You cannot re-submit until they are processed.</p>
+                        </div>
+                    </div>
+                }
+            </section>
+
+
 
             <section class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-6 shadow-sm">
                 <h3 class="font-headline-md text-headline-md text-on-surface mb-6 flex items-center gap-2">
@@ -267,69 +310,8 @@
 
         <div class="lg:col-span-4 flex flex-col gap-6">
 
-            <section class="glass-panel rounded-xl p-6">
-                <h3 class="font-headline-md text-lg font-semibold text-on-surface mb-6 pb-4 border-b border-outline-variant flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
-                    ID Verification
-                </h3>
+           
 
-                @if (!Model.HasPendingVerification)
-                {
-                    <p class="text-sm text-on-surface-variant mb-5">Upload your national ID to get a Verified badge and build trust with clients.</p>
-                    <div class="space-y-4">
-                        <label asp-for="IdFrontImage" class="block w-full p-4 border-2 border-dashed border-outline-variant rounded-lg text-center hover:bg-surface-container-low hover:border-primary transition-colors cursor-pointer group">
-                            <span class="material-symbols-outlined text-on-surface-variant mb-2 group-hover:text-primary transition-colors">badge</span>
-                            <p class="font-label-md font-semibold text-sm text-on-surface">Upload ID Front</p>
-                            <p class="font-caption text-xs font-medium text-on-surface-variant mt-1">Image format</p>
-                            <input asp-for="IdFrontImage" type="file" class="hidden" accept="image/*" />
-                        </label>
-
-                        <label asp-for="IdBackImage" class="block w-full p-4 border-2 border-dashed border-outline-variant rounded-lg text-center hover:bg-surface-container-low hover:border-primary transition-colors cursor-pointer group">
-                            <span class="material-symbols-outlined text-on-surface-variant mb-2 group-hover:text-primary transition-colors">credit_card</span>
-                            <p class="font-label-md font-semibold text-sm text-on-surface">Upload ID Back</p>
-                            <p class="font-caption text-xs font-medium text-on-surface-variant mt-1">Image format</p>
-                            <input asp-for="IdBackImage" type="file" class="hidden" accept="image/*" />
-                        </label>
-                    </div>
-                }
-                else
-                {
-                    <div class="p-4 rounded-lg bg-surface-container-high border border-outline-variant flex flex-col items-center text-center gap-3">
-                        <span class="material-symbols-outlined text-primary text-4xl">hourglass_top</span>
-                        <div>
-                            <h6 class="font-label-md font-bold text-on-surface mb-1">Verification in Progress</h6>
-                            <p class="text-sm text-on-surface-variant">Your documents are currently under review. You cannot re-submit until they are processed.</p>
-                        </div>
-                    </div>
-                }
-            </section>
-
-            <section class="glass-panel rounded-xl p-6">
-                <h3 class="font-headline-md text-lg font-semibold text-on-surface mb-6 pb-4 border-b border-outline-variant flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary text-[20px]">language</span>
-                    Languages
-                </h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-3 bg-surface rounded-lg border border-outline-variant">
-                        <div>
-                            <p class="font-label-md font-semibold text-sm text-on-surface">English</p>
-                            <p class="font-caption text-xs font-medium text-on-surface-variant">Native/Bilingual</p>
-                        </div>
-                        <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-error">close</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-surface rounded-lg border border-outline-variant">
-                        <div>
-                            <p class="font-label-md font-semibold text-sm text-on-surface">Spanish</p>
-                            <p class="font-caption text-xs font-medium text-on-surface-variant">Conversational</p>
-                        </div>
-                        <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-error">close</span>
-                    </div>
-                    <button type="button" class="w-full py-2.5 mt-2 rounded-lg btn-secondary font-label-md font-semibold text-sm flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-[18px]">add</span>
-                        Add Language
-                    </button>
-                </div>
-            </section>
 
         </div>
     </div>

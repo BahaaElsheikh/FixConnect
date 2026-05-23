@@ -90,27 +90,7 @@ namespace FixConnect.PL.ViewModels
     // ─────────────────────────────
     // Edit Request
     // ─────────────────────────────
-    public class EditRequestViewModel
-    {
-        public int RequestId { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string Title { get; set; } = null!;
-
-        [StringLength(300)]
-        public string? Description { get; set; }
-
-        public int RegionId { get; set; }
-        public int? SpecialtyId { get; set; }
-        public List<IFormFile>? NewImages { get; set; }
-        public List<string> ExistingImages { get; set; } = new();
-        public List<int> DeleteImageIds { get; set; } = new();
-
-        public List<SpecialtyOption> Specialties { get; set; } = new();
-        public List<RegionOption> Regions { get; set; } = new();
-    }
-
+    
     // ─────────────────────────────
     // Received Proposals (Customer)
     // ─────────────────────────────

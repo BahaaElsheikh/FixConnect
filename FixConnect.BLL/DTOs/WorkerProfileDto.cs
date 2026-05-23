@@ -13,6 +13,9 @@
         public string AvailabilityStatus { get; set; } = null!;
         public decimal AvgRating { get; set; }
         public List<string> WorkingRegions { get; set; } = new();
+
+        public int CompletedJobsCount { get; set; }
+
         public List<PortfolioItemViewModel> PortfolioItems { get; set; } = new();
         public List<ReviewItemViewModel> Reviews { get; set; } = new();
         public VerificationViewModel? Verification { get; set; }
@@ -31,6 +34,13 @@
         public string CustomerName { get; set; } = null!;
         public int RatingValue { get; set; }
         public string? Comment { get; set; }
+
+        // New
+        public int AccuracyRating { get; set; }
+        public int CommitmentRating { get; set; }
+        public int PriceRating { get; set; }
+        public decimal AvgRating { get; set; }
+        public bool SuggestWorker { get; set; }
     }
 
     public class VerificationViewModel

@@ -4,505 +4,632 @@
     Layout = "_CustomerLayout";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FixConnect — Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <style>
-        :root {
-            --bg: #f4f2ee;
-            --surface: #ffffff;
-            --border: #e5e2db;
-            --accent: #1a1a1a;
-            --accent2: #c9a39e;
-            --muted: #7a7570;
-            --green: #2d8a4e;
+<style>
+    :root {
+        --fc-blue: #1a4fd6;
+        --fc-blue-light: #e8effe;
+        --fc-blue-mid: #3b6fe8;
+        --fc-bg: #f0f4fb;
+        --fc-card: #ffffff;
+        --fc-text: #1a1f36;
+        --fc-muted: #6b7a99;
+        --fc-border: #dde4f0;
+        --fc-green: #16a34a;
+        --fc-green-bg: #dcfce7;
+        --fc-green-bdr: #86efac;
+        --fc-warning: #d97706;
+        --fc-warning-bg: #fef3c7;
+        --fc-warning-bdr: #fde68a;
+        --fc-star-on: #f5a623;
+        --fc-star-off: #dde4f0;
+        --fc-radius: 14px;
+        --fc-radius-sm: 8px;
+        --fc-shadow: 0 2px 16px rgba(26,79,214,.08);
+        --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
+    }
+
+    .fc-page {
+        background: var(--fc-bg);
+        min-height: 100vh;
+        padding: 1.75rem 0 3rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    /* ══ Layout ══ */
+    .fc-layout {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+    }
+
+    .fc-feed {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: calc(100% - 290px);
+        max-width: none;
+        margin-right :5%;
+    }
+
+    .fc-right {
+        width: 290px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 2rem;
+    }
+
+    /* ══ Create Request Button ══ */
+    .fc-create-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 1rem 1.5rem;
+        background: var(--fc-blue);
+        color: #fff;
+        font-size: .95rem;
+        font-weight: 700;
+        border-radius: var(--fc-radius);
+        text-decoration: none;
+        margin-bottom: 1.1rem;
+        transition: background .18s, transform .15s, box-shadow .15s;
+        box-shadow: 0 4px 16px rgba(26,79,214,.22);
+        letter-spacing: -.2px;
+    }
+
+        .fc-create-btn:hover {
+            background: var(--fc-blue-mid);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(26,79,214,.28);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            color: var(--accent);
-            min-height: 100vh;
-        }
-
-        /* ═══════════════════════
-                   TOP NAV
-                ═══════════════════════ */
-        .top-nav {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 28px;
+        .fc-create-btn .plus {
+            width: 26px;
+            height: 26px;
+            background: rgba(255,255,255,.2);
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-            .top-nav .brand {
-                font-weight: 700;
-                font-size: 1.1rem;
-                letter-spacing: -0.3px;
-            }
-
-                .top-nav .brand span {
-                    color: var(--accent2);
-                }
-
-        .nav-links {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-
-        .nav-link-item {
-            padding: 7px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--muted);
-            text-decoration: none;
-            transition: all 0.15s;
-        }
-
-            .nav-link-item:hover {
-                background: var(--bg);
-                color: var(--accent);
-            }
-
-            .nav-link-item.active {
-                background: var(--accent);
-                color: #fff;
-            }
-
-        .logout-form button {
-            padding: 7px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #c0392b;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-            .logout-form button:hover {
-                background: #fef2f2;
-            }
-
-        /* ═══════════════════════
-                   MAIN LAYOUT
-                ═══════════════════════ */
-        .page-wrapper {
-            display: flex;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px 16px;
-            gap: 24px;
-            align-items: flex-start;
-        }
-
-        /* Feed Column (70%) */
-        .feed-col {
-            flex: 1;
-            min-width: 0;
-        }
-
-        /* Right Column (30%) */
-        .right-col {
-            width: 300px;
+            justify-content: center;
+            font-size: 1.1rem;
             flex-shrink: 0;
-            position: sticky;
-            top: 80px;
         }
 
-        /* ═══════════════════════
-                   CREATE REQUEST BUTTON
-                ═══════════════════════ */
-        .create-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 16px;
-            background: var(--accent);
-            color: #fff;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 700;
-            text-decoration: none;
-            margin-bottom: 20px;
-            transition: opacity 0.15s, transform 0.1s;
-            letter-spacing: -0.2px;
-        }
+    /* ══ Search Card ══ */
+    .fc-search-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        padding: 1rem 1.1rem;
+        margin-bottom: 1.25rem;
+    }
 
-            .create-btn:hover {
-                opacity: 0.88;
-                color: #fff;
-                transform: translateY(-1px);
-            }
+    .fc-search-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
 
-            .create-btn .plus-icon {
-                width: 28px;
-                height: 28px;
-                background: rgba(255,255,255,0.2);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.2rem;
-            }
+    .fc-search-input {
+        flex: 1;
+        min-width: 130px;
+        padding: .5rem 1rem;
+        font-size: .83rem;
+        border: 1.5px solid var(--fc-border);
+        border-radius: 20px;
+        outline: none;
+        background: var(--fc-bg);
+        font-family: inherit;
+        color: var(--fc-text);
+        transition: border-color .15s, box-shadow .15s;
+    }
 
-        /* ═══════════════════════
-                   SEARCH BAR
-                ═══════════════════════ */
-        .search-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .search-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex: 1;
-            min-width: 140px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            font-family: 'DM Sans', sans-serif;
-            outline: none;
-            transition: border 0.15s;
-        }
-
-            .search-input:focus {
-                border-color: var(--accent);
-            }
-
-        .search-btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 18px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        /* ═══════════════════════
-                   WORKER GRID
-                ═══════════════════════ */
-        .section-title {
-            font-size: 0.78rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--muted);
-            margin-bottom: 12px;
-        }
-
-        .workers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
-        }
-
-        .worker-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 16px;
-            text-align: center;
-            transition: box-shadow 0.15s, transform 0.1s;
-        }
-
-            .worker-card:hover {
-                box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-                transform: translateY(-2px);
-            }
-
-            .worker-card img {
-                width: 64px;
-                height: 64px;
-                border-radius: 50%;
-                object-fit: cover;
-                margin-bottom: 10px;
-            }
-
-            .worker-card .name {
-                font-size: 0.88rem;
-                font-weight: 700;
-                margin-bottom: 2px;
-            }
-
-            .worker-card .specialty {
-                font-size: 0.75rem;
-                color: var(--muted);
-                margin-bottom: 6px;
-            }
-
-            .worker-card .stars {
-                font-size: 0.8rem;
-                color: #f5a623;
-                margin-bottom: 6px;
-            }
-
-        .avail-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .avail-available {
-            background: #dcfce7;
-            color: var(--green);
-        }
-
-        .avail-busy {
-            background: #fef9c3;
-            color: #b45309;
-        }
-
-        .avail-offline {
-            background: #f3f4f6;
-            color: var(--muted);
-        }
-
-        .worker-card .regions {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 3px;
-            margin-bottom: 10px;
-        }
-
-        .region-tag {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1px 7px;
-            font-size: 0.65rem;
-            color: var(--muted);
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .btn-view {
-            flex: 1;
-            padding: 6px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-decoration: none;
-            border: 1px solid var(--border);
-            color: var(--accent);
-            background: var(--bg);
-            text-align: center;
-            transition: background 0.12s;
-        }
-
-            .btn-view:hover {
-                background: #eae8e4;
-                color: var(--accent);
-            }
-
-        .btn-request {
-            flex: 1;
-            padding: 6px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-decoration: none;
-            background: var(--accent);
-            color: #fff;
-            text-align: center;
-            border: none;
-            transition: opacity 0.12s;
-        }
-
-            .btn-request:hover {
-                opacity: 0.85;
-                color: #fff;
-            }
-
-        /* ═══════════════════════
-                   RIGHT COLUMN CARDS
-                ═══════════════════════ */
-        .right-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 16px;
-        }
-
-            .right-card h6 {
-                font-size: 0.78rem;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.8px;
-                color: var(--muted);
-                margin-bottom: 14px;
-            }
-
-        .mini-item {
-            background: var(--bg);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 8px;
-        }
-
-            .mini-item:last-child {
-                margin-bottom: 0;
-            }
-
-            .mini-item .title {
-                font-size: 0.85rem;
-                font-weight: 600;
-                margin-bottom: 4px;
-            }
-
-            .mini-item .meta {
-                font-size: 0.75rem;
-                color: var(--muted);
-                margin-bottom: 8px;
-            }
-
-        .mini-link {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--accent);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-            .mini-link:hover {
-                text-decoration: underline;
-            }
-
-        .proposals-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.73rem;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: var(--accent);
-            color: #fff;
-            text-decoration: none;
-            transition: opacity 0.12s;
-        }
-
-            .proposals-btn:hover {
-                opacity: 0.85;
-                color: #fff;
-            }
-
-        .no-item {
-            font-size: 0.8rem;
-            color: var(--muted);
-            text-align: center;
-            padding: 8px 0;
-        }
-
-        /* Region Dropdown */
-        .region-wrapper {
-            position: relative;
-            flex: 1;
-            min-width: 140px;
-        }
-
-        #regionDropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
+        .fc-search-input:focus {
+            border-color: var(--fc-blue);
+            box-shadow: 0 0 0 3px rgba(26,79,214,.1);
             background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            z-index: 999;
-            display: none;
-            max-height: 180px;
-            overflow-y: auto;
         }
-    </style>
-</head>
-<body>
 
-    <!-- ═══════════════════════════════
-         TOP NAV
-    ═══════════════════════════════ -->
-   
+        .fc-search-input::placeholder {
+            color: #b0b9cc;
+        }
 
-    <!-- ═══════════════════════════════
-         PAGE WRAPPER
-    ═══════════════════════════════ -->
-    <div class="page-wrapper">
+    .fc-region-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 130px;
+    }
 
-        <!-- ═══════════════
-             FEED COLUMN
-        ═══════════════ -->
-        <div class="feed-col">
+    .fc-region-dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        box-shadow: var(--fc-shadow-md);
+        z-index: 999;
+        display: none;
+        max-height: 180px;
+        overflow-y: auto;
+    }
+
+    .fc-region-option {
+        padding: .5rem .9rem;
+        font-size: .83rem;
+        color: var(--fc-text);
+        cursor: pointer;
+        transition: background .1s;
+    }
+
+        .fc-region-option:hover {
+            background: var(--fc-blue-light);
+            color: var(--fc-blue);
+        }
+
+    .fc-search-btn {
+        padding: .5rem 1.2rem;
+        background: var(--fc-blue);
+        color: #fff;
+        font-size: .83rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background .15s;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+        .fc-search-btn:hover {
+            background: var(--fc-blue-mid);
+        }
+
+    /* ══ Section label ══ */
+    .fc-section-label {
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        color: var(--fc-muted);
+        margin-bottom: .85rem;
+    }
+
+    /* ══ Workers Grid — 3 columns fixed ══ */
+    .fc-workers-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); 
+        /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */
+        gap: 1rem;
+    }
+
+    /* ══ Worker Card — fixed height layout ══ */
+    .fc-worker-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: 300px;
+        transition: box-shadow .2s, transform .2s;
+        overflow: hidden;
+        padding: 0;
+    }
+
+        .fc-worker-card:hover {
+            box-shadow: var(--fc-shadow-md);
+            transform: translateY(-3px);
+        }
+
+    /* Photo section — fixed height, photo centered inside */
+    .fc-worker-photo-wrap {
+        width: 100%;
+        height: 90px;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, var(--fc-blue-light) 0%, #d4e3fc 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: visible;
+        position: relative;
+        z-index: 1;
+    }
+
+        .fc-worker-photo-wrap img {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 10px rgba(26,79,214,.18);
+            /* centered in the banner — no overlap */
+            position: static;
+            transform: none;
+            margin-top: 10px;
+        }
+
+    /* Card body */
+    .fc-worker-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: .6rem .85rem .85rem;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .fc-worker-name {
+        font-size: .875rem;
+        font-weight: 700;
+        color: var(--fc-text);
+        margin-bottom: .15rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+
+    .fc-verified-dot {
+        color: var(--fc-blue);
+        font-size: .65rem;
+        margin-left: 3px;
+    }
+
+    .fc-worker-specialty {
+        font-size: .75rem;
+        color: var(--fc-muted);
+        margin-bottom: .4rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+
+    .fc-worker-stars {
+        font-size: .8rem;
+        margin-bottom: .4rem;
+        line-height: 1;
+    }
+
+        .fc-worker-stars .s-on {
+            color: var(--fc-star-on);
+        }
+
+        .fc-worker-stars .s-off {
+            color: var(--fc-star-off);
+        }
+
+    /* Availability */
+    .fc-avail {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 20px;
+        font-size: .68rem;
+        font-weight: 700;
+        margin-bottom: .5rem;
+        letter-spacing: .2px;
+    }
+
+        .fc-avail.available {
+            background: var(--fc-green-bg);
+            color: var(--fc-green);
+        }
+
+        .fc-avail.busy {
+            background: var(--fc-warning-bg);
+            color: var(--fc-warning);
+        }
+
+        .fc-avail.offline {
+            background: #f1f5f9;
+            color: var(--fc-muted);
+        }
+
+    /* Regions */
+    .fc-worker-regions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 3px;
+        margin-bottom: .6rem;
+        min-height: 20px;
+    }
+
+    .fc-region-chip {
+        background: var(--fc-blue-light);
+        color: var(--fc-blue);
+        border: 1px solid #c5d6f8;
+        border-radius: 20px;
+        padding: 1px 7px;
+        font-size: .63rem;
+        font-weight: 500;
+    }
+
+    .fc-region-more {
+        background: var(--fc-bg);
+        color: var(--fc-muted);
+        border: 1px solid var(--fc-border);
+        border-radius: 20px;
+        padding: 1px 7px;
+        font-size: .63rem;
+    }
+
+    /* Card actions */
+    .fc-worker-actions {
+        display: flex;
+        gap: 6px;
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .fc-btn-view {
+        flex: 1;
+        padding: 6px 4px;
+        border-radius: 7px;
+        font-size: .73rem;
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--fc-blue);
+        background: var(--fc-blue-light);
+        border: 1px solid #c5d6f8;
+        text-align: center;
+        transition: background .12s;
+    }
+
+        .fc-btn-view:hover {
+            background: #d4e3fc;
+            color: var(--fc-blue);
+        }
+
+    .fc-btn-req {
+        flex: 1;
+        padding: 6px 4px;
+        border-radius: 7px;
+        font-size: .73rem;
+        font-weight: 700;
+        text-decoration: none;
+        background: var(--fc-blue);
+        color: #fff;
+        text-align: center;
+        border: none;
+        transition: background .12s;
+    }
+
+        .fc-btn-req:hover {
+            background: var(--fc-blue-mid);
+            color: #fff;
+        }
+
+    /* ══ Empty state ══ */
+    .fc-empty {
+        text-align: center;
+        padding: 3.5rem 1rem;
+        color: var(--fc-muted);
+        grid-column: 1 / -1;
+    }
+
+    .fc-empty-icon {
+        font-size: 2.5rem;
+        margin-bottom: .65rem;
+    }
+
+    .fc-empty p {
+        font-size: .875rem;
+    }
+
+    /* ══ Right Column ══ */
+    .fc-right-title {
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        color: var(--fc-muted);
+        margin-bottom: .85rem;
+    }
+
+    .fc-right-card {
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        padding: 1.1rem;
+        margin-bottom: 1rem;
+        transition: box-shadow .2s;
+    }
+
+        .fc-right-card:hover {
+            box-shadow: var(--fc-shadow-md);
+        }
+
+    .fc-mini-item {
+        background: var(--fc-bg);
+        border-radius: var(--fc-radius-sm);
+        padding: .75rem .85rem;
+        margin-bottom: .6rem;
+    }
+
+        .fc-mini-item:last-of-type {
+            margin-bottom: 0;
+        }
+
+    .fc-mini-title {
+        font-size: .845rem;
+        font-weight: 600;
+        color: var(--fc-text);
+        margin-bottom: .25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .fc-mini-meta {
+        font-size: .75rem;
+        color: var(--fc-muted);
+        margin-bottom: .25rem;
+    }
+
+    .fc-mini-link {
+        font-size: .75rem;
+        font-weight: 600;
+        color: var(--fc-blue);
+        text-decoration: none;
+        display: inline-block;
+        margin-top: .35rem;
+    }
+
+        .fc-mini-link:hover {
+            text-decoration: underline;
+        }
+
+    .fc-proposals-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: .7rem;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 20px;
+        background: var(--fc-blue);
+        color: #fff;
+        text-decoration: none;
+        transition: background .12s;
+    }
+
+        .fc-proposals-btn:hover {
+            background: var(--fc-blue-mid);
+            color: #fff;
+        }
+
+    .fc-mini-date {
+        font-size: .7rem;
+        color: var(--fc-muted);
+    }
+
+    .fc-mini-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: .35rem;
+    }
+
+    .fc-no-item {
+        font-size: .8rem;
+        color: var(--fc-muted);
+        text-align: center;
+        padding: .5rem 0;
+    }
+
+    .fc-view-all {
+        display: block;
+        text-align: center;
+        font-size: .75rem;
+        color: var(--fc-muted);
+        text-decoration: none;
+        margin-top: .6rem;
+        transition: color .15s;
+    }
+
+        .fc-view-all:hover {
+            color: var(--fc-blue);
+        }
+
+    /* ══ Responsive ══ */
+    @@media (max-width: 1024px) {
+        .fc-workers-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .fc-right {
+            width: 240px;
+        }
+    }
+
+    @@media (max-width: 860px) {
+        .fc-layout {
+            flex-direction: column;
+        }
+
+        .fc-right {
+            width: 100%;
+            position: static;
+        }
+
+        .fc-workers-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .fc-workers-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .fc-worker-card {
+            height: 300px;
+        }
+
+        .fc-search-row {
+            flex-direction: column;
+        }
+
+        .fc-search-input, .fc-region-wrap {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 400px) {
+        .fc-workers-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
+
+<div class="fc-page">
+    <div class="fc-layout">
+
+        <!-- ══ Feed Column ══ -->
+        <div class="fc-feed">
 
             <!-- Create Request Button -->
-            <a asp-action="CreateRequest" class="create-btn">
-                <span class="plus-icon">+</span>
+            <a asp-action="CreateRequest" class="fc-create-btn">
+                <span class="plus">+</span>
                 Create New Request
             </a>
 
             <!-- Search Card -->
-            <div class="search-card">
+            <div class="fc-search-card">
                 <form method="get" asp-action="Index">
-                    <div class="search-row">
+                    <div class="fc-search-row">
                         <input type="text" name="search"
                                value="@Model.SearchQuery"
-                               class="search-input"
+                               class="fc-search-input"
                                placeholder="Search worker by name..." />
 
-                        <div class="region-wrapper">
+                        <div class="fc-region-wrap">
                             <input type="text"
                                    id="regionSearchInput"
                                    name="regionSearch"
                                    value="@Model.RegionSearch"
-                                   class="search-input"
+                                   class="fc-search-input"
+                                   style="width:100%"
                                    placeholder="Filter by region..."
                                    autocomplete="off" />
-                            <div id="regionDropdown"></div>
+                            <div id="regionDropdown" class="fc-region-dropdown"></div>
                         </div>
 
-                        <select name="specialtyId" class="search-input" style="cursor:pointer">
+                        <select name="specialtyId" class="fc-search-input" style="cursor:pointer;flex:1;min-width:130px;">
                             <option value="">All Specialties</option>
                             @foreach (var s in Model.Specialties)
                             {
@@ -513,202 +640,183 @@
                             }
                         </select>
 
-                        <button type="submit" class="search-btn">Search</button>
+                        <button type="submit" class="fc-search-btn">Search</button>
                     </div>
                 </form>
             </div>
 
             <!-- Workers Grid -->
-            <p class="section-title">Available Workers (@Model.Workers.Count)</p>
+            <div class="fc-section-label">
+                Available Workers (@Model.Workers.Count)
+            </div>
 
-            @if (!Model.Workers.Any())
-            {
-                <div style="text-align:center;padding:48px;color:var(--muted)">
-                    <div style="font-size:2.5rem;margin-bottom:12px">🔍</div>
-                    <p>No workers found. Try different filters.</p>
-                </div>
-            }
-            else
-            {
-                <div class="workers-grid">
-                    @foreach (var w in Model.Workers)
-                    {
-                        <div class="worker-card">
-                            <img src="@(w.PhotoUrl ?? "/uploads/ProfilePictures/default.png")"
-                                 alt="@w.FullName" />
-
-                            <div class="name">
-                                @w.FullName
-                                @if (w.IsVerified)
-                                {
-                                    <span style="color:#3b82f6;font-size:0.7rem">✔</span>
-                                }
-                            </div>
-
-                            <div class="specialty">@(w.SpecialtyName ?? "General")</div>
-
-                            <div class="stars">
-                                @for (int i = 1; i <= 5; i++)
-                                {
-                                    <span style="color:@(i <= (int)w.AvgRating ? "#f5a623" : "#ddd")">★</span>
-                                }
-                            </div>
-
-                            <div>
-                                <span class="avail-badge @(w.AvailabilityStatus == "Available" ? "avail-available" :
-                                                                                              w.AvailabilityStatus == "Busy" ? "avail-busy" :
-                                                                                                                                     "avail-offline")">
-                            @w.AvailabilityStatus
-                        </span>
-                    </div>
-
-                            <div class="regions">
-                        @foreach (var region in w.Regions.Take(2))
-                                {
-                                    <span class="region-tag">@region</span>
-                                }
-                                @if (w.Regions.Count > 2)
-                                {
-                                    <span class="region-tag">+@(w.Regions.Count - 2)</span>
-                                }
-                            </div>
-
-                            <div class="card-actions">
-                                <a asp-action="WorkerProfile" asp-route-id="@w.UserId"
-                                   class="btn-view">View</a>
-                                <a asp-action="CreateRequest" asp-route-workerId="@w.UserId"
-                                   class="btn-request">Request</a>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-        </div>
-
-        <!-- ═══════════════
-             RIGHT COLUMN
-        ═══════════════ -->
-        <div class="right-col">
-
-            <!-- Latest Active Job -->
-            <div class="right-card">
-                <h6>⚡ Latest Active Job</h6>
-                @if (Model.LatestActiveJob != null)
+            <div class="fc-workers-grid">
+                @if (!Model.Workers.Any())
                 {
-                    <div class="mini-item">
-                        <div class="title">@Model.LatestActiveJob.RequestTitle</div>
-                        <div class="meta">
-                            🔨 @Model.LatestActiveJob.WorkerName
-                        </div>
-                        <div class="meta">
-                            💰 @Model.LatestActiveJob.LiveInvoiceTotal.ToString("0.00") EGP
-                        </div>
-                        <a asp-action="Jobs" class="mini-link">View Jobs →</a>
+                    <div class="fc-empty">
+                        <div class="fc-empty-icon">🔍</div>
+                        <p>No workers found. Try different filters.</p>
                     </div>
                 }
                 else
                 {
-                    <div class="no-item">No active jobs.</div>
+                    @foreach (var w in Model.Workers)
+                    {
+                        var availClass = w.AvailabilityStatus == "Available" ? "available"
+                        : w.AvailabilityStatus == "Busy" ? "busy"
+                        : "offline";
+                        <div class="fc-worker-card">
+
+                            <!-- Photo section (fixed 100px) -->
+                            <div class="fc-worker-photo-wrap">
+                                <img src="@(w.PhotoUrl ?? "/uploads/ProfilePictures/default.png")"
+                                     alt="@w.FullName" />
+                            </div>
+
+                            <!-- Body (fills remaining height) -->
+                            <div class="fc-worker-body">
+
+                                <div class="fc-worker-name">
+                                    @w.FullName
+                                    @if (w.IsVerified)
+                                    {
+                                        <span class="fc-verified-dot">✔</span>
+                                    }
+                                </div>
+
+                                <div class="fc-worker-specialty">@(w.SpecialtyName ?? "General")</div>
+
+                                <div class="fc-worker-stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span class="@(i <= (int)w.AvgRating ? "s-on" : "s-off")">★</span>
+                                    }
+                                </div>
+
+                                <span class="fc-avail @availClass">@w.AvailabilityStatus</span>
+
+                                <div class="fc-worker-regions">
+                                    @foreach (var region in w.Regions.Take(2))
+                                    {
+                                        <span class="fc-region-chip">@region</span>
+                                    }
+                                    @if (w.Regions.Count > 2)
+                                    {
+                                        <span class="fc-region-more">+@(w.Regions.Count - 2)</span>
+                                    }
+                                </div>
+
+                                <div class="fc-worker-actions">
+                                    <a asp-action="WorkerProfile"
+                                       asp-route-id="@w.UserId"
+                                       class="fc-btn-view">View</a>
+                                    <a asp-action="CreateRequest"
+                                       asp-route-workerId="@w.UserId"
+                                       class="fc-btn-req">Request</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- ══ Right Column ══ -->
+        <div class="fc-right">
+
+            <!-- Latest Active Job -->
+            <div class="fc-right-title">⚡ Latest Active Job</div>
+            <div class="fc-right-card">
+                @if (Model.LatestActiveJob != null)
+                {
+                    <div class="fc-mini-item">
+                        <div class="fc-mini-title">@Model.LatestActiveJob.RequestTitle</div>
+                        <div class="fc-mini-meta">🔨 @Model.LatestActiveJob.WorkerName</div>
+                        <div class="fc-mini-meta">💰 @Model.LatestActiveJob.LiveInvoiceTotal.ToString("0.00") EGP</div>
+                        <a asp-action="Jobs" class="fc-mini-link">View Jobs →</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="fc-no-item">No active jobs.</div>
                 }
             </div>
 
             <!-- Pending Requests -->
-            <div class="right-card">
-                <h6>📋 Pending Requests (@Model.PendingRequests.Count)</h6>
-
+            <div class="fc-right-title">📋 Pending Requests (@Model.PendingRequests.Count)</div>
+            <div class="fc-right-card">
                 @if (!Model.PendingRequests.Any())
                 {
-                    <div class="no-item">No pending requests.</div>
+                    <div class="fc-no-item">No pending requests.</div>
                 }
                 else
                 {
                     @foreach (var r in Model.PendingRequests)
                     {
-                        <div class="mini-item">
-                            <div class="title">@r.Title</div>
-                            <div class="meta">
+                        <div class="fc-mini-item">
+                            <div class="fc-mini-title">@r.Title</div>
+                            <div class="fc-mini-meta">
                                 📍 @r.RegionName
                                 @if (!string.IsNullOrEmpty(r.SpecialtyName))
                                 {
                                     <span>· @r.SpecialtyName</span>
                                 }
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span style="font-size:0.72rem;color:var(--muted)">
-                                    @r.CreatedAt.ToString("dd MMM")
-                                </span>
+                            <div class="fc-mini-row">
+                                <span class="fc-mini-date">@r.CreatedAt.ToString("dd MMM")</span>
                                 <a asp-action="RequestProposals"
                                    asp-route-requestId="@r.RequestId"
-                                   class="proposals-btn">
+                                   class="fc-proposals-btn">
                                     📨 @r.ProposalCount
                                 </a>
                             </div>
                         </div>
                     }
-
-                    <a asp-action="MyRequests"
-                       style="display:block;text-align:center;font-size:0.78rem;
-                              color:var(--muted);margin-top:8px;text-decoration:none">
-                        View all requests →
-                    </a>
+                    <a asp-action="MyRequests" class="fc-view-all">View all requests →</a>
                 }
             </div>
 
         </div>
     </div>
+</div>
 
-    <!-- Region Autocomplete Script -->
-    <script>
-        const regionInput    = document.getElementById('regionSearchInput');
-        const regionDropdown = document.getElementById('regionDropdown');
+<script>
+    /* ── Region autocomplete ── */
+    const regionInput    = document.getElementById('regionSearchInput');
+    const regionDropdown = document.getElementById('regionDropdown');
 
-        const allRegions = [
-            @foreach (var r in Model.Regions)
-            {
+    const allRegions = [
+        @foreach (var r in Model.Regions)
+        {
                     <text>{ name: "@Html.Raw(r.RegionName)" },</text>
-            }
-        ];
+        }
+    ];
 
-        regionInput.addEventListener('input', function () {
-            const query = this.value.trim().toLowerCase();
-            regionDropdown.innerHTML = '';
+    regionInput.addEventListener('input', function () {
+        const query = this.value.trim().toLowerCase();
+        regionDropdown.innerHTML = '';
+        if (query.length < 1) { regionDropdown.style.display = 'none'; return; }
 
-            if (query.length < 1) {
+        const filtered = allRegions.filter(r => r.name.toLowerCase().includes(query));
+        if (!filtered.length) { regionDropdown.style.display = 'none'; return; }
+
+        filtered.forEach(r => {
+            const div = document.createElement('div');
+            div.className   = 'fc-region-option';
+            div.textContent = r.name;
+            div.addEventListener('click', () => {
+                regionInput.value = r.name;
                 regionDropdown.style.display = 'none';
-                return;
-            }
-
-            const filtered = allRegions.filter(r =>
-                r.name.toLowerCase().includes(query));
-
-            if (!filtered.length) {
-                regionDropdown.style.display = 'none';
-                return;
-            }
-
-            filtered.forEach(r => {
-                const item = document.createElement('div');
-                item.textContent = r.name;
-                item.style.cssText = 'padding:9px 14px;font-size:0.85rem;cursor:pointer;';
-                item.addEventListener('mouseover', () => item.style.background = '#f4f2ee');
-                item.addEventListener('mouseout',  () => item.style.background = '#fff');
-                item.addEventListener('click', () => {
-                    regionInput.value = r.name;
-                    regionDropdown.style.display = 'none';
-                    regionInput.closest('form').submit();
-                });
-                regionDropdown.appendChild(item);
+                regionInput.closest('form').submit();
             });
-
-            regionDropdown.style.display = 'block';
+            regionDropdown.appendChild(div);
         });
+        regionDropdown.style.display = 'block';
+    });
 
-        document.addEventListener('click', e => {
-            if (!regionDropdown.contains(e.target) && e.target !== regionInput)
-                regionDropdown.style.display = 'none';
-        });
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    document.addEventListener('click', e => {
+        if (!regionDropdown.contains(e.target) && e.target !== regionInput)
+            regionDropdown.style.display = 'none';
+    });
+</script>

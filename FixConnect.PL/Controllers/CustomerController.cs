@@ -229,13 +229,20 @@ namespace FixConnect.PL.Controllers
                 Description = request.Description,
                 RegionId = request.RegionId,
                 SpecialtyId = request.SpecialtyId,
-                ExistingImages = request.Images.Select(i => i.ImagePath).ToList(),
+                ExistingImages = request.Images.Select(i => new ExistingImageItem
+                {
+                    ImageId = i.ImageId,
+                    ImagePath = i.ImagePath
+                }).ToList(),
                 Specialties = _workerService.GetAllSpecialties()
                     .Select(s => new SpecialtyOption
                     {
                         SpecialtyId = s.SpecialtyId,
                         SpecialtyName = s.SpecialtyName
                     }).ToList(),
+
+             
+
                 Regions = _workerService.GetAllRegions()
                     .Select(r => new RegionOption
                     {

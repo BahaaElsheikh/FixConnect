@@ -211,8 +211,16 @@ namespace FixConnect.BLL.Services
                 {
                     CustomerName = r.Customer.User.FullName,
                     RatingValue = r.RatingValue,
-                    Comment = r.Comment
+                    Comment = r.Comment,
+                    AccuracyRating = r.AccuracyRating,    // ← أضف
+                    CommitmentRating = r.CommitmentRating,  // ← أضف
+                    PriceRating = r.PriceRating,       // ← أضف
+                    AvgRating = Math.Round((r.AccuracyRating + r.CommitmentRating + r.PriceRating) / 3m, 1), // ← أضف
+                    SuggestWorker = r.SuggestWorker      // ← أضف
                 }).ToList(),
+
+                CompletedJobsCount = worker.CompletedJobsCount,  // ← أضف
+
                 Verification = worker.Verification == null ? null : new VerificationViewModel
                 {
                     WorkerId = worker.UserId,
