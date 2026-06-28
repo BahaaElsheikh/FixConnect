@@ -109,7 +109,7 @@ namespace FixConnect.PL.Controllers
                 AvailabilityStatus = worker.AvailabilityStatus.ToString(),
                 AvgRating = worker.AvgRating,
                 WorkingRegions = worker.WorksAt.Select(x => x.Region.RegionName).ToList(),
-
+                IsActive = worker.User.IsActive,
                 CompletedJobsCount = worker.CompletedJobsCount,
 
                 AvgAccuracyRating = totalReviewsCount > 0

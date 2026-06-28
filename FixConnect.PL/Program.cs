@@ -1,4 +1,5 @@
 ﻿using FixConnect.BLL.Services;
+using FixConnect.BLL.Settings;
 using FixConnect.DAL.Context;
 using FixConnect.DAL.Data.Seed;
 using FixConnect.DAL.Repositories;
@@ -28,6 +29,12 @@ builder.Services.AddScoped<ReviewService>();
 
 builder.Services.AddScoped<NotificationBadgeService>();
 builder.Services.AddScoped<CustomerNotificationBadgeService>();
+
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<EmailSender>();
+
+
 
 // ✅ Fix Correlation failed
 builder.Services.Configure<CookiePolicyOptions>(options =>

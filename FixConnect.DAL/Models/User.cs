@@ -18,6 +18,7 @@ namespace FixConnect.DAL.Models
 
         public bool IsActive { get; set; } /// For Admin
 
+        public bool IsEmailConfirmed { get; set; } = false;   // ← ADDED
 
         public string Phone { get; set; } = null!;
         public RoleType RoleType { get; set; }

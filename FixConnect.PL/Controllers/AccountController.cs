@@ -102,6 +102,13 @@ namespace FixConnect.PL.Controllers
             }
 
             var user = _authService.FindByEmail(model.Email)!;
+
+            // Generate + send email confirmation link
+            var confirmToken = _authService.GenerateEmailConfirmationToken(user.UserId);
+            var confirmLink = Url.Action("ConfirmEmail", "Account",
+                new { userId = user.UserId, token = confirmToken }, Request.Scheme)!;
+            await _authService.SendConfirmationEmailAsync(user.Email, user.FullName, confirmLink);
+
             await SignInUser(user.UserId.ToString(), user.FullName, user.Email, user.RoleType.ToString());
             return RedirectByRole(user.RoleType);
         }
@@ -214,6 +221,90 @@ namespace FixConnect.PL.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
+
+
+
+        // ─────────────────────────────
+        // GET: /Account/ConfirmEmail
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult ConfirmEmail(int userId, string token)
+        {
+            var (success, message) = _authService.ConfirmEmail(userId, token);
+            ViewBag.Success = success;
+            ViewBag.Message = message;
+            return View();
+        }
+
+        // ─────────────────────────────
+        // GET: /Account/ForgotPassword
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult ForgotPassword() => View();
+
+        // ─────────────────────────────
+        // POST: /Account/ForgotPassword
+        // ─────────────────────────────
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = _authService.FindByEmail(model.Email);
+
+            // Always show the same message — don't reveal whether the email exists
+            if (user != null)
+            {
+                var token = _authService.GeneratePasswordResetToken(model.Email);
+                if (token != null)
+                {
+                    var resetLink = Url.Action("ResetPassword", "Account",
+                        new { userId = user.UserId, token = token }, Request.Scheme)!;
+                    await _authService.SendPasswordResetEmailAsync(user.Email, user.FullName, resetLink);
+                }
+            }
+
+            return View("EmailSent");
+        }
+
+        // ─────────────────────────────
+        // GET: /Account/ResetPassword
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult ResetPassword(int userId, string token)
+        {
+            bool isValid = _authService.ValidatePasswordResetToken(userId, token);
+            if (!isValid)
+            {
+                ViewBag.InvalidLink = true;
+                return View();
+            }
+
+            var model = new ResetPasswordViewModel { UserId = userId, Token = token };
+            return View(model);
+        }
+
+        // ─────────────────────────────
+        // POST: /Account/ResetPassword
+        // ─────────────────────────────
+        [HttpPost]
+        public IActionResult ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var (success, message) = _authService.ResetPassword(model.UserId, model.Token, model.NewPassword);
+
+            if (!success)
+            {
+                ModelState.AddModelError("", message);
+                return View(model);
+            }
+
+            ViewBag.Message = message;
+            return View("ResetPasswordSuccess");
+        }
+
+
 
         // ─────────────────────────────
         // PRIVATE HELPERS

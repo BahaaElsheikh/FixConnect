@@ -10,6 +10,9 @@
         public string? SpecialtyName { get; set; }
         public string? PhotoUrl { get; set; }
         public bool IsVerified { get; set; }
+
+        public bool IsActive { get; set; }
+
         public string AvailabilityStatus { get; set; } = null!;
         public decimal AvgRating { get; set; }
         public List<string> WorkingRegions { get; set; } = new();

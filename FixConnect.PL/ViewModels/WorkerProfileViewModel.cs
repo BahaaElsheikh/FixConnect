@@ -10,8 +10,11 @@
         public string? SpecialtyName { get; set; }
         public string? PhotoUrl { get; set; }
         public bool IsVerified { get; set; }
+        public bool IsActive { get; set; }
         public string AvailabilityStatus { get; set; } = null!;
         public decimal AvgRating { get; set; }
+
+        public VerificationViewModel Verification { get; set; }
 
         // أضف هذه الحقول داخل كلاس PublicWorkerProfileViewModel تحت الـ AvgRating القديم
         public decimal AvgAccuracyRating { get; set; }   // متوسط الدقة
@@ -33,4 +36,6 @@
         public int RatingValue { get; set; }
         public string? Comment { get; set; }
     }
+
+   
 }

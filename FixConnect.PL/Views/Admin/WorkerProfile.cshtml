@@ -1,253 +1,529 @@
-﻿@model FixConnect.BLL.DTOs.PublicWorkerProfileViewModel
+﻿@model FixConnect.PL.ViewModels.WorkerProfileViewModel
 @{
-    ViewData["Title"] = "Worker: " + Model.FullName;
+    ViewData["Title"] = "Admin - Worker: " + Model.FullName;
     Layout = "_AdminLayout";
 }
-@* <partial name="_AdminNav" /> *@
-<div class="container py-4">
-    <div class="row g-4">
 
-        <!-- Left: Profile Card -->
-        <div class="col-md-4">
-            <div class="card shadow-sm text-center p-4">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
-                <img src="@(Model.PhotoUrl ?? "/uploads/ProfilePictures/default.png")"
-                     class="rounded-circle mx-auto mb-3"
-                     style="width:110px;height:110px;object-fit:cover;" />
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "surface-container-low": "#f2f4f6",
+                    "surface-variant": "#e0e3e5",
+                    "surface": "#f7f9fb",
+                    "outline": "#737688",
+                    "primary-container": "#0052ff",
+                    "on-primary-container": "#dfe3ff",
+                    "on-surface": "#191c1e",
+                    "surface-container-lowest": "#ffffff",
+                    "background": "#f7f9fb",
+                    "primary": "#003ec7",
+                    "secondary": "#5d5e62",
+                    "outline-variant": "#c3c5d9",
+                    "surface-container-high": "#e6e8ea"
+                },
+                "spacing": {
+                    "gutter": "24px",
+                    "stack-md": "24px",
+                    "container-margin": "32px",
+                    "stack-lg": "48px"
+                },
+                "fontFamily": {
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "display-xl": ["Plus Jakarta Sans"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"]
+                }
+            }
+        }
+    }
+</script>
 
-                <h5 class="fw-bold mb-1">
-                    @Model.FullName
+<style>
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #003ec7 0%, #0052ff 100%);
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 82, 255, 0.2);
+        transform: translateY(-1px);
+    }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #e0e3e5;
+        border-radius: 4px;
+    }
+</style>
+
+<div class="max-w-[1440px] mx-auto p-4 md:p-8 lg:p-container-margin relative z-10">
+
+    <div class="relative bg-surface-container-lowest rounded-2xl border border-surface-variant/50 p-6 md:p-10 mb-8 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+
+            <div class="relative shrink-0">
+                <div class="w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden border-2 border-surface shadow-md">
+                    <img src="@(Model.PhotoUrl ?? "/uploads/ProfilePictures/default.png")"
+                         class="w-full h-full object-cover" alt="@Model.FullName" />
+                </div>
+                @if (Model.AvailabilityStatus == "Available")
+                {
+                    <div class="absolute -bottom-2 -right-2 bg-green-500/10 backdrop-blur-sm border border-green-200 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="font-caption text-[10px] font-bold uppercase tracking-wider">Available</span>
+                    </div>
+                }
+            </div>
+
+            <div class="flex-1 space-y-2">
+                <div class="flex items-center gap-3">
+                    <h1 class="font-display-xl text-headline-lg md:text-display-xl text-on-surface">
+                        @Model.FullName
+                    </h1>
                     @if (Model.IsVerified)
                     {
-                        <span class="badge bg-primary ms-1">✔ Verified</span>
+                        <span class="material-symbols-outlined text-primary"
+                              style="font-variation-settings: 'FILL' 1;" title="Verified Pro">verified</span>
                     }
-                    else
-                    {
-                        <span class="badge bg-secondary ms-1">Unverified</span>
-                    }
-                </h5>
-
-                <p class="text-muted small mb-1" @Model.SpecialtyName</p>
-                <p class="text-muted small mb-1">@Model.Email</p>
-                <p class="text-muted small mb-2">@Model.Phone</p>
-
-                <!-- Stars -->
-                <div class="mb-3">
-                    @for (int i = 1; i <= 5; i++)
-                    {
-                        <span style="color:@(i <= (int)Model.AvgRating ? "#f5a623" : "#ccc");font-size:1.1rem">★</span>
-                    }
-                    <small class="text-muted ms-1">(@Model.AvgRating.ToString("0.0"))</small>
                 </div>
 
-                <span class="badge @(Model.AvailabilityStatus == "Available" ? "bg-success" :
-                                                                                  Model.AvailabilityStatus == "Busy" ? "bg-warning text-dark" :
-                                                                                                                             "bg-secondary")">
-                    @Model.AvailabilityStatus
-                </span>
+                <p class="font-body-lg text-body-lg text-secondary">
+                    @Model.SpecialtyName
+                    <span class="text-surface-variant mx-2">|</span>
+                    📞 Phone : @Model.Phone
+                    <span class="text-surface-variant mx-2">|</span>
+                    📧 Email : @Model.Email
+                </p>
 
-                <hr />
-
-                <p class="small fw-semibold mb-2">Working Areas</p>
-                <div class="d-flex flex-wrap justify-content-center gap-1">
-                    @foreach (var region in Model.WorkingRegions)
-                    {
-                        <span class="badge bg-light text-dark border">@region</span>
-                    }
+                <div class="flex flex-wrap items-center gap-4 pt-2">
+                    <div class="flex items-center gap-1 text-on-surface">
+                        <span class="material-symbols-outlined text-amber-500 text-lg"
+                              style="font-variation-settings: 'FILL' 1;">star</span>
+                        <span class="font-label-md text-label-md">@Model.AvgRating.ToString("0.0") / 5</span>
+                        <span class="font-caption text-caption text-secondary ml-1">
+                            (@Model.Reviews.Count Reviews)
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1 text-secondary">
+                        <span class="material-symbols-outlined text-lg">task_alt</span>
+                        <span class="font-caption text-caption">@Model.CompletedJobsCount Completed Jobs</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- ══════════════════════════════
-                 Verification Card (Admin Only)
-            ══════════════════════════════ -->
-            @if (Model.Verification != null)
-            {
-                <div class="card shadow-sm p-4 mt-3">
-                    <h6 class="fw-bold mb-3">🪪 ID Verification</h6>
+            <div class="flex flex-row md:flex-col gap-3 w-full md:w-auto mt-4 md:mt-0 shrink-0">
+                <form asp-controller="Admin" asp-action="ToggleWorkerStatus" method="post" class="w-full">
+                    <input type="hidden" name="workerId" value="@Model.UserId" />
+                    
+                    @* افتراضاً لو الحساب شغال هيظهر زرار الإيقاف، ولو واقف هيظهر زرار التفعيل *@
+                    @if (Model.IsActive) 
+                    {
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-label-md text-label-md py-2.5 px-6 rounded-lg transition-all shadow-md flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">block</span>
+                            Deactivate Worker
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-label-md text-label-md py-2.5 px-6 rounded-lg transition-all shadow-md flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">check_circle</span>
+                            Activate Worker
+                        </button>
+                    }
+                </form>
+            </div>
 
-                    <div class="mb-2">
-                        <p class="small fw-semibold mb-1">
-                            Status:
-                            <span class="badge @(Model.Verification.Status == "Approved" ? "bg-success" :
-                                                                                                                      Model.Verification.Status == "Rejected" ? "bg-danger" :
-                                                                                                                                                                 "bg-warning text-dark")">
-                            @Model.Verification.Status
-                        </span>
-                    </p>
-                    <p class="small text-muted">
-                        Submitted: @Model.Verification.SubmittedAt.ToString("dd MMM yyyy")
-                    </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+
+        <div class="md:col-span-8 space-y-gutter">
+
+            <section class="glass-panel rounded-2xl border border-surface-variant p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-headline-md text-headline-md text-on-surface"> Reviews Summary </h2>
                 </div>
 
-                    <!-- ID Images -->
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <p class="small fw-semibold mb-1">Front</p>
-                            <img src="@Model.Verification.IdFrontImagePath"
-                                 class="img-fluid rounded border"
-                                 style="cursor:pointer"
-                                 onclick="openImgModal('@Model.Verification.IdFrontImagePath', 'ID Front')" />
+                <div class="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-3 bg-surface-container-low p-3 rounded-xl border border-surface-variant/60 shadow-sm">
+                    <div class="bg-surface-container-lowest p-2 rounded-lg border border-surface-variant/30">
+                        <div class="flex justify-between mb-1 items-center">
+                            <span class="font-medium text-xs text-on-surface flex items-center gap-1">
+                                <span class="material-symbols-outlined text-primary text-[16px]">track_changes</span>
+                                Accuracy & Quality
+                            </span>
+                            <span class="font-bold text-xs text-primary">@Model.AvgAccuracyRating.ToString("0.0")</span>
                         </div>
-                        <div class="col-6">
-                            <p class="small fw-semibold mb-1">Back</p>
-                            <img src="@Model.Verification.IdBackImagePath"
-                                 class="img-fluid rounded border"
-                                 style="cursor:pointer"
-                                 onclick="openImgModal('@Model.Verification.IdBackImagePath', 'ID Back')" />
+                        <div class="w-full bg-surface-variant rounded-full h-1.5">
+                            <div class="bg-primary h-1.5 rounded-full" style="width: @(Model.AvgAccuracyRating * 20)%"></div>
                         </div>
                     </div>
 
-                    <!-- Approve / Reject -->
-                @if (Model.Verification.Status == "Pending")
-                    {
-                        <div class="d-flex gap-2">
-                            <form asp-controller="Admin"
-                                  asp-action="ApproveVerification" method="post" class="flex-fill">
-                                <input type="hidden" name="workerId" value="@Model.Verification.WorkerId" />
-                                <button type="submit" class="btn btn-success btn-sm w-100">
-                                    ✔ Approve
-                                </button>
-                            </form>
-                            <form asp-controller="Admin"
-                                  asp-action="RejectVerification" method="post" class="flex-fill">
-                                <input type="hidden" name="workerId" value="@Model.Verification.WorkerId" />
-                                <button type="submit" class="btn btn-danger btn-sm w-100">
-                                    ✖ Reject
-                                </button>
-                            </form>
+                    <div class="bg-surface-container-lowest p-2 rounded-lg border border-surface-variant/30">
+                        <div class="flex justify-between mb-1 items-center">
+                            <span class="font-medium text-xs text-on-surface flex items-center gap-1">
+                                <span class="material-symbols-outlined text-teal-600 text-[16px]">calendar_clock</span>
+                                Commitment
+                            </span>
+                            <span class="font-bold text-xs text-teal-600">@Model.AvgCommitmentRating.ToString("0.0")</span>
                         </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-secondary mt-3 small">
-                    No verification submitted yet.
-                </div>
-            }
-        </div>
+                        <div class="w-full bg-surface-variant rounded-full h-1.5">
+                            <div class="bg-teal-500 h-1.5 rounded-full" style="width: @(Model.AvgCommitmentRating * 20)%"></div>
+                        </div>
+                    </div>
 
-        <!-- Right -->
-        <div class="col-md-8">
+                    <div class="bg-surface-container-lowest p-2 rounded-lg border border-surface-variant/30">
+                        <div class="flex justify-between mb-1 items-center">
+                            <span class="font-medium text-xs text-on-surface flex items-center gap-1">
+                                <span class="material-symbols-outlined text-amber-600 text-[16px]">payments</span>
+                                Fair Pricing
+                            </span>
+                            <span class="font-bold text-xs text-amber-600">@Model.AvgPriceRating.ToString("0.0")</span>
+                        </div>
+                        <div class="w-full bg-surface-variant rounded-full h-1.5">
+                            <div class="bg-amber-500 h-1.5 rounded-full" style="width: @(Model.AvgPriceRating * 20)%"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            <!-- Bio -->
             @if (!string.IsNullOrEmpty(Model.Bio))
             {
-                <div class="card shadow-sm p-4 mb-4">
-                    <h6 class="fw-bold mb-2">About</h6>
-                    <p class="text-muted mb-0">@Model.Bio</p>
-                </div>
+                <section class="glass-panel rounded-2xl border border-surface-variant p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                    <h2 class="font-headline-md text-headline-md text-on-surface mb-4">About</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                        @Model.Bio
+                    </p>
+                </section>
             }
 
-            <!-- Portfolio (View Only + Click to Zoom) -->
-            <div class="card shadow-sm p-4 mb-4">
-                <h6 class="fw-bold mb-3">Portfolio</h6>
+            <section class="glass-panel rounded-2xl border border-surface-variant p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-headline-md text-headline-md text-on-surface">
+                        Portfolio (@Model.PortfolioItems.Count)
+                    </h2>
+                </div>
+
                 @if (!Model.PortfolioItems.Any())
                 {
-                    <p class="text-muted small">No portfolio items.</p>
+                    <div class="text-center py-8 text-secondary font-body-md text-sm border-2 border-dashed border-outline-variant rounded-xl">
+                        No portfolio items yet.
+                    </div>
                 }
                 else
                 {
-                    <div class="row g-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         @foreach (var item in Model.PortfolioItems)
                         {
-                            <div class="col-6 col-md-4">
-                                <div class="card border-0 shadow-sm h-100"
-                                     style="cursor:pointer"
-                                     onclick="openPortfolioModal('@item.ImageUrl', '@item.Title', '@item.Description')">
-                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            <div class="border border-surface-variant rounded-xl overflow-hidden bg-surface-container-lowest shadow-sm flex flex-col cursor-pointer"
+                                 onclick="openPortfolioModal('@item.ImageUrl', '@Html.Raw(item.Title)', '@Html.Raw(item.Description ?? "")')">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" class="w-full h-32 object-cover" alt="@item.Title" />
+                                }
+                                else
+                                {
+                                    <div class="w-full h-32 bg-surface-container flex items-center justify-center text-secondary">
+                                        <span class="material-symbols-outlined text-4xl">image</span>
+                                    </div>
+                                }
+                                <div class="p-4 flex-1 flex flex-col">
+                                    <p class="font-label-md text-label-md text-on-surface mb-1">@item.Title</p>
+                                    <p class="font-caption text-caption text-secondary line-clamp-2">@item.Description</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+
+            <section class="glass-panel rounded-2xl border border-surface-variant p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-headline-md text-headline-md text-on-surface">Client Reviews</h2>
+                    <span class="font-label-md text-label-md text-secondary">@Model.Reviews.Count Reviews</span>
+                </div>
+
+                @if (!Model.Reviews.Any())
+                {
+                    <p class="text-center py-6 text-secondary font-body-md text-sm">No reviews yet.</p>
+                }
+                else
+                {
+                    <div class="space-y-6">
+                        @foreach (var r in Model.Reviews)
+                        {
+                            <div class="border-b border-surface-variant/50 pb-6 last:border-0 last:pb-0">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-primary/10 text-primary font-headline-md text-lg flex items-center justify-center font-bold">
+                                            @(!string.IsNullOrEmpty(r.CustomerName) ? r.CustomerName.Substring(0, 1).ToUpper() : "U")
+                                        </div>
+                                        <div>
+                                            <p class="font-label-md text-label-md text-on-surface">@r.CustomerName</p>
+                                            <div class="flex items-center gap-1 text-amber-500 mt-0.5">
+                                                <span class="font-bold text-sm">@r.AvgRating.ToString("0.0")</span>
+                                                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if (r.SuggestWorker)
                                     {
-                                        <img src="@item.ImageUrl"
-                                             class="card-img-top"
-                                             style="height:140px;object-fit:cover;" />
+                                        <span class="bg-green-100 text-green-700 border border-green-200 px-2 py-1 rounded-md flex items-center gap-1 font-caption text-xs">
+                                            <span class="material-symbols-outlined text-[14px]">thumb_up</span>
+                                            Recommends
+                                        </span>
                                     }
-                                    <div class="card-body p-2">
-                                        <p class="fw-semibold small mb-0">@item.Title</p>
-                                        <p class="text-muted" style="font-size:0.75rem">@item.Description</p>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(r.Comment))
+                                {
+                                    <p class="font-body-md text-sm text-on-surface-variant italic mb-3">"@r.Comment"</p>
+                                }
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 bg-surface-container-low p-3 rounded-lg border border-surface-variant/50">
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span class="font-caption text-[11px] text-secondary flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-[14px]">track_changes</span> Accuracy
+                                            </span>
+                                            <span class="font-caption text-[11px] font-bold text-on-surface">@r.AccuracyRating/5</span>
+                                        </div>
+                                        <div class="w-full bg-surface-variant rounded-full h-1.5">
+                                            <div class="bg-amber-500 h-1.5 rounded-full" style="width: @(r.AccuracyRating * 20)%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span class="font-caption text-[11px] text-secondary flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-[14px]">calendar_clock</span> Commitment
+                                            </span>
+                                            <span class="font-caption text-[11px] font-bold text-on-surface">@r.CommitmentRating/5</span>
+                                        </div>
+                                        <div class="w-full bg-surface-variant rounded-full h-1.5">
+                                            <div class="bg-amber-500 h-1.5 rounded-full" style="width: @(r.CommitmentRating * 20)%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span class="font-caption text-[11px] text-secondary flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-[14px]">payments</span> Price
+                                            </span>
+                                            <span class="font-caption text-[11px] font-bold text-on-surface">@r.PriceRating/5</span>
+                                        </div>
+                                        <div class="w-full bg-surface-variant rounded-full h-1.5">
+                                            <div class="bg-amber-500 h-1.5 rounded-full" style="width: @(r.PriceRating * 20)%"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         }
                     </div>
                 }
-            </div>
+            </section>
 
-            <!-- Reviews -->
-            <div class="card shadow-sm p-4">
-                <h6 class="fw-bold mb-3">Reviews</h6>
-                @if (!Model.Reviews.Any())
+        </div>
+
+        <div class="md:col-span-4 space-y-gutter">
+
+            <section class="glass-panel rounded-2xl border border-surface-variant p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-primary">badge</span>
+                    <h2 class="font-headline-md text-lg text-on-surface font-bold">ID Verification</h2>
+                </div>
+
+                @if (Model.Verification != null)
                 {
-                    <p class="text-muted small">No reviews yet.</p>
+                   
+                        var statusColor = Model.Verification.Status switch
+                        {
+                            "Approved" => "bg-green-100 text-green-800 border-green-200",
+                            "Rejected" => "bg-red-100 text-red-800 border-red-200",
+                            _ => "bg-amber-100 text-amber-800 border-amber-200"
+                        };
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center bg-surface-container-low p-2.5 rounded-xl border border-surface-variant/50">
+                            <span class="font-body-md text-xs text-secondary">Status:</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border @statusColor">
+                                @Model.Verification.Status
+                            </span>
+                        </div>
+
+                        <p class="font-caption text-xs text-secondary">
+                            Submitted: @Model.Verification.SubmittedAt.ToString("dd MMM yyyy")
+                        </p>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="font-caption text-xs font-semibold text-on-surface">Front Side</span>
+                                <div class="border border-surface-variant rounded-lg overflow-hidden cursor-pointer shadow-sm bg-white"
+                                     onclick="openImgModal('@Model.Verification.IdFrontImagePath', 'ID Front')">
+                                    <img src="@Model.Verification.IdFrontImagePath" class="w-full h-24 object-cover hover:scale-105 transition-transform" />
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="font-caption text-xs font-semibold text-on-surface">Back Side</span>
+                                <div class="border border-surface-variant rounded-lg overflow-hidden cursor-pointer shadow-sm bg-white"
+                                     onclick="openImgModal('@Model.Verification.IdBackImagePath', 'ID Back')">
+                                    <img src="@Model.Verification.IdBackImagePath" class="w-full h-24 object-cover hover:scale-105 transition-transform" />
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.Verification.Status == "Pending")
+                        {
+                            <div class="grid grid-cols-2 gap-2 pt-2">
+                                <form asp-controller="Admin" asp-action="ApproveVerification" method="post">
+                                    <input type="hidden" name="workerId" value="@Model.Verification.WorkerId" />
+                                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-label-md text-xs py-2 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">check</span> Approve
+                                    </button>
+                                </form>
+                                <form asp-controller="Admin" asp-action="RejectVerification" method="post">
+                                    <input type="hidden" name="workerId" value="@Model.Verification.WorkerId" />
+                                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-label-md text-xs py-2 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">close</span> Reject
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
                 }
                 else
                 {
-                    @foreach (var r in Model.Reviews)
-                    {
-                        <div class="border-bottom pb-3 mb-3">
-                            <div class="d-flex justify-content-between">
-                                <strong class="small">@r.CustomerName</strong>
-                                <span>
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        <span style="color:@(i <= r.RatingValue ? "#f5a623" : "#ccc")">★</span>
-                                    }
-                                </span>
-                            </div>
-                            <p class="text-muted small mb-0">@r.Comment</p>
-                        </div>
-                    }
+                    <div class="text-center py-4 text-secondary font-body-md text-xs border border-dashed border-outline-variant rounded-xl bg-surface-container-low">
+                        No verification records found.
+                    </div>
                 }
-            </div>
+            </section>
+
+            <section class="glass-panel rounded-2xl border border-surface-variant p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-primary">toggle_on</span>
+                    <h2 class="font-headline-md text-lg text-on-surface font-bold">Availability Status</h2>
+                </div>
+                @{
+                    var (availColor, availLabel) = Model.AvailabilityStatus switch
+                    {
+                        "Available" => ("bg-green-600 text-white border-green-700", "Available"),
+                        "Busy" => ("bg-amber-500 text-white border-amber-600", "Busy"),
+                        _ => ("bg-secondary text-white border-secondary", "Offline")
+                    };
+                }
+                <div class="w-full py-2.5 rounded-lg border font-label-md text-sm @availColor flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                    @availLabel
+                </div>
+            </section>
+
+            <section class="glass-panel rounded-2xl border border-surface-variant p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-on-surface">map</span>
+                    <h2 class="font-headline-md text-lg font-bold text-on-surface">Service Areas</h2>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    @if (!Model.WorkingRegions.Any())
+                    {
+                        <span class="text-caption text-secondary italic">No areas listed.</span>
+                    }
+                    @foreach (var region in Model.WorkingRegions)
+                    {
+                        <span class="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full font-label-md text-xs font-semibold">
+                            @region
+                        </span>
+                    }
+                </div>
+            </section>
 
         </div>
     </div>
 </div>
 
-<!-- Image Zoom Modal -->
-<div class="modal fade" id="imgModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-bold" id="imgModalTitle"></h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="imgModalSrc" src="" class="img-fluid rounded"
-                     style="max-height:500px;object-fit:contain;" />
-            </div>
+<div id="imgModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden border border-surface-variant">
+        <div class="flex justify-between items-center p-4 border-b border-surface-variant">
+            <h3 id="imgModalTitle" class="font-headline-md font-bold text-on-surface text-sm"></h3>
+            <button onclick="closeModal('imgModal')" class="text-secondary hover:text-on-surface">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="p-6 flex justify-center bg-surface-container-low">
+            <img id="imgModalSrc" src="" class="max-h-[70vh] object-contain rounded-lg shadow-md" />
         </div>
     </div>
 </div>
 
-<!-- Portfolio Modal -->
-<div class="modal fade" id="portfolioModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-bold" id="portfolioModalTitle"></h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="portfolioModalImage" src=""
-                     class="img-fluid rounded mb-3"
-                     style="max-height:420px;object-fit:contain;" />
-                <p id="portfolioModalDescription" class="text-muted small mb-0"></p>
-            </div>
+<div id="portfolioModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden border border-surface-variant">
+        <div class="flex justify-between items-center p-4 border-b border-surface-variant">
+            <h3 id="portfolioModalTitle" class="font-headline-md font-bold text-on-surface text-sm"></h3>
+            <button onclick="closeModal('portfolioModal')" class="text-secondary hover:text-on-surface">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="p-6 bg-surface-container-low space-y-4 text-center">
+            <img id="portfolioModalImage" src="" class="max-h-[50vh] mx-auto object-contain rounded-lg shadow-sm" />
+            <p id="portfolioModalDescription" class="font-body-md text-sm text-secondary bg-white p-3 rounded-xl border border-surface-variant/60 text-left"></p>
         </div>
     </div>
 </div>
 
 <script>
     function openImgModal(src, title) {
-        document.getElementById('imgModalSrc').src       = src;
+        document.getElementById('imgModalSrc').src = src;
         document.getElementById('imgModalTitle').innerText = title;
-        new bootstrap.Modal(document.getElementById('imgModal')).show();
+        const modal = document.getElementById('imgModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function openPortfolioModal(imageUrl, title, description) {
-        document.getElementById('portfolioModalImage').src            = imageUrl || '';
-        document.getElementById('portfolioModalTitle').innerText      = title    || '';
+        document.getElementById('portfolioModalImage').src = imageUrl || '';
+        document.getElementById('portfolioModalTitle').innerText = title || '';
         document.getElementById('portfolioModalDescription').innerText = description || '';
-        new bootstrap.Modal(document.getElementById('portfolioModal')).show();
+        const modal = document.getElementById('portfolioModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    }
+
+    // إغلاق المودال عند الضغط بره الكارد
+    window.onclick = function(event) {
+        const imgModal = document.getElementById('imgModal');
+        const portfolioModal = document.getElementById('portfolioModal');
+        if (event.target === imgModal) closeModal('imgModal');
+        if (event.target === portfolioModal) closeModal('portfolioModal');
     }
 </script>

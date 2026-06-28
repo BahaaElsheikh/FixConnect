@@ -40,6 +40,8 @@ namespace FixConnect.DAL.Context
         public DbSet<WorkerNotificationState> WorkerNotificationStates { get; set; }
         public DbSet<CustomerNotificationState> CustomerNotificationStates { get; set; }
 
+        public DbSet<UserToken> UserTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -362,6 +364,9 @@ namespace FixConnect.DAL.Context
                       .HasForeignKey<CustomerNotificationState>(e => e.CustomerId);
             });
 
+
+            modelBuilder.Entity<UserToken>()
+        .HasIndex(t => t.Token);
         }
     }
 }
