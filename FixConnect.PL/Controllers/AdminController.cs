@@ -13,17 +13,19 @@ namespace FixConnect.PL.Controllers
         private readonly AdminService _adminService;
         private readonly WorkerService _workerService;
         private readonly AppDbContext _context;
-
+        private readonly AdminAnalyticsService _analyticsService;
 
         private const int PageSize = 10;   
 
 
         public AdminController(AdminService adminService,
             WorkerService workerService,
+            AdminAnalyticsService analyticsService,
             AppDbContext context)
         {
             _adminService = adminService;
             _workerService = workerService;
+            _analyticsService = analyticsService;
             _context = context;
         }
 
@@ -327,6 +329,14 @@ namespace FixConnect.PL.Controllers
             return View(vm);
         }
 
+
+
+        [HttpGet]
+        public IActionResult Analytics()
+        {
+            var dashboardData = _analyticsService.GetFullDashboardData();
+            return View(dashboardData);
+        }
 
     }
 }

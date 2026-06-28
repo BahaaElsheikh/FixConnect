@@ -1,0 +1,263 @@
+﻿@model FixConnect.BLL.DTOs.AdminAnalyticsDashboardViewModel
+
+@{
+    ViewData["Title"] = "Analytics Dashboard";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid py-4" dir="ltr">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0 text-gray-800 fw-bold">Analytics & Insights Dashboard</h2>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm border-0 h-100 rounded-3">
+                <div class="card-body p-4">
+                    <div class="text-uppercase text-muted fw-semibold small mb-1">Requests This Month</div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fs-2 fw-bold text-dark">@Model.Kpis.TotalRequestsThisMonth</span>
+                        <span class="badge rounded-pill @(Model.Kpis.TotalRequestsGrowthPercent >= 0 ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger") fs-7">
+                            @(Model.Kpis.TotalRequestsGrowthPercent >= 0 ? "+" : "")@Model.Kpis.TotalRequestsGrowthPercent%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm border-0 h-100 rounded-3">
+                <div class="card-body p-4">
+                    <div class="text-uppercase text-muted fw-semibold small mb-1">Revenue This Month (Comm.)</div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fs-2 fw-bold text-dark">@Model.Kpis.TotalRevenueThisMonth.ToString("N2") EGP</span>
+                        <span class="badge rounded-pill @(Model.Kpis.RevenueGrowthPercent >= 0 ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger") fs-7">
+                            @(Model.Kpis.RevenueGrowthPercent >= 0 ? "+" : "")@Model.Kpis.RevenueGrowthPercent%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm border-0 h-100 rounded-3">
+                <div class="card-body p-4">
+                    <div class="text-uppercase text-muted fw-semibold small mb-1">New Users This Month</div>
+                    <div class="fs-2 fw-bold text-dark">@Model.Kpis.NewUsersThisMonth</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm border-0 h-100 rounded-3">
+                <div class="card-body p-4">
+                    <div class="text-uppercase text-muted fw-semibold small mb-1">Completion Rate</div>
+                    <div class="fs-2 fw-bold text-dark">@Model.Kpis.CompletionRatePercent%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold text-gray-800 mb-4">Requests & Revenue Trends (Last 6 Months)</h5>
+                    <div style="position: relative; height:320px; width: 100%;">
+                        <canvas id="requestsRevenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4 g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100 rounded-3">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold text-gray-800 mb-4">Top Requested Specialties</h5>
+                    <div style="position: relative; height:280px; width: 100%;">
+                        <canvas id="topSpecialtiesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100 rounded-3">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold text-gray-800 mb-4">Request Status Distribution</h5>
+                    <div style="position: relative; height:280px; width: 100%;">
+                        <canvas id="statusDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4 g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100 rounded-3">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold text-gray-800 mb-4">User Roles Distribution</h5>
+                    <div style="position: relative; height:280px; width: 100%;">
+                        <canvas id="userRoleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100 rounded-3">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold text-gray-800 mb-4">Top Regions by Demand</h5>
+                    <div style="position: relative; height:280px; width: 100%;">
+                        <canvas id="topRegionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+    <script>
+        // Data serialization
+        const dashboardData = @Html.Raw(Json.Serialize(Model));
+
+        // Global Chart Options for better styling
+        Chart.defaults.font.family = "'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif";
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+        // ---------- Chart 1: Line Chart (Requests & Revenue) ----------
+        new Chart(document.getElementById('requestsRevenueChart'), {
+            type: 'line',
+            data: {
+                labels: dashboardData.requestsRevenueOverTime.map(x => x.periodLabel),
+                datasets: [
+                    {
+                        label: 'Number of Requests',
+                        data: dashboardData.requestsRevenueOverTime.map(x => x.requestsCount),
+                        borderColor: '#0d6efd', // Vibrant Blue
+                        backgroundColor: 'rgba(13, 110, 253, 0.08)',
+                        yAxisID: 'y',
+                        tension: 0.35,
+                        fill: true,
+                        borderWidth: 3,
+                        pointRadius: 4
+                    },
+                    {
+                        label: 'Revenue (EGP)',
+                        data: dashboardData.requestsRevenueOverTime.map(x => x.revenue),
+                        borderColor: '#fd7e14', // High Contrast Vibrant Orange
+                        backgroundColor: 'rgba(253, 126, 20, 0.08)',
+                        yAxisID: 'y1',
+                        tension: 0.35,
+                        fill: true,
+                        borderWidth: 3,
+                        pointRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        title: { display: true, text: 'Requests Count', font: { weight: 'bold' } },
+                        grid: { borderDash: [5, 5] }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        title: { display: true, text: 'Revenue (EGP)', font: { weight: 'bold' } },
+                        grid: { drawOnChartArea: false }
+                    }
+                }
+            }
+        });
+
+        // ---------- Chart 2: Bar Chart (Top Specialties) ----------
+        new Chart(document.getElementById('topSpecialtiesChart'), {
+            type: 'bar',
+            data: {
+                labels: dashboardData.topSpecialties.map(x => x.specialtyName),
+                datasets: [{
+                    label: 'Requests',
+                    data: dashboardData.topSpecialties.map(x => x.requestCount),
+                    backgroundColor: '#0d6efd',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // ---------- Chart 3: Donut Chart (Status Distribution) ----------
+        new Chart(document.getElementById('statusDistributionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: dashboardData.statusDistribution.map(x => x.status),
+                datasets: [{
+                    data: dashboardData.statusDistribution.map(x => x.count),
+                    backgroundColor: ['#0d6efd', '#6f42c1', '#198754', '#dc3545', '#adb5bd'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+
+        // ---------- Chart 4: Pie Chart (User Roles) ----------
+        new Chart(document.getElementById('userRoleChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Customers', 'Verified Technicians', 'Pending Technicians'],
+                datasets: [{
+                    data: [
+                        dashboardData.userRoleDistribution.customersCount,
+                        dashboardData.userRoleDistribution.verifiedWorkersCount,
+                        dashboardData.userRoleDistribution.pendingWorkersCount
+                    ],
+                    backgroundColor: ['#0d6efd', '#198754', '#ffc107'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+
+        // ---------- Chart 5: Horizontal Bar Chart (Top Regions) ----------
+        new Chart(document.getElementById('topRegionsChart'), {
+            type: 'bar',
+            data: {
+                labels: dashboardData.topRegions.map(x => x.regionName),
+                datasets: [{
+                    label: 'Requests',
+                    data: dashboardData.topRegions.map(x => x.requestCount),
+                    backgroundColor: '#495057',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+}

@@ -48,6 +48,10 @@ builder.Services.AddScoped<WorkerService>();
 builder.Services.AddScoped<PortfolioService>();
 builder.Services.AddScoped<ReportService>();
 
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<AdminAnalyticsService>();
+
+
 // ✅ Authentication
 builder.Services.AddAuthentication(options =>
 {
