@@ -16,6 +16,8 @@ namespace FixConnect.DAL.Models
         public JobStatus Status { get; set; }
         public int ProposalId { get; set; }
 
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime?  CreatedAt { get; set; }
 
 
         public string? CustomerExactAddress { get; set; }

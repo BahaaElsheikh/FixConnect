@@ -2,8 +2,12 @@
 using FixConnect.DAL.Data.Enums;
 using FixConnect.PL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace FixConnect.PL.Controllers
 {
@@ -18,18 +22,20 @@ namespace FixConnect.PL.Controllers
         private readonly JobService _jobService;
         private readonly WalletService _walletService;
         private readonly ReviewService _reviewService;
+        private readonly NotificationBadgeService _notificationBadgeService;
+
 
         private readonly IWebHostEnvironment _env;
 
         public WorkerController(WorkerService workerService,
-            PortfolioService portfolioService,
-            RequestService requestService,
-            ProposalService proposalService,
-            JobService jobService,
-            WalletService walletService,
-             ReviewService reviewService,
-
-            IWebHostEnvironment env)
+    PortfolioService portfolioService,
+    RequestService requestService,
+    ProposalService proposalService,
+    JobService jobService,
+    WalletService walletService,
+    ReviewService reviewService,
+    NotificationBadgeService notificationBadgeService,
+    IWebHostEnvironment env)
         {
             _workerService = workerService;
             _portfolioService = portfolioService;
@@ -38,7 +44,17 @@ namespace FixConnect.PL.Controllers
             _jobService = jobService;
             _walletService = walletService;
             _reviewService = reviewService;
+            _notificationBadgeService = notificationBadgeService;
             _env = env;
+        }
+
+
+       public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+
+            int workerId = GetCurrentUserId();
+            ViewBag.NotificationBadges = _notificationBadgeService.GetBadgeCounts(workerId);
         }
 
         private int GetCurrentUserId()
@@ -52,6 +68,8 @@ namespace FixConnect.PL.Controllers
         {
             var worker = _workerService.GetWorkerProfile(GetCurrentUserId());
             if (worker == null) return NotFound();
+
+            int totalReviewsCount = worker.Reviews?.Count ?? 0;
 
             var vm = new WorkerProfileViewModel
             {
@@ -70,6 +88,24 @@ namespace FixConnect.PL.Controllers
                 HasPendingVerification = worker.Verification?.Status == "Pending",
 
                 CompletedJobsCount = worker.CompletedJobsCount,
+
+               
+
+                AvgAccuracyRating = totalReviewsCount > 0
+                ? Math.Round(worker.Reviews.Average(r => (decimal)r.AccuracyRating), 1)
+                : 0,
+
+                AvgCommitmentRating = totalReviewsCount > 0
+                ? Math.Round(worker.Reviews.Average(r => (decimal)r.CommitmentRating), 1)
+                : 0,
+
+                AvgPriceRating = totalReviewsCount > 0
+                 ? Math.Round(worker.Reviews.Average(r => (decimal)r.PriceRating), 1)
+                 : 0,
+
+
+
+
 
                 PortfolioItems = worker.PortfolioItems.Select(p => new PortfolioItemViewModel
                 {
@@ -91,6 +127,9 @@ namespace FixConnect.PL.Controllers
                 }).ToList()
             };
 
+
+
+
             return View(vm);
         }
 
@@ -110,6 +149,7 @@ namespace FixConnect.PL.Controllers
                 Bio = worker.Bio,
                 SpecialtyId = worker.SpecialtyId,       // ← int?
                 AllSpecialties = _workerService.GetAllSpecialties()
+
                     .Select(s => new SpecialtyOption
                     {
                         SpecialtyId = s.SpecialtyId,
@@ -118,12 +158,18 @@ namespace FixConnect.PL.Controllers
                 AvailabilityStatus = worker.AvailabilityStatus,
                 CurrentPhotoUrl = worker.PhotoUrl,
                 SelectedRegionIds = worker.WorksAt.Select(wa => wa.RegionId).ToList(),
+
                 AllRegions = _workerService.GetAllRegions()
                     .Select(r => new RegionOption
                     {
                         RegionId = r.RegionId,
                         RegionName = r.RegionName
                     }).ToList(),
+
+                WorkingRegions = worker.WorksAt
+            .Select(x => x.Region.RegionName)
+            .ToList(),
+
                 HasPendingVerification = worker.Verification?.Status == "Pending"
             };
 
@@ -333,7 +379,11 @@ namespace FixConnect.PL.Controllers
         public IActionResult DirectRequests()
         {
             int workerId = GetCurrentUserId();
+
+            _notificationBadgeService.MarkDirectRequestsSeen(workerId);
+
             var requests = _requestService.GetDirectRequests(workerId);
+
 
             var vm = new WorkerDashboardViewModel
             {
@@ -460,6 +510,7 @@ namespace FixConnect.PL.Controllers
         public IActionResult MyProposals()
         {
             var proposals = _proposalService.GetWorkerProposals(GetCurrentUserId());
+            _notificationBadgeService.MarkProposalsSeen(GetCurrentUserId());
 
             var vm = new MyProposalsViewModel
             {
@@ -484,7 +535,7 @@ namespace FixConnect.PL.Controllers
         public IActionResult Jobs()
         {
             var jobs = _jobService.GetWorkerJobs(GetCurrentUserId());
-
+            _notificationBadgeService.MarkJobsSeen(GetCurrentUserId());
             var vm = new WorkerJobsViewModel
             {
                 Jobs = jobs.Select(j => new WorkerJobRowViewModel
@@ -537,6 +588,10 @@ namespace FixConnect.PL.Controllers
                                      && job.Status == JobStatus.Active,
                 CanMarkFinished = job.ActualStartDate.HasValue
                                      && job.Status == JobStatus.Active,
+
+                CompletedDate = job.EndDate.HasValue
+                 ? job.EndDate.Value.ToDateTime(TimeOnly.MinValue)
+                 : null,
 
                 LaborCost = job.LaborCost,
 
@@ -631,19 +686,29 @@ namespace FixConnect.PL.Controllers
         public IActionResult Wallet()
         {
             int workerId = GetCurrentUserId();
-            var (balance, transactions) = _walletService.GetWalletDetails(workerId);
+
+            _notificationBadgeService.MarkWalletSeen(workerId);
+
+            var (balance, pending, total, transactions) = _walletService.GetWalletDetails(workerId);
 
             var vm = new WalletViewModel
+               
             {
                 Balance = balance,
+                PendingPayouts = pending,
+                TotalEarnings = total,
                 Transactions = transactions.Select(t => new TransactionRowViewModel
                 {
                     TransactionId = t.TransactionId,
-                    Amount = t.Amount ?? 0,
-                    Type = t.Type == 1 ? "Credit" : "Debit",
-                    CreatedAt = t.CreatedAt
+                    CreatedAt = t.CreatedAt,
+                    Amount = t.Amount ?? 0m,
+                    Type = t.Type == 1 ? "Credit" : "Debit", // تحويل الـ Type من int لـ string بناءً على الكود بتاعك
                 }).ToList()
-            };
+            }
+            ;
+
+
+      
 
             return View(vm);
         }
@@ -676,5 +741,41 @@ namespace FixConnect.PL.Controllers
             TempData[success ? "Success" : "Error"] = message;
             return RedirectToAction("JobDetail", new { id = jobId });
         }
+
+
+        [HttpGet]
+        public IActionResult GoToJobWorkspace(int proposalId)
+        {
+            // بنروح لجدول الـ Jobs ونشوف الشغلانة اللي قايمة على البروبوزال ده
+            var jobId = _jobService.GetJobIdByProposal(proposalId); 
+            if (jobId == 0)
+            {
+                TempData["Error"] = "Workspace not found for this proposal.";
+                return RedirectToAction("MyProposals");
+            }
+
+            // هنا بنوجّه المستخدم لصفحة تفاصيل الجوب مباشرة وبشكل ديناميكي
+            return RedirectToAction("JobDetail", new { id = jobId });
+        }
+
+
+
+        // ─────────────────────────────
+        // GET: /Worker/GetNotificationCounts (Polling endpoint)
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult GetNotificationCounts()
+        {
+            var counts = _notificationBadgeService.GetBadgeCounts(GetCurrentUserId());
+
+            return Json(new
+            {
+                directRequests = counts.DirectRequests,
+                proposals = counts.Proposals,
+                jobs = counts.Jobs,
+                wallet = counts.Wallet
+            });
+        }
+
     }
 }

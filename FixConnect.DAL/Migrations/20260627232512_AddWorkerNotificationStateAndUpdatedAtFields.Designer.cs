@@ -4,6 +4,7 @@ using FixConnect.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FixConnect.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260627232512_AddWorkerNotificationStateAndUpdatedAtFields")]
+    partial class AddWorkerNotificationStateAndUpdatedAtFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,25 +54,6 @@ namespace FixConnect.DAL.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Customers", (string)null);
-                });
-
-            modelBuilder.Entity("FixConnect.DAL.Models.CustomerNotificationState", b =>
-                {
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("LastSeenJobs")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("LastSeenProposalsReceived")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("LastSeenRequests")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("CustomerId");
-
-                    b.ToTable("CustomerNotificationStates");
                 });
 
             modelBuilder.Entity("FixConnect.DAL.Models.Job", b =>
@@ -642,17 +626,6 @@ namespace FixConnect.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FixConnect.DAL.Models.CustomerNotificationState", b =>
-                {
-                    b.HasOne("FixConnect.DAL.Models.User", "Customer")
-                        .WithOne()
-                        .HasForeignKey("FixConnect.DAL.Models.CustomerNotificationState", "CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("FixConnect.DAL.Models.Job", b =>

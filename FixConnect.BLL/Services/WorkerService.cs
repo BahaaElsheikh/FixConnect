@@ -174,63 +174,63 @@ namespace FixConnect.BLL.Services
         }
 
 
-        public PublicWorkerProfileViewModel? GetPublicProfile(int workerId)
-        {
-            var worker = _context.Workers
-                .Include(w => w.User)
-                .Include(w => w.Specialty)
-                .Include(w => w.WorksAt).ThenInclude(wa => wa.Region)
-                .Include(w => w.PortfolioItems)
-                .Include(w => w.Reviews).ThenInclude(r => r.Customer).ThenInclude(c => c.User)
-                .Include(w => w.Verification)
-                .FirstOrDefault(w => w.UserId == workerId);
+        //    public PublicWorkerProfileViewModel? GetPublicProfile(int workerId)
+        //    {
+        //        var worker = _context.Workers
+        //            .Include(w => w.User)
+        //            .Include(w => w.Specialty)
+        //            .Include(w => w.WorksAt).ThenInclude(wa => wa.Region)
+        //            .Include(w => w.PortfolioItems)
+        //            .Include(w => w.Reviews).ThenInclude(r => r.Customer).ThenInclude(c => c.User)
+        //            .Include(w => w.Verification)
+        //            .FirstOrDefault(w => w.UserId == workerId);
 
-            if (worker == null) return null;
+        //        if (worker == null) return null;
 
-            return new PublicWorkerProfileViewModel
-            {
-                UserId = worker.UserId,
-                FullName = worker.User.FullName,
-                Email = worker.User.Email,
-                Phone = worker.User.Phone,
-                Bio = worker.Bio,
-                SpecialtyName = worker.Specialty?.SpecialtyName,
-                PhotoUrl = worker.PhotoUrl,
-                IsVerified = worker.IsVerified,
-                AvailabilityStatus = worker.AvailabilityStatus.ToString(),
-                AvgRating = worker.AvgRating,
-                WorkingRegions = worker.WorksAt.Select(wa => wa.Region.RegionName).ToList(),
-                PortfolioItems = worker.PortfolioItems.Select(p => new PortfolioItemViewModel
-                {
-                    ItemId = p.ItemId,
-                    Title = p.Title ?? "",
-                    Description = p.Description,
-                    ImageUrl = p.ImageUrl
-                }).ToList(),
-                Reviews = worker.Reviews.Select(r => new ReviewItemViewModel
-                {
-                    CustomerName = r.Customer.User.FullName,
-                    RatingValue = r.RatingValue,
-                    Comment = r.Comment,
-                    AccuracyRating = r.AccuracyRating,    // ← أضف
-                    CommitmentRating = r.CommitmentRating,  // ← أضف
-                    PriceRating = r.PriceRating,       // ← أضف
-                    AvgRating = Math.Round((r.AccuracyRating + r.CommitmentRating + r.PriceRating) / 3m, 1), // ← أضف
-                    SuggestWorker = r.SuggestWorker      // ← أضف
-                }).ToList(),
+        //        return new PublicWorkerProfileViewModel
+        //        {
+        //            UserId = worker.UserId,
+        //            FullName = worker.User.FullName,
+        //            Email = worker.User.Email,
+        //            Phone = worker.User.Phone,
+        //            Bio = worker.Bio,
+        //            SpecialtyName = worker.Specialty?.SpecialtyName,
+        //            PhotoUrl = worker.PhotoUrl,
+        //            IsVerified = worker.IsVerified,
+        //            AvailabilityStatus = worker.AvailabilityStatus.ToString(),
+        //            AvgRating = worker.AvgRating,
+        //            WorkingRegions = worker.WorksAt.Select(wa => wa.Region.RegionName).ToList(),
+        //            PortfolioItems = worker.PortfolioItems.Select(p => new PortfolioItemViewModel
+        //            {
+        //                ItemId = p.ItemId,
+        //                Title = p.Title ?? "",
+        //                Description = p.Description,
+        //                ImageUrl = p.ImageUrl
+        //            }).ToList(),
+        //            Reviews = worker.Reviews.Select(r => new ReviewItemViewModel
+        //            {
+        //                CustomerName = r.Customer.User.FullName,
+        //                RatingValue = r.RatingValue,
+        //                Comment = r.Comment,
+        //                AccuracyRating = r.AccuracyRating,    // ← أضف
+        //                CommitmentRating = r.CommitmentRating,  // ← أضف
+        //                PriceRating = r.PriceRating,       // ← أضف
+        //                AvgRating = Math.Round((r.AccuracyRating + r.CommitmentRating + r.PriceRating) / 3m, 1), // ← أضف
+        //                SuggestWorker = r.SuggestWorker      // ← أضف
+        //            }).ToList(),
 
-                CompletedJobsCount = worker.CompletedJobsCount,  // ← أضف
+        //            CompletedJobsCount = worker.CompletedJobsCount,  // ← أضف
 
-                Verification = worker.Verification == null ? null : new VerificationViewModel
-                {
-                    WorkerId = worker.UserId,
-                    IdFrontImagePath = worker.Verification.IdFrontImagePath,
-                    IdBackImagePath = worker.Verification.IdBackImagePath,
-                    Status = worker.Verification.Status,
-                    SubmittedAt = worker.Verification.SubmittedAt
-                }
-            };
-        }
+        //            Verification = worker.Verification == null ? null : new VerificationViewModel
+        //            {
+        //                WorkerId = worker.UserId,
+        //                IdFrontImagePath = worker.Verification.IdFrontImagePath,
+        //                IdBackImagePath = worker.Verification.IdBackImagePath,
+        //                Status = worker.Verification.Status,
+        //                SubmittedAt = worker.Verification.SubmittedAt
+        //            }
+        //        };
+        //    }
 
         public List<Specialty> GetAllSpecialties()
     => _context.Specialties.OrderBy(s => s.SpecialtyName).ToList();

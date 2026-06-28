@@ -1,6 +1,9 @@
 ﻿@{
     var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
 
+    // جلب موديل الـ Badges من الـ ViewBag وتأمين عدم وجود Null
+    var badges = ViewBag.CustomerNotificationBadges as FixConnect.BLL.DTOs.CustomerNotificationBadgeViewModel;
+
     // هيلبر فانكشن لربط كلاسات الـ Bootstrap والـ Active state
     string GetNavClass(string targetAction)
     {
@@ -31,10 +34,21 @@
 <nav class="d-md-none fixed-top w-100 d-flex justify-content-between align-items-center px-4 bg-white border-bottom shadow-sm" style="height: 64px; z-index: 1050;">
     <div class="d-flex align-items-center gap-3">
         <span class="material-symbols-outlined text-dark cursor-pointer">menu</span>
-        <span class="fw-bold text-primary fs-4">FixConnect</span>
+        <img src="~/images/Osta Logo .png" style="width: 120px; height: 80px;" alt="Osta Logo" />
     </div>
-    <div class="d-flex align-items-center gap-3 text-primary">
-        <span class="material-symbols-outlined rounded-circle p-2 cursor-pointer">notifications</span>
+    <div class="d-flex align-items-center gap-3 text-primary position-relative">
+        <div class="position-relative">
+            <span class="material-symbols-outlined rounded-circle p-2 cursor-pointer">notifications</span>
+            @{
+                int totalBadges = (badges?.Requests ?? 0) + (badges?.ProposalsReceived ?? 0) + (badges?.Jobs ?? 0);
+                if (totalBadges > 0)
+                {
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px; padding: 0.35em 0.5em;">
+                        @totalBadges
+                    </span>
+                }
+            }
+        </div>
         <img alt="Customer profile avatar" class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;" src="~/uploads/ProfilePictures/default.png" />
     </div>
 </nav>
@@ -42,7 +56,7 @@
 <aside class="d-none d-md-flex flex-column bg-white border-end shadow-sm py-4 px-3 gap-3 z-40 position-fixed top-0 start-0 h-100" style="width: 310px; min-height: 100vh;">
 
     <div class="px-3 mb-2">
-        <h1 class="fw-extrabold text-primary fs-3 mb-1">FixConnect</h1>
+        <img src="~/images/Osta Logo .png" style="width: 160px; height: 100px;" alt="Osta Logo" />
 
         <div class="d-flex align-items-center gap-3 mt-4 bg-light p-3 rounded-3 border">
             <img alt="Customer profile picture" class="rounded-circle border" style="width: 40px; height: 40px; object-fit: cover;" src="~/uploads/ProfilePictures/default.png" />
@@ -64,16 +78,34 @@
         <a asp-controller="Customer" asp-action="MyRequests" class="@GetNavClass("MyRequests")">
             <span class="material-symbols-outlined" style="@GetIconFill("MyRequests")">chat_bubble</span>
             <span>My Requests</span>
+            @if (badges != null && badges.Requests > 0)
+            {
+                <span class="badge rounded-pill bg-danger ms-auto px-2 py-1 small animate-pulse">
+                    @badges.Requests
+                </span>
+            }
         </a>
 
         <a asp-controller="Customer" asp-action="ReceivedProposals" class="@GetNavClass("ReceivedProposals")">
             <span class="material-symbols-outlined" style="@GetIconFill("ReceivedProposals")">move_to_inbox</span>
             <span>Proposals Received</span>
+            @if (badges != null && badges.ProposalsReceived > 0)
+            {
+                <span class="badge rounded-pill bg-danger ms-auto px-2 py-1 small">
+                    @badges.ProposalsReceived
+                </span>
+            }
         </a>
 
         <a asp-controller="Customer" asp-action="Jobs" class="@GetNavClass("Jobs")">
             <span class="material-symbols-outlined" style="@GetIconFill("Jobs")">construction</span>
             <span>My Jobs</span>
+            @if (badges != null && badges.Jobs > 0)
+            {
+                <span class="badge rounded-pill bg-danger ms-auto px-2 py-1 small">
+                    @badges.Jobs
+                </span>
+            }
         </a>
     </nav>
 

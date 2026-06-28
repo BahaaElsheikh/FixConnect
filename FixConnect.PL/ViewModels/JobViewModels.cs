@@ -79,6 +79,9 @@ namespace FixConnect.PL.ViewModels
         public string CustomerContactNumber { get; set; } = null!;
         public DateTime? EstimatedStartTime { get; set; }
         public DateTime? ActualStartDate { get; set; }
+
+        public DateTime? CompletedDate { get; set; }
+
         public decimal LiveInvoiceTotal { get; set; }
         public string Status { get; set; } = null!;
         public bool CanStart { get; set; }

@@ -42,7 +42,8 @@ namespace FixConnect.BLL.Services
                 DurationEstimate = duration,
                 Notes = notes,
                 EstimatedStartTime = estimatedStartTime,  // ← أضف
-                Status = ProposalStatus.Pending
+                Status = ProposalStatus.Pending , 
+                CreatedAt = DateTime.Now
             });
 
             _context.SaveChanges();
@@ -70,6 +71,7 @@ namespace FixConnect.BLL.Services
             proposal.DurationEstimate = duration;
             proposal.Notes = notes;
             proposal.EstimatedStartTime = estimatedStartTime;
+            proposal.UpdatedAt = DateTime.Now;
 
             _context.SaveChanges();
             return (true, "Proposal updated.");
@@ -117,6 +119,8 @@ namespace FixConnect.BLL.Services
             // Accept this proposal
             proposal.Status = ProposalStatus.Accepted;
 
+            proposal.UpdatedAt = DateTime.Now;
+
             // Auto-reject all other proposals on the same request
             var otherProposals = _context.Proposals
                 .Where(p => p.RequestId == proposal.RequestId
@@ -125,7 +129,10 @@ namespace FixConnect.BLL.Services
                 .ToList();
 
             foreach (var p in otherProposals)
+            {
                 p.Status = ProposalStatus.AutoRejected;
+                p.UpdatedAt = DateTime.Now;
+            }
 
             // Update Request Status to InProgress
             var request = proposal.Request;
@@ -140,7 +147,8 @@ namespace FixConnect.BLL.Services
                 CustomerExactAddress = exactAddress,
                 CustomerContactNumber = contactNumber,
                 EstimatedStartTime = proposal.EstimatedStartTime,  // 
-                ActualStartDate = null
+                ActualStartDate = null,
+                CreatedAt = DateTime.Now,
             };
 
             _context.Jobs.Add(job);

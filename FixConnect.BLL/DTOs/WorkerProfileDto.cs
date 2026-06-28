@@ -16,6 +16,10 @@
 
         public int CompletedJobsCount { get; set; }
 
+        public double AvgAccuracyRating { get; set; }
+        public double AvgCommitmentRating { get; set; }
+        public double AvgPriceRating { get; set; }
+
         public List<PortfolioItemViewModel> PortfolioItems { get; set; } = new();
         public List<ReviewItemViewModel> Reviews { get; set; } = new();
         public VerificationViewModel? Verification { get; set; }

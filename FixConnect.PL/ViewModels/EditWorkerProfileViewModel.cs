@@ -21,6 +21,7 @@ namespace FixConnect.PL.ViewModels
         public List<int> SelectedRegionIds { get; set; } = new();
         public List<RegionOption> AllRegions { get; set; } = new();
 
+        public List<string> WorkingRegions { get; set; } = new(); 
         // Photo Upload
         public IFormFile? PhotoFile { get; set; }
         public string? CurrentPhotoUrl { get; set; }

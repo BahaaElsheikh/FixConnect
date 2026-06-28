@@ -12,6 +12,11 @@
         public bool IsVerified { get; set; }
         public string AvailabilityStatus { get; set; } = null!;
         public decimal AvgRating { get; set; }
+
+        // أضف هذه الحقول داخل كلاس PublicWorkerProfileViewModel تحت الـ AvgRating القديم
+        public decimal AvgAccuracyRating { get; set; }   // متوسط الدقة
+        public decimal AvgCommitmentRating { get; set; } // متوسط الالتزام
+        public decimal AvgPriceRating { get; set; }      // متوسط السعر
         public List<string> WorkingRegions { get; set; } = new();
         public List<PortfolioItemViewModel> PortfolioItems { get; set; } = new();
         public List<ReviewDisplayViewModel> Reviews { get; set; } = new();

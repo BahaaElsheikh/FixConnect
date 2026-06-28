@@ -5,6 +5,8 @@ namespace FixConnect.PL.ViewModels
     public class WalletViewModel
     {
         public decimal Balance { get; set; }
+        public decimal PendingPayouts { get; set; } // الخصائص الجديدة
+        public decimal TotalEarnings { get; set; }   // الخصائص الجديدة
         public List<TransactionRowViewModel> Transactions { get; set; } = new();
     }
 

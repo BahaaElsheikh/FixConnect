@@ -440,6 +440,30 @@
         color: var(--on-surface-variant);
         margin: 0;
     }
+
+    .fc-region-dropdown {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-top: 4px;
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 999;
+        display: none;
+    }
+
+    .fc-region-option {
+        padding: 12px;
+        cursor: pointer;
+    }
+
+        .fc-region-option:hover {
+            background: #f3f6ff;
+        }
 </style>
 
 <div class="cr-page">
@@ -530,16 +554,22 @@
                     @* ── Region ── *@
                     <div class="cr-col-half">
                         <label asp-for="RegionId" class="cr-label">Region</label>
-                        <div class="cr-select-wrap">
-                            <select asp-for="RegionId" class="cr-select">
-                                <option value="">— Select Region —</option>
-                                @foreach (var r in Model.Regions)
-                                {
-                                    <option value="@r.RegionId">@r.RegionName</option>
-                                }
-                            </select>
-                            <span class="material-symbols-outlined cr-select-icon">location_on</span>
+
+                        <div class="cr-select-wrap" style="position:relative;">
+                            <input type="text"
+                                   id="regionSearchInput"
+                                   class="cr-input"
+                                   placeholder="Search region..."
+                                   autocomplete="off" />
+
+                            <input type="hidden"
+                                   asp-for="RegionId"
+                                   id="RegionId" />
+
+                            <div id="regionDropdown" class="fc-region-dropdown"></div>
                         </div>
+
+                        <span asp-validation-for="RegionId" class="cr-validation"></span>
                     </div>
 
                     @* ── Description ── *@
@@ -563,6 +593,11 @@
                             <p>Click or drag photos here</p>
                             <span class="cr-upload-sub">Upload up to 5 clear images of the problem area</span>
                         </div>
+
+                        <div id="imagePreview"
+                             style=" display:flex; gap:12px;margin-top:20px;flex-wrap:wrap;">
+                        </div>
+
                     </div>
 
                 </div>@* /cr-form-grid *@
@@ -619,4 +654,108 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+                const regionInput = document.getElementById("regionSearchInput");
+        const regionIdInput = document.getElementById("RegionId");
+        const regionDropdown = document.getElementById("regionDropdown");
+
+        const allRegions = [
+        @foreach (var r in Model.Regions)
+        {
+                <text>
+                {
+                    id:@r.RegionId,
+                    name:"@Html.Raw(r.RegionName)"
+                },
+                </text>
+        }
+        ];
+
+        regionInput.addEventListener("input", function () {
+
+            const query = this.value.toLowerCase();
+
+            regionDropdown.innerHTML="";
+
+            if(query.length==0){
+                regionDropdown.style.display="none";
+                return;
+            }
+
+            allRegions
+            .filter(r=>r.name.toLowerCase().includes(query))
+            .forEach(r=>{
+
+                const div=document.createElement("div");
+
+                div.className="fc-region-option";
+
+                div.textContent=r.name;
+
+                div.onclick=()=>{
+
+                    regionInput.value=r.name;
+                  
+                    regionIdInput.value=r.id;
+
+                    regionDropdown.style.display="none";
+                };
+
+                regionDropdown.appendChild(div);
+
+            });
+
+            regionDropdown.style.display =
+                regionDropdown.children.length ? "block":"none";
+
+        });
+
+
+                const imageInput=document.querySelector('input[name="Images"]');
+
+        const preview=document.getElementById("imagePreview");
+
+        imageInput.addEventListener("change",()=>{
+
+            preview.innerHTML="";
+
+            [...imageInput.files].forEach(file=>{
+
+                const reader=new FileReader();
+
+                reader.onload=function(e){
+
+                    const img=document.createElement("img");
+
+                    img.src=e.target.result;
+
+                    img.style.width="120px";
+                    img.style.height="120px";
+                    img.style.objectFit="cover";
+                    img.style.borderRadius="10px";
+                    img.style.border="1px solid #ddd";
+
+                    preview.appendChild(img);
+
+                }
+
+                reader.readAsDataURL(file);
+
+            });
+
+        });
+
+                document.addEventListener("click", function (e) {
+
+            if (
+                !regionDropdown.contains(e.target) &&
+                e.target !== regionInput
+            ) {
+                regionDropdown.style.display = "none";
+            }
+
+        });
+
+    </script>
 }

@@ -5,7 +5,7 @@ using FixConnect.PL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-
+using Microsoft.AspNetCore.Mvc.Filters; // تأكد من وجود الـ using دي فوق
 namespace FixConnect.PL.Controllers
 {
     [Authorize(Roles = "Customer")]
@@ -18,6 +18,7 @@ namespace FixConnect.PL.Controllers
         private readonly JobService _jobService;
         private readonly WalletService _walletService;
         private readonly ReviewService _reviewService;
+        private readonly CustomerNotificationBadgeService _customerNotificationBadgeService;
 
 
 
@@ -27,6 +28,7 @@ namespace FixConnect.PL.Controllers
              JobService jobService,
              WalletService walletService,
               ReviewService reviewService,
+              CustomerNotificationBadgeService customerNotificationBadgeService, // الحقل الجديد
             IWebHostEnvironment env)
         {
             _requestService = requestService;
@@ -35,8 +37,22 @@ namespace FixConnect.PL.Controllers
             _jobService = jobService;
             _walletService = walletService;
             _reviewService = reviewService;
+            _customerNotificationBadgeService = customerNotificationBadgeService; // تعيين الخدمة
             _env = env;
         }
+
+
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                int customerId = GetCurrentUserId();
+                ViewBag.CustomerNotificationBadges = _customerNotificationBadgeService.GetBadgeCounts(customerId);
+            }
+        }
+
 
         private int GetCurrentUserId()
             => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -116,8 +132,11 @@ namespace FixConnect.PL.Controllers
         [HttpGet]
         public IActionResult MyRequests()
         {
-            var requests = _requestService.GetCustomerRequests(GetCurrentUserId());
+            int customerId = GetCurrentUserId();
+            _customerNotificationBadgeService.MarkRequestsSeen(customerId); // التصفير هنا
 
+
+            var requests = _requestService.GetCustomerRequests(GetCurrentUserId());
             var vm = new MyRequestsViewModel
             {
                 Requests = requests.Select(r => new MyRequestRowViewModel
@@ -284,6 +303,10 @@ namespace FixConnect.PL.Controllers
         [HttpGet]
         public IActionResult ReceivedProposals()
         {
+
+            int customerId = GetCurrentUserId();
+            _customerNotificationBadgeService.MarkProposalsReceivedSeen(customerId); // التصفير هنا
+
             var proposals = _requestService.GetReceivedProposals(GetCurrentUserId());
 
             var vm = new ReceivedProposalsViewModel
@@ -335,8 +358,61 @@ namespace FixConnect.PL.Controllers
         [HttpGet]
         public IActionResult WorkerProfile(int id)
         {
-            var vm = _workerService.GetPublicProfile(id);
-            if (vm == null) return NotFound();
+            var worker = _workerService.GetWorkerProfile(id);
+            if (worker == null)
+                return NotFound();
+
+            int totalReviewsCount = worker.Reviews?.Count ?? 0;
+
+            var vm = new WorkerProfileViewModel
+            {
+                UserId = worker.UserId,
+                FullName = worker.User.FullName,
+                Email = worker.User.Email,
+                Phone = worker.User.Phone,
+                Bio = worker.Bio,
+                SpecialtyName = worker.Specialty?.SpecialtyName,
+
+                PhotoUrl = worker.PhotoUrl,
+                IsVerified = worker.IsVerified,
+                AvailabilityStatus = worker.AvailabilityStatus.ToString(),
+                AvgRating = worker.AvgRating,
+                WorkingRegions = worker.WorksAt.Select(x => x.Region.RegionName).ToList(),
+
+                CompletedJobsCount = worker.CompletedJobsCount,
+
+                AvgAccuracyRating = totalReviewsCount > 0
+                    ? Math.Round(worker.Reviews.Average(r => (decimal)r.AccuracyRating), 1)
+                    : 0,
+
+                AvgCommitmentRating = totalReviewsCount > 0
+                    ? Math.Round(worker.Reviews.Average(r => (decimal)r.CommitmentRating), 1)
+                    : 0,
+
+                AvgPriceRating = totalReviewsCount > 0
+                    ? Math.Round(worker.Reviews.Average(r => (decimal)r.PriceRating), 1)
+                    : 0,
+
+                PortfolioItems = worker.PortfolioItems.Select(p => new PortfolioItemViewModel
+                {
+                    ItemId = p.ItemId,
+                    Title = p.Title ?? "",
+                    Description = p.Description,
+                    ImageUrl = p.ImageUrl
+                }).ToList(),
+
+                Reviews = worker.Reviews.Select(r => new ReviewDisplayViewModel
+                {
+                    CustomerName = r.Customer.User.FullName,
+                    AccuracyRating = r.AccuracyRating,
+                    CommitmentRating = r.CommitmentRating,
+                    PriceRating = r.PriceRating,
+                    AvgRating = Math.Round((r.AccuracyRating + r.CommitmentRating + r.PriceRating) / 3m, 1),
+                    SuggestWorker = r.SuggestWorker,
+                    Comment = r.Comment
+                }).ToList()
+            };
+
             return View(vm);
         }
 
@@ -403,6 +479,8 @@ namespace FixConnect.PL.Controllers
         [HttpGet]
         public IActionResult Jobs()
         {
+            int customerId = GetCurrentUserId();
+            _customerNotificationBadgeService.MarkJobsSeen(customerId); // التصفير هنا
             var jobs = _jobService.GetCustomerJobs(GetCurrentUserId());
 
             var vm = new CustomerJobsViewModel

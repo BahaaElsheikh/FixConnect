@@ -1,0 +1,16 @@
+﻿@* @model FixConnect.BLL.DTOs.NotificationBadgeViewModel
+
+@{
+    string BadgeMarkup(int count, string id)
+    {
+        if (count <= 0)
+            return $"<span id=\"{id}\" class=\"hidden\"></span>";
+
+        return $"<span id=\"{id}\" class=\"ml-auto inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-error text-on-error text-[11px] font-bold leading-none\">{count}</span>";
+    }
+}
+
+<span id="badge-direct-requests-wrapper">@Html.Raw(BadgeMarkup(Model.DirectRequests, "badge-direct-requests"))</span>
+<span id="badge-proposals-wrapper">@Html.Raw(BadgeMarkup(Model.Proposals, "badge-proposals"))</span>
+<span id="badge-jobs-wrapper">@Html.Raw(BadgeMarkup(Model.Jobs, "badge-jobs"))</span>
+<span id="badge-wallet-wrapper">@Html.Raw(BadgeMarkup(Model.Wallet, "badge-wallet"))</span> *@

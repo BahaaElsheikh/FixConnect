@@ -1,4 +1,5 @@
-﻿@model FixConnect.BLL.DTOs.PublicWorkerProfileViewModel
+﻿@* @model FixConnect.BLL.DTOs.PublicWorkerProfileViewModel *@
+@model FixConnect.PL.ViewModels.WorkerProfileViewModel
 @{
     ViewData["Title"] = Model.FullName;
     Layout = "_CustomerLayout";
@@ -121,7 +122,7 @@
                 <p class="font-body-lg text-body-lg text-secondary">
                     @Model.SpecialtyName
                     <span class="text-surface-variant mx-2">|</span>
-                    @Model.Email
+                    📞 Phone : @Model.Phone
                 </p>
 
                 <div class="flex flex-wrap items-center gap-4 pt-2">
@@ -160,6 +161,57 @@
 
         <!-- Left Column -->
         <div class="md:col-span-8 space-y-gutter">
+
+            <section class="glass-panel rounded-2xl border border-surface-variant p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-headline-md text-headline-md text-on-surface"> Reviews Summary </h2>
+                </div>
+
+                <div class="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-3 bg-surface-container-low p-3 rounded-xl border border-surface-variant/60 shadow-sm">
+                    <div class="bg-surface-container-lowest p-2 rounded-lg border border-surface-variant/30">
+                        <div class="flex justify-between mb-1 items-center">
+                            <span class="font-medium text-xs text-on-surface flex items-center gap-1">
+                                <span class="material-symbols-outlined text-primary text-[16px]">track_changes</span>
+                                Accuracy & Quality
+                            </span>
+                            <span class="font-bold text-xs text-primary">@Model.AvgAccuracyRating.ToString("0.0")</span>
+                        </div>
+                        <div class="w-full bg-surface-variant rounded-full h-1.5">
+                            <div class="bg-primary h-1.5 rounded-full" style="width: @(Model.AvgAccuracyRating * 20)%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface-container-lowest p-2 rounded-lg border border-surface-variant/30">
+                        <div class="flex justify-between mb-1 items-center">
+                            <span class="font-medium text-xs text-on-surface flex items-center gap-1">
+                                <span class="material-symbols-outlined text-teal-600 text-[16px]">calendar_clock</span>
+                                Commitment
+                            </span>
+                            <span class="font-bold text-xs text-teal-600">@Model.AvgCommitmentRating.ToString("0.0")</span>
+                        </div>
+                        <div class="w-full bg-surface-variant rounded-full h-1.5">
+                            <div class="bg-teal-500 h-1.5 rounded-full" style="width: @(Model.AvgCommitmentRating * 20)%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface-container-lowest p-2 rounded-lg border border-surface-variant/30">
+                        <div class="flex justify-between mb-1 items-center">
+                            <span class="font-medium text-xs text-on-surface flex items-center gap-1">
+                                <span class="material-symbols-outlined text-amber-600 text-[16px]">payments</span>
+                                Fair Pricing
+                            </span>
+                            <span class="font-bold text-xs text-amber-600">@Model.AvgPriceRating.ToString("0.0")</span>
+                        </div>
+                        <div class="w-full bg-surface-variant rounded-full h-1.5">
+                            <div class="bg-amber-500 h-1.5 rounded-full" style="width: @(Model.AvgPriceRating * 20)%"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+
+
 
             <!-- Bio -->
             @if (!string.IsNullOrEmpty(Model.Bio))

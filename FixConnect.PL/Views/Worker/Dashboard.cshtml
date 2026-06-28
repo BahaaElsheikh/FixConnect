@@ -4,37 +4,136 @@
     Layout = "_WorkerLayout";
 }
 
+<style>
+    :root {
+        --fc-blue: #1a4fd6;
+        --fc-blue-light: #e8effe;
+        --fc-blue-mid: #3b6fe8;
+        --fc-radius: 14px;
+        --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
+    }
+
+    .fc-hero {
+        border-radius: var(--fc-radius);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        position: relative;
+        height: 220px;
+        box-shadow: var(--fc-shadow-md);
+    }
+
+        .fc-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .fc-hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(26,79,214,.85) 0%, rgba(26,79,214,.35) 100%);
+        display: flex;
+        align-items: center;
+        padding: 0 2.5rem;
+    }
+
+    .fc-hero-text h2 {
+        color: #fff;
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: .4rem;
+    }
+
+    .fc-hero-text p {
+        color: rgba(255,255,255,.9);
+        font-size: .95rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .fc-hero-stats {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .fc-stat {
+        background: rgba(255,255,255,.16);
+        backdrop-filter: blur(8px);
+        color: #fff;
+        padding: .8rem 1rem;
+        border-radius: 12px;
+        min-width: 120px;
+    }
+
+    .fc-stat-number {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .fc-stat-label {
+        font-size: .8rem;
+        opacity: .9;
+    }
+</style>
+
 <div class="flex-1 p-gutter md:p-container-margin max-w-7xl mx-auto w-full pt-6">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-stack-lg gap-4">
-        <div>
-            <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Available Requests</h2>
-            <p class="font-body-md text-body-md text-on-surface-variant mt-2">Browse and apply to public jobs matching your skills.</p>
-        </div>
-    </div>
 
-    <form method="get" asp-action="Dashboard" class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 shadow-[0_4px_20px_rgba(0,62,199,0.04)] mb-stack-lg flex flex-col md:flex-row gap-4 mb-8">
-        <div class="flex-1 relative">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
-            <input name="search" value="@Model.SearchQuery" class="w-full pl-12 pr-4 py-3 bg-[#F1F5F9] border-transparent focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-body-md text-body-md text-on-surface placeholder:text-outline transition-all outline-none" placeholder="Search by title or description..." type="text" />
-        </div>
-
-        <div class="flex gap-4 flex-1 md:flex-none">
-            <div class="relative flex-1 md:w-64">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">location_on</span>
-                <input type="text" id="regionSearchInput" name="regionSearch" value="@Model.RegionSearch" class="w-full pl-12 pr-4 py-3 bg-[#F1F5F9] border-transparent focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-body-md text-body-md text-on-surface placeholder:text-outline transition-all outline-none" placeholder="Filter by region..." autocomplete="off" />
-
-                <div id="regionDropdown" class="absolute top-[110%] left-0 right-0 bg-white border border-outline-variant/30 rounded-xl shadow-lg z-[999] hidden max-h-48 overflow-y-auto">
+    <div class="fc-hero">
+        <img src="~/images/WorkerDashboardBanner.png" alt="Worker Dashboard" />
+        <div class="fc-hero-overlay">
+            <div class="fc-hero-text">
+                <h2>Welcome Back 👋</h2>
+                <p>
+                    Discover new opportunities, review incoming requests,
+                    and grow your business with FixConnect.
+                </p>
+                <div class="fc-hero-stats">
+                    <div class="fc-stat">
+                        <div class="fc-stat-number">@Model.PublicRequests.Count</div>
+                        <div class="fc-stat-label">Available Jobs</div>
+                    </div>
+                    <div class="fc-stat">
+                        <div class="fc-stat-number">@(Model.PublicRequests.Count(x => x.AlreadyBid))</div>
+                        <div class="fc-stat-label">My Bids</div>
+                    </div>
+                    <div class="fc-stat">
+                        <div class="fc-stat-number">@(Model.LatestJob != null ? "1" : "0")</div>
+                        <div class="fc-stat-label">Active Job</div>
+                    </div>
                 </div>
             </div>
-            <button type="submit" class="px-6 py-3 bg-primary text-white rounded-xl font-label-md text-label-md hover:shadow-lg hover:shadow-primary/20 transition-all font-semibold">
-                Search
-            </button>
         </div>
-    </form>
+    </div>
 
     <div class="flex flex-col lg:flex-row gap-8">
 
         <div class="flex-1">
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Available Requests</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant mt-2">Browse and apply to public jobs matching your skills.</p>
+                </div>
+            </div>
+
+            <form method="get" asp-action="Dashboard" class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 shadow-[0_4px_20px_rgba(0,62,199,0.04)] flex flex-col md:flex-row gap-4 mb-8">
+                <div class="flex-1 relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+                    <input name="search" value="@Model.SearchQuery" class="w-full pl-12 pr-4 py-3 bg-[#F1F5F9] border-transparent focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-body-md text-body-md text-on-surface placeholder:text-outline transition-all outline-none" placeholder="Search by title or description..." type="text" />
+                </div>
+
+                <div class="flex gap-4 flex-1 md:flex-none">
+                    <div class="relative flex-1 md:w-64">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">location_on</span>
+                        <input type="text" id="regionSearchInput" name="regionSearch" value="@Model.RegionSearch" class="w-full pl-12 pr-4 py-3 bg-[#F1F5F9] border-transparent focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-body-md text-body-md text-on-surface placeholder:text-outline transition-all outline-none" placeholder="Filter by region..." autocomplete="off" />
+                        <div id="regionDropdown" class="absolute top-[110%] left-0 right-0 bg-white border border-outline-variant/30 rounded-xl shadow-lg z-[999] hidden max-h-48 overflow-y-auto"></div>
+                    </div>
+                    <button type="submit" class="px-6 py-3 bg-primary text-white rounded-xl font-label-md text-label-md hover:shadow-lg hover:shadow-primary/20 transition-all font-semibold">
+                        Search
+                    </button>
+                </div>
+            </form>
+
             @if (!Model.PublicRequests.Any())
             {
                 <div class="text-center py-16 bg-surface-container-lowest border border-slate-200 rounded-xl shadow-sm">
@@ -63,7 +162,6 @@
                             </div>
 
                             <h3 class="font-headline-md text-headline-md text-on-surface mb-2 line-clamp-2 font-bold break-words">@r.Title</h3>
-
                             <p class="text-sm text-secondary mb-4 line-clamp-3 flex-1 text-gray-600 break-words">@r.Description</p>
 
                             @if (r.ImagePaths.Any())
@@ -145,6 +243,7 @@
                 }
             </div>
         </div>
+
     </div>
 </div>
 

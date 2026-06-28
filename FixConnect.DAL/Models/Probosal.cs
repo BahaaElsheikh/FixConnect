@@ -14,6 +14,8 @@ namespace FixConnect.DAL.Models
         public decimal? MaterialCost { get; set; }
         public int? DurationEstimate { get; set; }   // days
 
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         public ProposalStatus Status { get; set; }
         public int UserId { get; set; }      // Customer

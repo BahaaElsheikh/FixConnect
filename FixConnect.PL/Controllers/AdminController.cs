@@ -86,10 +86,64 @@ namespace FixConnect.PL.Controllers
         // GET: /Admin/WorkerProfile/5
         // ─────────────────────────────
         [HttpGet]
+        [HttpGet]
         public IActionResult WorkerProfile(int id)
         {
-            var vm = _workerService.GetPublicProfile(id);
-            if (vm == null) return NotFound();
+            var worker = _workerService.GetWorkerProfile(id);
+            if (worker == null)
+                return NotFound();
+
+            int totalReviewsCount = worker.Reviews?.Count ?? 0;
+
+            var vm = new WorkerProfileViewModel
+            {
+                UserId = worker.UserId,
+                FullName = worker.User.FullName,
+                Email = worker.User.Email,
+                Phone = worker.User.Phone,
+                Bio = worker.Bio,
+                SpecialtyName = worker.Specialty?.SpecialtyName,
+
+                PhotoUrl = worker.PhotoUrl,
+                IsVerified = worker.IsVerified,
+                AvailabilityStatus = worker.AvailabilityStatus.ToString(),
+                AvgRating = worker.AvgRating,
+                WorkingRegions = worker.WorksAt.Select(x => x.Region.RegionName).ToList(),
+
+                CompletedJobsCount = worker.CompletedJobsCount,
+
+                AvgAccuracyRating = totalReviewsCount > 0
+                    ? Math.Round(worker.Reviews.Average(r => (decimal)r.AccuracyRating), 1)
+                    : 0,
+
+                AvgCommitmentRating = totalReviewsCount > 0
+                    ? Math.Round(worker.Reviews.Average(r => (decimal)r.CommitmentRating), 1)
+                    : 0,
+
+                AvgPriceRating = totalReviewsCount > 0
+                    ? Math.Round(worker.Reviews.Average(r => (decimal)r.PriceRating), 1)
+                    : 0,
+
+                PortfolioItems = worker.PortfolioItems.Select(p => new PortfolioItemViewModel
+                {
+                    ItemId = p.ItemId,
+                    Title = p.Title ?? "",
+                    Description = p.Description,
+                    ImageUrl = p.ImageUrl
+                }).ToList(),
+
+                Reviews = worker.Reviews.Select(r => new ReviewDisplayViewModel
+                {
+                    CustomerName = r.Customer.User.FullName,
+                    AccuracyRating = r.AccuracyRating,
+                    CommitmentRating = r.CommitmentRating,
+                    PriceRating = r.PriceRating,
+                    AvgRating = Math.Round((r.AccuracyRating + r.CommitmentRating + r.PriceRating) / 3m, 1),
+                    SuggestWorker = r.SuggestWorker,
+                    Comment = r.Comment
+                }).ToList()
+            };
+
             return View(vm);
         }
 

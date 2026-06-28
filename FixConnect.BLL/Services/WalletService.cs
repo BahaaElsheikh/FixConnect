@@ -1,5 +1,8 @@
 ﻿using FixConnect.DAL.Context;
+using FixConnect.DAL.Data.Enums;
 using FixConnect.DAL.Models;
+
+
 using Microsoft.EntityFrameworkCore;
 
 namespace FixConnect.BLL.Services
@@ -67,16 +70,31 @@ namespace FixConnect.BLL.Services
         // ─────────────────────────────
         // Get Wallet with Transactions
         // ─────────────────────────────
-        public (decimal Balance, List<Transaction> Transactions) GetWalletDetails(int workerId)
+        public (decimal Balance, decimal PendingPayouts, decimal TotalEarnings, List<Transaction> Transactions) GetWalletDetails(int workerId)
         {
             var wallet = _context.Wallets
                 .Include(w => w.Transactions)
                 .FirstOrDefault(w => w.WorkerId == workerId);
 
-            if (wallet == null) return (0, new());
+            if (wallet == null) return (0, 0, 0, new());
 
-            return (wallet.Balance,
-                    wallet.Transactions.OrderByDescending(t => t.CreatedAt).ToList());
+            // 1. حساب الـ Pending: كل الـ Jobs اللي لسه مخلصتش (مش Completed) للـ Worker ده
+            // ملحوظة: غير اسم الحالة (مثلاً "Completed") بناءً على الـ Enum أو الـ String عندك في الـ DB
+            decimal pendingPayouts = _context.Jobs
+            .Where(j => j.Proposal.WorkerId == workerId &&
+                 j.Status != JobStatus.Completed)
+             .Sum(j => j.LaborCost ?? 0m);
+
+            decimal totalEarnings = _context.Jobs
+                .Where(j => j.Proposal.WorkerId == workerId &&
+                            j.Status == JobStatus.Completed)
+                .Sum(j => j.LaborCost ?? 0m);
+            var transactions = wallet.Transactions.OrderByDescending(t => t.CreatedAt).ToList();
+
+           
+            return (wallet.Balance, pendingPayouts, totalEarnings, transactions);
         }
+
+
     }
 }

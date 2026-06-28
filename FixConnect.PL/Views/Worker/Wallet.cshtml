@@ -110,7 +110,9 @@
                     <span class="material-symbols-outlined text-amber-500 text-[20px]">schedule</span>
                     <p class="font-label-md text-[14px] font-semibold text-secondary uppercase tracking-wider">Pending Payouts</p>
                 </div>
-                <h4 class="font-headline-md text-[24px] font-bold text-on-surface">EGP 3,200.00</h4>
+                <h4 class="font-headline-md text-[24px] font-bold text-on-surface">
+                    EGP @Model.PendingPayouts.ToString("N2")
+                </h4>
                 <p class="font-caption text-[12px] font-medium text-secondary mt-1">Clearing in 2-3 days</p>
             </div>
 
@@ -119,7 +121,9 @@
                     <span class="material-symbols-outlined text-primary text-[20px]">trending_up</span>
                     <p class="font-label-md text-[14px] font-semibold text-secondary uppercase tracking-wider">Total Earnings (YTD)</p>
                 </div>
-                <h4 class="font-headline-md text-[24px] font-bold text-on-surface">EGP 45,890.00</h4>
+                <h4 class="font-headline-md text-[24px] font-bold text-on-surface">
+                    EGP @Model.TotalEarnings.ToString("N2")
+                </h4>
             </div>
         </div>
     </div>

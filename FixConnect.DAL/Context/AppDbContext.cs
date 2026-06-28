@@ -37,6 +37,9 @@ namespace FixConnect.DAL.Context
 
         public DbSet<JobInvoiceItem> JobInvoiceItems { get; set; }
 
+        public DbSet<WorkerNotificationState> WorkerNotificationStates { get; set; }
+        public DbSet<CustomerNotificationState> CustomerNotificationStates { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -169,6 +172,9 @@ namespace FixConnect.DAL.Context
                       .WithMany(w => w.Proposals)
                       .HasForeignKey(p => p.WorkerId)
                       .OnDelete(DeleteBehavior.NoAction);
+
+                entity.Property(p => p.UpdatedAt);
+                entity.Property(p => p.CreatedAt);
             });
 
             // ============================
@@ -183,6 +189,9 @@ namespace FixConnect.DAL.Context
                       .WithOne(p => p.Job)
                       .HasForeignKey<Job>(j => j.ProposalId)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(p => p.UpdatedAt);
+                entity.Property(p => p.CreatedAt);
             });
 
             // ============================
@@ -322,6 +331,35 @@ namespace FixConnect.DAL.Context
                       .WithMany(job => job.InvoiceItems)
                       .HasForeignKey(j => j.JobId)
                       .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
+            // ============================
+            // WorkerNotificationState
+            // ============================
+            modelBuilder.Entity<WorkerNotificationState>(entity =>
+            {
+                entity.HasKey(n => n.WorkerId);
+
+                entity.Property(n => n.LastSeenDirectRequests).HasDefaultValueSql("'1900-01-01'");
+                entity.Property(n => n.LastSeenProposals).HasDefaultValueSql("'1900-01-01'");
+                entity.Property(n => n.LastSeenJobs).HasDefaultValueSql("'1900-01-01'");
+                entity.Property(n => n.LastSeenWallet).HasDefaultValueSql("'1900-01-01'");
+
+                entity.HasOne(n => n.Worker)
+                      .WithOne()
+                      .HasForeignKey<WorkerNotificationState>(n => n.WorkerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
+            modelBuilder.Entity<CustomerNotificationState>(entity =>
+            {
+                entity.HasKey(e => e.CustomerId);
+
+                entity.HasOne(e => e.Customer)
+                      .WithOne() // أو حسب الـ Inverse Navigation لو موجودة في الـ User
+                      .HasForeignKey<CustomerNotificationState>(e => e.CustomerId);
             });
 
         }

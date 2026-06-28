@@ -80,6 +80,8 @@ namespace FixConnect.BLL.Services
 
             job.ActualStartDate = DateTime.Now;
             job.StartDate = DateOnly.FromDateTime(DateTime.Now);
+            job.UpdatedAt = DateTime.Now;
+
             _context.SaveChanges();
 
             return (true, "Job started successfully.");
@@ -98,10 +100,11 @@ namespace FixConnect.BLL.Services
                 return (false, "Cannot cancel a job that has already started.");
 
             job.Status =JobStatus.Disputed;
-
+            job.UpdatedAt = DateTime.Now;
             // Revert proposal & request
             job.Proposal.Status = ProposalStatus.Rejected;
             job.Proposal.Request.Status = (int)RequestStatus.Pending;
+            job.Proposal.UpdatedAt = DateTime.Now;
 
             _context.SaveChanges();
             return (true, "Job cancelled.");
@@ -130,6 +133,8 @@ namespace FixConnect.BLL.Services
 
             // Update total
             job.LiveInvoiceTotal += cost;
+            job.UpdatedAt = DateTime.Now;
+
             _context.SaveChanges();
 
             return (true, "Invoice item added.");
@@ -153,6 +158,8 @@ namespace FixConnect.BLL.Services
             // Use Disputed temporarily to mean "Waiting for Customer Confirmation"
             job.Status = JobStatus.Disputed;
             job.EndDate = DateOnly.FromDateTime(DateTime.Now);
+            job.UpdatedAt = DateTime.Now;
+
             _context.SaveChanges();
 
             return (true, "Marked as finished. Waiting for customer confirmation.");
@@ -170,6 +177,8 @@ namespace FixConnect.BLL.Services
                 return (false, "Job not found.");
 
             job.Status = JobStatus.Completed;
+            job.UpdatedAt = DateTime.Now;
+
             job.Proposal.Request.Status = (int)RequestStatus.Completed;
 
             // Update Worker CompletedJobsCount
@@ -206,6 +215,8 @@ namespace FixConnect.BLL.Services
             item.Description = description;
             item.Cost = cost;
 
+            job.UpdatedAt = DateTime.Now;
+
             _context.SaveChanges();
             return (true, "Item updated.");
         }
@@ -223,6 +234,8 @@ namespace FixConnect.BLL.Services
 
             job.LiveInvoiceTotal = (job.LiveInvoiceTotal ?? 0) - item.Cost;
             _context.JobInvoiceItems.Remove(item);
+            job.UpdatedAt = DateTime.Now;
+
             _context.SaveChanges();
             return (true, "Item deleted.");
         }
@@ -237,6 +250,12 @@ namespace FixConnect.BLL.Services
             job.LaborCost = laborCost;
             _context.SaveChanges();
             return (true, "Labor cost updated.");
+        }
+
+
+        public int GetJobIdByProposal(int proposalId)
+        {
+            return _context.Jobs.Where(j => j.ProposalId == proposalId).Select(j => j.JobId).FirstOrDefault();
         }
 
 

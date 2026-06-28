@@ -3,179 +3,373 @@
     Layout = "_WorkerLayout";
 }
 
-<style>
-    /* Layout styling */
-    .kanban-board {
-        padding: 1rem 0;
-    }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+ <style>
+                             
+                       
+                                  /* Layout styling */
+     .kanban-board {
+         padding: 1.5rem 0;
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+     }
 
-    .kanban-column {
-        background-color: #f8f9fa;
-        border-radius: 12px;
-        padding: 1.5rem;
-        min-height: 500px;
-    }
+     .kanban-column {
+         background-color: #f8f9fa;
+         border-radius: 12px;
+         padding: 1.5rem;
+         min-height: 500px;
+     }
 
-    .column-header {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #495057;
-        text-transform: uppercase;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
+     .column-header {
+         font-size: 1.1rem;
+         font-weight: 800;
+         color: #1a1d21;
+         text-transform: uppercase;
+         margin-bottom: 1.5rem;
+         display: flex;
+         align-items: center;
+         gap: 0.5rem;
+     }
 
-    .dot {
-        height: 8px;
-        width: 8px;
-        background-color: #6c757d;
-        border-radius: 50%;
-        display: inline-block;
-    }
+     .dot {
+         height: 10px;
+         width: 10px;
+         background-color: #6c757d;
+         border-radius: 50%;
+         display: inline-block;
+     }
 
-    .dot.accepted {
-        background-color: #4361ee;
-    }
+         .dot.accepted {
+             background-color: #4361ee;
+         }
 
-    /* NEW: This grid forces the 2x2 side-by-side layout */
-    .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        /* ─── CRUCIAL FIX 1: Stops rows from forcing height synchronization ─── */
-        align-items: start;
-    }
+     /* Grid layout */
+     .cards-grid {
+         display: grid;
+         grid-template-columns: repeat(2, 1fr);
+         gap: 1.5rem; /* زودنا المسافة بين الكروت وبعضها */
+         align-items: start;
+     }
 
-    /* Card Styling */
-    .job-card {
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        transition: transform 0.2s, box-shadow 0.2s;
-        cursor: pointer;
-        /* ─── FIX: Forces every card to be identical in size ─── */
-        display: flex;
-        flex-direction: column;
-        height: 230px; /* This sets the exact fixed height for all cards */
-        box-sizing: border-box;
-    }
+     /* Card Styling */
+     .job-card {
+         background: #ffffff !important; /* للتأكيد إن الخلفية بيضاء */
+         border: 1px solid #dcdcdc !important; /* بوردر أغمق وأوضح */
+         border-radius: 12px;
+         padding: 1.5rem; /* مسافة داخلية محترمة عشان الكلام ميزنقش في الحواف */
+         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+         transition: all 0.3s ease; /* حركة ناعمة في الـ Hover */
+         cursor: pointer;
+         display: flex;
+         flex-direction: column;
+         min-height: 280px; /* الارتفاع المناسب للمحتوى */
+         box-sizing: border-box;
+         position: relative;
+     }
 
-    .job-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
+         /* تأثير الـ Hover المتظبط */
+         .job-card:hover {
+             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+             transform: translateY(-4px);
+             border-color: #4361ee !important; /* لون البوردر بيتغير مع الهوفر لشكل جمالي */
+         }
 
-    .job-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-        font-size: 0.8rem;
-    }
+     .job-header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 1rem;
+         font-size: 0.85rem;
+         font-weight: 700;
+         color: #6c757d;
+     }
 
-    .status-badge {
-        background-color: #e0e7ff;
-        color: #4361ee;
-        padding: 0.25rem 0.6rem;
-        border-radius: 20px;
-        font-weight: 600;
-    }
+     /* الـ Badge الأساسي */
+     .status-badge {
+         padding: 0.35rem 0.8rem;
+         border-radius: 20px;
+         font-weight: 700;
+         font-size: 0.8rem;
+     }
 
-    .text-truncate {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-    }
+     /* ألوان الحالات */
+     .status-completed {
+         background-color: #e2fbe8;
+         color: #155724;
+     }
 
-    .job-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #212529;
-    }
+     .status-active {
+         background-color: #e0e7ff;
+         color: #1e3a8a;
+     }
 
-    .job-details {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin-bottom: 1.2rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-    }
+     .status-canceled {
+         background-color: #fde8e8;
+         color: #721c24;
+     }
 
-    .card-footer-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 0.75rem;
-        border-top: 1px solid #f0f0f0;
-        /* ─── FIX: Keeps the footer perfectly pinned to the bottom ─── */
-        margin-top: auto;
-    }
+     .status-disputed {
+         background-color: #fff3cd;
+         color: #856404;
+     }
 
-    .invoice-total {
-        font-weight: 700;
-        color: #212529;
-    }
+     .status-default {
+         background-color: #e2e3e5;
+         color: #1b1e21;
+     }
 
-    .btn-primary-action {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        font-weight: 500;
-        cursor: pointer;
-        text-decoration: none;
-    }
+     /* كلاس التقرير النصي السحري للفليكس */
+     .text-truncate-custom {
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         flex-grow: 1;
+     }
 
-    .btn-primary-action:hover {
-        background-color: #0056b3;
-    }
+     .job-title {
+         font-size: 1.2rem;
+         font-weight: 800;
+         margin-bottom: 1rem;
+         color: #111111;
+         line-height: 1.4;
+     }
 
-    /* Mobile responsiveness: stacks cards 1-by-1 on smaller screens */
-    /* media (max-width: 900px) {
-        .cards-grid {
-            grid-template-columns: 1fr;
-        }
-    } */
+     .job-details {
+         font-size: 0.95rem;
+         color: #495057;
+         font-weight: 600;
+         margin-bottom: 1.5rem;
+         display: flex;
+         flex-direction: column;
+         gap: 0.75rem; /* مسافة مريحة للعين بين الأسطر */
+     }
+
+         .job-details span {
+             display: flex;
+             align-items: center;
+             gap: 0.75rem;
+             width: 100%;
+             min-width: 0; /* بيمنع الفليكس من كسر الـ truncate */
+         }
+
+         .job-details i {
+             color: #4361ee;
+             width: 20px;
+             text-align: center;
+             flex-shrink: 0; /* بيمنع الأيقونة إنها تتفعص */
+             font-size: 1rem;
+         }
+
+     /* تظبيط الجزء السفلي */
+     .card-footer-actions {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         padding-top: 1rem;
+         border-top: 1px solid #ededed;
+         margin-top: auto;
+         width: 100%;
+     }
+
+     .invoice-total {
+         font-size: 1.15rem;
+         font-weight: 800;
+         color: #000000;
+         flex-shrink: 0;
+     }
+
+     .btn-primary-action {
+         background-color: #007bff;
+         color: white;
+         border: none;
+         padding: 0.6rem 1.4rem;
+         border-radius: 8px;
+         font-weight: 700;
+         text-decoration: none;
+         font-size: 0.9rem;
+         flex-shrink: 0;
+         transition: background-color 0.2s ease;
+     }
+
+         .btn-primary-action:hover {
+             background-color: #0056b3;
+             color: white;
+         }
+
+     /* باقي ستايل الهيرو زي ما هو */
+     :root {
+         --fc-blue: #1a4fd6;
+         --fc-blue-light: #e8effe;
+         --fc-blue-mid: #3b6fe8;
+         --fc-radius: 14px;
+         --fc-shadow-md: 0 4px 24px rgba(26,79,214,.13);
+     }
+
+     .fc-hero {
+         border-radius: var(--fc-radius);
+         overflow: hidden;
+         margin-bottom: 1.5rem;
+         position: relative;
+         height: 220px;
+         box-shadow: var(--fc-shadow-md);
+     }
+
+         .fc-hero img {
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+         }
+
+     .fc-hero-overlay {
+         position: absolute;
+         inset: 0;
+         background: linear-gradient( 90deg, rgba(26,79,214,.92) 0%, rgba(26,79,214,.5) 100% );
+         display: flex;
+         align-items: center;
+         padding: 0 2.5rem;
+     }
+
+     .fc-hero-text h2 {
+         color: #fff;
+         font-size: 2rem;
+         font-weight: 900;
+         margin-bottom: .4rem;
+     }
+
+     .fc-hero-text p {
+         color: #ffffff;
+         font-size: 1rem;
+         font-weight: 600;
+         margin-bottom: 1.2rem;
+         max-width: 600px;
+     }
+
+     .fc-hero-stats {
+         display: flex;
+         gap: .8rem;
+         flex-wrap: wrap;
+     }
+
+     .fc-stat {
+         background: rgba(255,255,255,.25);
+         backdrop-filter: blur(10px);
+         border: 1px solid rgba(255,255,255,.3);
+         color: #fff;
+         padding: .8rem 1.2rem;
+         border-radius: 12px;
+         min-width: 130px;
+     }
+
+     .fc-stat-number {
+         font-size: 1.5rem;
+         font-weight: 800;
+     }
+
+     .fc-stat-label {
+         font-size: .85rem;
+         font-weight: 700;
+         opacity: 1;
+     }
 </style>
+<div class="fc-hero">
+    <img src="~/images/WorkerJobsBanner.png" alt="Worker Jobs" />
+
+    <div class="fc-hero-overlay">
+        <div class="fc-hero-text">
+
+            <h2>My Jobs Dashboard</h2>
+
+            <p>
+                Track your active jobs, monitor completed work,
+                and manage every service request from one place.
+            </p>
+
+            <div class="fc-hero-stats">
+
+                <div class="fc-stat">
+                    <div class="fc-stat-number">
+                        @Model.Jobs.Count
+                    </div>
+                    <div class="fc-stat-label">
+                        Total Jobs
+                    </div>
+                </div>
+
+                <div class="fc-stat">
+                    <div class="fc-stat-number">
+                        @Model.Jobs.Count(j => j.Status.ToString() == "Active")
+                    </div>
+                    <div class="fc-stat-label">
+                        Active
+                    </div>
+                </div>
+
+                <div class="fc-stat">
+                    <div class="fc-stat-number">
+                        @Model.Jobs.Count(j => j.Status.ToString() == "Completed")
+                    </div>
+                    <div class="fc-stat-label">
+                        Completed
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 <div class="kanban-board">
     <div class="kanban-column">
         <div class="column-header">
-            <span class="dot accepted"></span> ACTIVE / ACCEPTED
+            <span class="dot accepted"></span> Jobs List
         </div>
 
         <div class="cards-grid">
             @foreach (var job in Model.Jobs)
             {
+                string statusClass = job.Status?.ToString() switch
+                {
+                    "Completed" => "status-completed",
+                    "Active" => "status-active",
+                    "Canceled" => "status-canceled",
+                    "Disputed" => "status-disputed",
+                    _ => "status-default"
+                };
+
                 <div class="job-card">
                     <div class="job-header">
-                        <span class="status-badge">@job.Status</span>
+                        <span class="status-badge @statusClass">@job.Status</span>
                         <span class="text-muted">ID: #FC-@job.JobId</span>
                     </div>
 
-                    <h4 class="job-title text-truncate break-words" title="@job.RequestTitle">@job.RequestTitle</h4>
+                    <h4 class="job-title text-truncate-custom" title="@job.RequestTitle">@job.RequestTitle</h4>
 
                     <div class="job-details">
-                        <span class="text-truncate break-words" title="@job.CustomerName">
-                            <i class="icon-user"></i> @job.CustomerName
+                        <span title="@job.CustomerName">
+                            <i class="fas fa-user"></i>
+                            <span class="text-truncate-custom">@job.CustomerName</span>
                         </span>
-                        <span class="text-truncate" title="@job.CustomerExactAddress">
-                            <i class="icon-location"></i> @job.CustomerExactAddress
+
+                        <span title="@job.RequestTitle">
+                            <i class="fas fa-tools"></i>
+                            <span class="text-truncate-custom">@job.RequestTitle</span>
                         </span>
+
+                        <span title="@job.CustomerExactAddress">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="text-truncate-custom">@job.CustomerExactAddress</span>
+                        </span>
+
                         <span>
-                            <i class="icon-calendar"></i> @(job.EstimatedStartTime?.ToString("dd MMM yyyy") ?? "TBD")
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="text-truncate-custom">@(job.EstimatedStartTime?.ToString("dd MMM yyyy") ?? "TBD")</span>
                         </span>
                     </div>
 
                     <div class="card-footer-actions">
-                        <span class="invoice-total">@job.LiveInvoiceTotal.ToString("0.00") EGP</span>
+                        <span class="invoice-total">@job.LiveInvoiceTotal.ToString("N2") EGP</span>
                         <a href="/Worker/JobDetail/@job.JobId" class="btn-primary-action">View Details</a>
                     </div>
                 </div>
