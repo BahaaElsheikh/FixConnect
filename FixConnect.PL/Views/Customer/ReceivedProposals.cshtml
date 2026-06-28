@@ -591,6 +591,52 @@
             grid-template-columns: 1fr 1fr;
         }
     }
+
+    .fc-btn-reject {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: .5rem 1.2rem;
+        font-size: .8rem;
+        font-weight: 700;
+        color: var(--fc-danger);
+        background: transparent;
+        border: 1.5px solid var(--fc-danger-bdr);
+        border-radius: var(--fc-radius-sm);
+        text-decoration: none;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all .15s;
+    }
+
+    .fc-btn-reject:hover {
+        background: var(--fc-danger-bg);
+        color: var(--fc-danger);
+        border-color: var(--fc-danger);
+    }
+
+    .fc-btn-report-sm {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: transparent;
+        color: var(--fc-muted);
+        border: 1.5px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-size: .9rem;
+    }
+
+        .fc-btn-report-sm:hover {
+            background: var(--fc-danger-bg);
+            color: var(--fc-danger);
+            border-color: var(--fc-danger-bdr);
+        }
+
 </style>
 
 <div class="fc-page">
@@ -712,20 +758,33 @@
                     <div class="fc-proposal-footer">
                         <button class="fc-btn-details"
                                 onclick="fcOpenDetails(
-                                            '@Html.Raw(p.WorkerName.Replace("'", "\\\'"))',
-                                            '@Html.Raw((p.WorkerSpecialty ?? "").Replace("'", "\\\'"))',
-                                            '@Html.Raw(p.RequestTitle.Replace("'", "\\\'"))',
-                                            '@(p.LaborCost?.ToString("0.00") ?? "—")',
-                                            '@(p.MaterialCost?.ToString("0.00") ?? "—")',
-                                            '@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")',
-                                            '@(p.EstimatedStartTime.HasValue? p.EstimatedStartTime.Value.ToString("dd MMM yyyy, hh:mm tt") : "—")',
-                                            '@Html.Raw((p.Notes ?? "—").Replace("'", "\\\'"))',
-                                            '@p.Status')">
+                                                    '@Html.Raw(p.WorkerName.Replace("'", "\\\'"))',
+                                                    '@Html.Raw((p.WorkerSpecialty ?? "").Replace("'", "\\\'"))',
+                                                    '@Html.Raw(p.RequestTitle.Replace("'", "\\\'"))',
+                                                    '@(p.LaborCost?.ToString("0.00") ?? "—")',
+                                                    '@(p.MaterialCost?.ToString("0.00") ?? "—")',
+                                                    '@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")',
+                                                    '@(p.EstimatedStartTime.HasValue? p.EstimatedStartTime.Value.ToString("dd MMM yyyy, hh:mm tt") : "—")',
+                                                    '@Html.Raw((p.Notes ?? "—").Replace("'", "\\\'"))',
+                                                    '@p.Status')">
                             🔍 View Details
                         </button>
 
                         @if (p.Status == "Pending")
                         {
+                            <a asp-controller="Reports" asp-action="Create"
+                               asp-route-category="Proposal"
+                               asp-route-targetId="@p.ProposalId"
+                               class="fc-btn-report-sm" title="Report Proposal">
+                                🚩
+                            </a>
+
+                            <a asp-action="RejectProposal"
+                               asp-route-proposalId="@p.ProposalId"
+                               class="fc-btn-reject">
+                                ❌ Reject
+                            </a>
+
                             <a asp-action="AcceptProposal"
                                asp-route-proposalId="@p.ProposalId"
                                class="fc-btn-accept">

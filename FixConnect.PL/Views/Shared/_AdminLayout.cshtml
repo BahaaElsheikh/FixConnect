@@ -25,6 +25,14 @@
                class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Proposals" ? "text-black fw-bold" : "text-secondary")">
                 📝 Proposals
             </a>
+            <a asp-controller="Admin" asp-action="Jobs"
+               class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Jobs" ? "text-black fw-bold" : "text-secondary")">
+                🛠️ Jobs
+            </a>
+            <a asp-controller="Reports" asp-action="AdminIndex"
+               class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "AdminIndex" && ViewContext.RouteData.Values["controller"]?.ToString() == "Reports" ? "text-black fw-bold" : "text-secondary")">
+                🚨 Reports
+            </a>
             <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline ms-2">
                 <button class="btn btn-sm btn-outline-danger">Logout</button>
             </form>

@@ -149,6 +149,15 @@
                     <span class="material-symbols-outlined text-sm">send</span>
                     Send Request
                 </a>
+
+                <a asp-controller="Reports" asp-action="Create"
+                   asp-route-category="Worker"
+                   asp-route-targetId="@Model.UserId"
+                   class="flex-none btn-outline-danger border border-red-200 hover:bg-red-50 text-red-600 font-label-md text-label-md py-2.5 px-4 rounded-lg transition-all flex items-center justify-center gap-2 no-underline shadow-sm"
+                   title="Report this worker">
+                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">report</span>
+                    Report
+                </a>
             </div>
 
         </div>

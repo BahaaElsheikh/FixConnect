@@ -22,8 +22,8 @@ namespace FixConnect.BLL.Services
         public List<UserResult> GetUsers(string? search, string? roleFilter)
         {
             var query = _context.Users
-                .Include(u => u.Worker)
-                .AsQueryable();
+     .Include(u => u.Worker).ThenInclude(w => w.Verification) // ← تأكد من عمل Include لجدول التحقق هنا
+     .AsQueryable();
 
             // Filter by Role
             if (roleFilter == "Worker")
@@ -153,6 +153,22 @@ namespace FixConnect.BLL.Services
             _context.Proposals.Remove(proposal);
             _context.SaveChanges();
         }
+
+        // ─────────────────────────────
+        // Get All Jobs (لأدمن النظام)
+        // ─────────────────────────────
+        public List<FixConnect.DAL.Models.Job> GetAllJobs()
+        {
+            return _context.Jobs
+                .Include(j => j.Proposal).ThenInclude(p => p.Request).ThenInclude(r => r.Customer).ThenInclude(c => c.User)
+                .Include(j => j.Proposal).ThenInclude(p => p.Worker).ThenInclude(w => w.User)
+                .Include(j => j.InvoiceItems)
+                .OrderByDescending(j => j.JobId)
+                .ToList();
+        }
+
+
+
 
         // ─────────────────────────────
         // Result Classes (internal DTOs)

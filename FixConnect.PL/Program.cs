@@ -46,6 +46,7 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 // ✅ DI: Worker Phase Services
 builder.Services.AddScoped<WorkerService>();
 builder.Services.AddScoped<PortfolioService>();
+builder.Services.AddScoped<ReportService>();
 
 // ✅ Authentication
 builder.Services.AddAuthentication(options =>

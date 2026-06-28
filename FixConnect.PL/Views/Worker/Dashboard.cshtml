@@ -74,12 +74,78 @@
         font-size: .8rem;
         opacity: .9;
     }
+
+
+    /* Dropdown Container */
+    .fc-request-menu {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* الـ 3 نقط نفسها */
+    .fc-menu-btn {
+        background: transparent;
+        border: none;
+        color: #64748b; /* slate-500 */
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+        .fc-menu-btn:hover {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+    /* القائمة اللي بتظهر */
+    .fc-menu-dropdown {
+        position: absolute;
+        right: 0;
+        top: 110%;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 50;
+        min-width: 140px;
+        display: none; /* مخفية باي ديفولت */
+        overflow: hidden;
+    }
+
+        .fc-menu-dropdown.show {
+            display: block;
+        }
+
+    /* الأيتمز جوة القائمة */
+    .fc-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        color: #ef4444; /* اللون الأحمر عشان ريبورت */
+        text-align: left;
+        background: transparent;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+
+        .fc-menu-item:hover {
+            background-color: #fef2f2;
+        }
 </style>
 
 <div class="flex-1 p-gutter md:p-container-margin max-w-7xl mx-auto w-full pt-6">
 
     <div class="fc-hero">
-        <img src="~/images/WorkerDashboardBanner.png" alt="Worker Dashboard" />
+        @* <img src="~/images/WorkerDashboardBanner.png" alt="Worker Dashboard" /> *@
         <div class="fc-hero-overlay">
             <div class="fc-hero-text">
                 <h2>Welcome Back 👋</h2>
@@ -147,7 +213,8 @@
                     @foreach (var r in Model.PublicRequests)
                     {
                         <div class="bg-surface-container-lowest border border-slate-200 rounded-xl p-6 shadow-[0_4px_20px_rgba(0,62,199,0.04)] hover:shadow-[0_8px_30px_rgba(0,62,199,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-                            <div class="flex justify-between items-start mb-4 gap-2 flex-wrap">
+
+                            <div class="flex justify-between items-start mb-4 gap-2">
                                 <div class="flex gap-2 flex-wrap">
                                     @if (!string.IsNullOrEmpty(r.SpecialtyName))
                                     {
@@ -158,8 +225,29 @@
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">✔ Bid Sent</span>
                                     }
                                 </div>
-                                <span class="font-caption text-caption text-outline whitespace-nowrap">@r.CreatedAt.ToString("dd MMM yyyy")</span>
+
+                                <div class="flex items-center gap-2">
+                                    <span class="font-caption text-caption text-outline whitespace-nowrap">@r.CreatedAt.ToString("dd MMM yyyy")</span>
+
+                                    <div class="fc-request-menu">
+                                        <button type="button" class="fc-menu-btn" onclick="toggleRequestMenu(event, this)">
+                                            <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+                                        </button>
+                                        <div class="fc-menu-dropdown">
+                                            <a asp-controller="Reports" asp-action="Create"
+                                               asp-route-category="Request"
+                                               asp-route-targetId="@r.RequestId"
+                                               class="fc-menu-item">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">flag</span>
+                                                Report Request
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <h3 class="font-headline-md text-headline-md text-on-surface mb-2 line-clamp-2 font-bold break-words">@r.Title</h3>
+                            ...
 
                             <h3 class="font-headline-md text-headline-md text-on-surface mb-2 line-clamp-2 font-bold break-words">@r.Title</h3>
                             <p class="text-sm text-secondary mb-4 line-clamp-3 flex-1 text-gray-600 break-words">@r.Description</p>
@@ -324,5 +412,29 @@
         if (!regionDropdown.contains(e.target) && e.target !== regionInput) {
             regionDropdown.classList.add('hidden');
         }
+    });
+
+
+    // فتح وقفل قائمة الـ 3 نقط
+    function toggleRequestMenu(event, button) {
+        event.stopPropagation(); // منع انتشار الكليكة عشان ما تفتحش تفاصيل تانية غلط
+
+        // قفل أي قائمة تانية مفتوحة الأول
+        document.querySelectorAll('.fc-menu-dropdown').forEach(dropdown => {
+            if (dropdown !== button.nextElementSibling) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // توجل القائمة الحالية
+        const currentDropdown = button.nextElementSibling;
+        currentDropdown.classList.toggle('show');
+    }
+
+    // قفل القائمة لو داس في أي مكان فاضي بالصفحة
+    document.addEventListener('click', function () {
+        document.querySelectorAll('.fc-menu-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('show');
+        });
     });
 </script>

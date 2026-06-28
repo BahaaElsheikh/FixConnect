@@ -4,9 +4,6 @@
     Layout = "_AdminLayout";
 }
 
-
-@* <partial name="_AdminNav" /> *@
-
 <div class="container-fluid py-4">
     <h5 class="fw-bold mb-4">All Proposals</h5>
 
@@ -27,7 +24,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                @foreach (var p in Model.Proposals.Items)
+                    @foreach (var p in Model.Proposals.Items)
                     {
                         <tr>
                             <td class="small">@p.ProposalId</td>
@@ -38,23 +35,35 @@
                             <td class="small">@(p.MaterialCost?.ToString("0.00") ?? "—")</td>
                             <td class="small">@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")</td>
                             <td>
-                                <span class="badge @(p.Status == "Pending"      ? "bg-warning text-dark" :
+                                <span class="badge @(p.Status == "Pending" ? "bg-warning text-dark" :
                                                                                            p.Status == "Accepted" ? "bg-success" :
-                                                                                           p.Status == "Rejected" ? "bg-danger" :
-                                                                                                                        "bg-secondary")">
+                                                                                           p.Status == "Rejected" ? "bg-danger" : "bg-secondary")">
                                 @p.Status
                             </span>
                         </td>
                         <td>
-                            <form asp-action="DeleteProposal" method="post"
-                                  onsubmit="return confirm('Delete this proposal?')">
-                                <input type="hidden" name="proposalId" value="@p.ProposalId" />
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    Delete
+                            <div class="d-flex gap-1">
+                                <button type="button" class="btn btn-outline-primary btn-sm view-proposal-details"
+                                        data-id="@p.ProposalId"
+                                        data-reqtitle="@p.RequestTitle"
+                                        data-worker="@p.WorkerName"
+                                        data-customer="@p.CustomerName"
+                                        data-labor="@(p.LaborCost?.ToString("0.00") ?? "—")"
+                                        data-material="@(p.MaterialCost?.ToString("0.00") ?? "—")"
+                                        data-duration="@(p.DurationEstimate.HasValue ? $"{p.DurationEstimate} days" : "—")"
+                                        data-status="@p.Status">
+                                    Details
                                 </button>
-                            </form>
-                        </td>
-                    </tr>
+
+                                    <form asp-action="DeleteProposal" method="post" onsubmit="return confirm('Delete this proposal?')">
+                                        <input type="hidden" name="proposalId" value="@p.ProposalId" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
                                         }
 
                     @if (!Model.Proposals.Items.Any())
@@ -67,7 +76,61 @@
             </table>
         </div>
     </div>
-    <div class="px-3 pb-3">
+
+    <div class="px-3 pb-3 mt-3">
         <partial name="_Pagination" model="Model.Proposals" />
     </div>
 </div>
+
+<div class="modal fade" id="proposalModal" tabindex="-1" aria-labelledby="proposalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="proposalModalLabel">Proposal Details (#<span id="modal-prop-id"></span>)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered m-0">
+                    <tr><th width="35%">Related Request</th><td id="modal-prop-reqtitle" class="fw-semibold"></td></tr>
+                    <tr><th>Worker Name</th><td id="modal-prop-worker" class="text-success fw-semibold"></td></tr>
+                    <tr><th>Customer Name</th><td id="modal-prop-customer"></td></tr>
+                    <tr><th>Labor Cost</th><td><span id="modal-prop-labor"></span> EGP</td></tr>
+                    <tr><th>Material Cost</th><td><span id="modal-prop-material"></span> EGP</td></tr>
+                    <tr><th>Duration Estimate</th><td id="modal-prop-duration"></td></tr>
+                    <tr><th>Status</th><td><span id="modal-prop-status" class="badge"></span></td></tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const proposalButtons = document.querySelectorAll('.view-proposal-details');
+        proposalButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                document.getElementById('modal-prop-id').innerText = this.getAttribute('data-id');
+                document.getElementById('modal-prop-reqtitle').innerText = this.getAttribute('data-reqtitle');
+                document.getElementById('modal-prop-worker').innerText = this.getAttribute('data-worker');
+                document.getElementById('modal-prop-customer').innerText = this.getAttribute('data-customer');
+                document.getElementById('modal-prop-labor').innerText = this.getAttribute('data-labor');
+                document.getElementById('modal-prop-material').innerText = this.getAttribute('data-material');
+                document.getElementById('modal-prop-duration').innerText = this.getAttribute('data-duration');
+
+                const status = this.getAttribute('data-status');
+                const statusBadge = document.getElementById('modal-prop-status');
+                statusBadge.innerText = status;
+                statusBadge.className = "badge " +
+                    (status === "Pending" ? "bg-warning text-dark" :
+                     status === "Accepted" ? "bg-success" :
+                     status === "Rejected" ? "bg-danger" : "bg-secondary");
+
+                var myModal = new bootstrap.Modal(document.getElementById('proposalModal'));
+                myModal.show();
+            });
+        });
+    });
+</script>

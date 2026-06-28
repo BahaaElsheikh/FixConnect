@@ -42,6 +42,9 @@ namespace FixConnect.DAL.Context
 
         public DbSet<UserToken> UserTokens { get; set; }
 
+
+        public DbSet<Report> Reports { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -365,8 +368,27 @@ namespace FixConnect.DAL.Context
             });
 
 
+
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.HasKey(r => r.ReportId);
+                entity.Property(r => r.CreatedAt).HasDefaultValueSql("GETDATE()");
+                entity.Property(r => r.Description).IsRequired().HasMaxLength(1000);
+
+                // ربط المشتكي بجدول المستخدمين
+                entity.HasOne(r => r.Reporter)
+                      .WithMany()
+                      .HasForeignKey(r => r.ReporterId)
+                      .OnDelete(DeleteBehavior.NoAction);
+            });
+
+
             modelBuilder.Entity<UserToken>()
         .HasIndex(t => t.Token);
         }
+
+
+
+
     }
 }

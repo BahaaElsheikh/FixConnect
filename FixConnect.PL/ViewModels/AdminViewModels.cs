@@ -8,6 +8,8 @@
         public PaginatedList<UserRowViewModel> Users { get; set; } = null!;
         public string? SearchQuery { get; set; }
         public string? RoleFilter { get; set; }   // "Worker" | "Customer" | null
+
+        public string? SortOrder { get; set; }
     }
 
     public class UserRowViewModel

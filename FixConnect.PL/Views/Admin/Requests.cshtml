@@ -3,7 +3,7 @@
     ViewData["Title"] = "All Requests";
     Layout = "_AdminLayout";
 }
-@* <partial name="_AdminNav" /> *@
+
 <div class="container-fluid py-4">
     <h5 class="fw-bold mb-4">All Requests</h5>
 
@@ -23,8 +23,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                   @foreach (var r in Model.Requests.Items)  
-
+                    @foreach (var r in Model.Requests.Items)
                     {
                         <tr>
                             <td class="small">@r.RequestId</td>
@@ -32,28 +31,47 @@
                             <td class="small">@r.CustomerName</td>
                             <td class="small">@r.RegionName</td>
                             <td>
-                                <span class="badge bg-light text-dark border">@r.RequestType</span>
+                                @{
+                                    // عملنا Casting للـ RequestType Enum هنا عشان يظهر نص
+                                    var typeText = ((FixConnect.DAL.Data.Enums.RequestType)Convert.ToInt32(r.Status)).ToString();
+                                }
+                                <span class="badge bg-light text-dark border">@typeText</span>
                             </td>
                             <td>
-                                <span class="badge @(r.Status == "Pending"    ? "bg-warning text-dark" :
-                                                                                           r.Status == "InProgress" ? "bg-info text-dark" :
-                                                                                           r.Status == "Completed" ? "bg-success" :
-                                                                                                                      "bg-secondary")">
-                                @r.Status
-                            </span>
-                        </td>
-                        <td class="small">@r.CreatedAt.ToString("dd MMM yyyy")</td>
-                        <td>
-                            <form asp-action="DeleteRequest" method="post"
-                                  onsubmit="return confirm('Delete this request?')">
-                                <input type="hidden" name="requestId" value="@r.RequestId" />
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    Delete
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                                        }
+                                @{
+                                    // عملنا Casting للـ Status Enum
+                                    var statusText = ((FixConnect.DAL.Data.Enums.RequestStatus)Convert.ToInt32(r.Status)).ToString();
+                                    // تحديد لون الـ Badge بناءً على الاسم النصي
+                                    var badgeClass = statusText == "Pending" ? "bg-warning text-dark" :
+                                                     statusText == "InProgress" ? "bg-info text-dark" :
+                                                     statusText == "Completed" ? "bg-success" : "bg-secondary";
+                                }
+                                <span class="badge @badgeClass">@statusText</span>
+                            </td>
+                            <td class="small">@r.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <button type="button" class="btn btn-outline-primary btn-sm view-request-details"
+                                            data-id="@r.RequestId"
+                                            data-title="@r.Title"
+                                            data-customer="@r.CustomerName"
+                                            data-region="@r.RegionName"
+                                            data-type="@typeText"
+                                            data-status="@statusText"
+                                            data-date="@r.CreatedAt.ToString("dd MMM yyyy")">
+                                        Details
+                                    </button>
+
+                                    <form asp-action="DeleteRequest" method="post" onsubmit="return confirm('Delete this request?')">
+                                        <input type="hidden" name="requestId" value="@r.RequestId" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
 
                     @if (!Model.Requests.Items.Any())
                     {
@@ -65,8 +83,59 @@
             </table>
         </div>
     </div>
-    <div class="px-3 pb-3">
+
+    <div class="px-3 pb-3 mt-3">
         <partial name="_Pagination" model="Model.Requests" />
     </div>
-
 </div>
+
+<div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="requestModalLabel">Request Details (#<span id="modal-req-id"></span>)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered m-0">
+                    <tr><th width="35%">Title</th><td id="modal-req-title" class="fw-semibold text-primary"></td></tr>
+                    <tr><th>Customer Name</th><td id="modal-req-customer"></td></tr>
+                    <tr><th>Region</th><td id="modal-req-region"></td></tr>
+                    <tr><th>Type</th><td><span id="modal-req-type" class="badge bg-light text-dark border"></span></td></tr>
+                    <tr><th>Status</th><td><span id="modal-req-status" class="badge"></span></td></tr>
+                    <tr><th>Created Date</th><td id="modal-req-date"></td></tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const requestButtons = document.querySelectorAll('.view-request-details');
+        requestButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                document.getElementById('modal-req-id').innerText = this.getAttribute('data-id');
+                document.getElementById('modal-req-title').innerText = this.getAttribute('data-title');
+                document.getElementById('modal-req-customer').innerText = this.getAttribute('data-customer');
+                document.getElementById('modal-req-region').innerText = this.getAttribute('data-region');
+                document.getElementById('modal-req-type').innerText = this.getAttribute('data-type');
+                document.getElementById('modal-req-date').innerText = this.getAttribute('data-date');
+
+                const status = this.getAttribute('data-status');
+                const statusBadge = document.getElementById('modal-req-status');
+                statusBadge.innerText = status;
+                statusBadge.className = "badge " +
+                    (status === "Pending" ? "bg-warning text-dark" :
+                     status === "InProgress" ? "bg-info text-dark" :
+                     status === "Completed" ? "bg-success" : "bg-secondary");
+
+                var myModal = new bootstrap.Modal(document.getElementById('requestModal'));
+                myModal.show();
+            });
+        });
+    });
+</script>

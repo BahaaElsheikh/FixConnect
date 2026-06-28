@@ -487,6 +487,108 @@
             grid-template-columns: 1fr;
         }
     }
+
+
+
+    /* ── Job Card ── */
+    .fc-job-card {
+        position: relative; /* ضيفنا دي عشان نخلي الزرار المطلق يترسم بالنسبة للكارد */
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius);
+        box-shadow: var(--fc-shadow);
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow .2s, transform .2s;
+    }
+
+    /* زرار الريبورت الصغير فوق على الشمال */
+    /* ── Dropdown Menu (3 Dots) ── */
+    .fc-card-menu-wrap {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 20;
+    }
+
+    .fc-menu-dots-btn {
+        background: none;
+        border: none;
+        color: var(--fc-muted);
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s, color 0.2s;
+    }
+
+        .fc-menu-dots-btn:hover {
+            background: var(--fc-bg);
+            color: var(--fc-text);
+        }
+
+    .fc-menu-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: var(--fc-card);
+        border: 1px solid var(--fc-border);
+        border-radius: var(--fc-radius-sm);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        min-width: 110px;
+        margin-top: 4px;
+    }
+
+        .fc-menu-dropdown.show {
+            display: block;
+        }
+
+    .fc-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: .5rem .75rem;
+        color: var(--fc-danger);
+        font-size: .78rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.15s;
+        border-radius: var(--fc-radius-sm);
+    }
+
+        .fc-menu-item:hover {
+            background: var(--fc-danger-bg);
+            color: var(--fc-danger);
+        }
+
+    /* تعديل مساحة التوب عشان الـ Title ميتداخلش مع النقط */
+    .fc-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: .5rem;
+        margin-bottom: .75rem;
+        padding-left: 20px;
+    }
+
+    /* تعديل بسيط عشان التوب ميبقاش لازق في الزرار */
+    .fc-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: .5rem;
+        margin-bottom: .75rem;
+        padding-left: 15px; /* مساحة عشان الـ Title ميتداخلش مع الزرار على الشاشات الصغيرة */
+    }
+
+
 </style>
 
 <!-- Toast -->
@@ -519,6 +621,19 @@
                     var displayLabel = j.WorkerMarkedFinished ? "⏳ Awaiting Confirmation" : j.Status;
 
                     <div class="fc-job-card">
+
+
+                        <div class="fc-card-menu-wrap">
+                            <button class="fc-menu-dots-btn" onclick="fcToggleMenu(event, this)">⋮</button>
+                            <div class="fc-menu-dropdown">
+                                <a asp-controller="Reports" asp-action="Create"
+                                   asp-route-category="Job"
+                                   asp-route-targetId="@j.JobId"
+                                   class="fc-menu-item">
+                                    🚩 Report Job
+                                </a>
+                            </div>
+                        </div>
 
                         <!-- Top -->
                         <div class="fc-card-top">
@@ -655,4 +770,27 @@
     {
             <text>fcShowToast('danger', '@Html.Raw(TempData["Error"].ToString().Replace("'", "\\'"))');</text>
     }
+
+
+
+    function fcToggleMenu(event, btn) {
+        event.stopPropagation(); // بنمنع إن الضغطة تأثر على أي مكان تاني في الكارد
+
+        // قفل أي Dropdown تاني مفتوح في كارد تانية الأول
+        document.querySelectorAll('.fc-menu-dropdown').forEach(dropdown => {
+            if (dropdown !== btn.nextElementSibling) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // فتح أو قفل الـ Dropdown الحالي
+        btn.nextElementSibling.classList.toggle('show');
+    }
+
+    // قفل القائمة لو المستخدم ضغط في أي مكان برة في الصفحة
+    window.addEventListener('click', () => {
+        document.querySelectorAll('.fc-menu-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('show');
+        });
+    });
 </script>

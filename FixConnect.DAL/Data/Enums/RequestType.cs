@@ -10,6 +10,7 @@ namespace FixConnect.DAL.Data.Enums
     public enum RequestType
     {
         Open = 1,
-        Targeted = 2
+        Targeted = 2,
+        Closed=3
     }
 }

@@ -37,9 +37,24 @@ namespace FixConnect.PL.Controllers
         // GET: /Admin/Users
         // ─────────────────────────────
         [HttpGet]
-        public IActionResult Users(string? search, string? roleFilter, int page = 1)
+        public IActionResult Users(string? search, string? roleFilter, string? sortOrder, int page = 1)
         {
             var users = _adminService.GetUsers(search, roleFilter);
+
+
+
+
+            if (sortOrder == "date_asc")
+            {
+                users = users.OrderBy(u => u.CreatedAt).ToList();
+            }
+            else
+            {
+                // الديفولت أو الـ "date_desc" يكون تنازلي (الأحدث أولاً)
+                users = users.OrderByDescending(u => u.CreatedAt).ToList();
+                sortOrder = "date_desc";
+            }
+
 
             var rows = users.Select(u => new UserRowViewModel
             {
@@ -263,5 +278,55 @@ namespace FixConnect.PL.Controllers
             _adminService.DeleteProposal(proposalId);
             return RedirectToAction("Proposals");
         }
+
+
+        // ─────────────────────────────
+        // GET: /Admin/Jobs
+        // ─────────────────────────────
+        [HttpGet]
+        public IActionResult Jobs(int page = 1)
+        {
+            var jobsData = _adminService.GetAllJobs();
+
+            var rows = jobsData.Select(j => new AdminJobRowViewModel
+            {
+                JobId = j.JobId,
+                RequestTitle = j.Proposal.Request.Title,
+                WorkerName = j.Proposal.Worker.User.FullName,
+                CustomerName = j.Proposal.Request.Customer.User.FullName,
+                Status = j.Status.ToString(),
+                TotalInvoice = j.LiveInvoiceTotal ?? 0,
+                CreatedAt = j.CreatedAt,
+
+                // داتا الـ Request
+                RequestId = j.Proposal.Request.RequestId,
+                RequestType = j.Proposal.Request.RequestType.ToString(),
+                RegionName = j.Proposal.Request.Region?.RegionName ?? "—",
+
+                // داتا الـ Proposal
+                ProposalId = j.ProposalId,
+                LaborCost = j.LaborCost,
+                MaterialCost = j.Proposal.MaterialCost,
+                DurationEstimate = j.Proposal.DurationEstimate,
+
+                // داتا الفاتورة والتواصل
+                CustomerAddress = j.CustomerExactAddress ?? "—",
+                CustomerPhone = j.CustomerContactNumber ?? "—",
+                InvoiceItems = j.InvoiceItems.Select(i => new AdminInvoiceItemViewModel
+                {
+                    Description = i.Description,
+                    Cost = i.Cost
+                }).ToList()
+            }).ToList();
+
+            var vm = new AdminJobsListViewModel
+            {
+                Jobs = PaginatedList<AdminJobRowViewModel>.Create(rows, page, PageSize)
+            };
+
+            return View(vm);
+        }
+
+
     }
 }

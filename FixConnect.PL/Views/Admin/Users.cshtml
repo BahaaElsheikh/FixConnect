@@ -3,14 +3,12 @@
     ViewData["Title"] = "User Management";
     Layout = "_AdminLayout";
 }
-@* <partial name="_AdminNav" /> *@
+
 <div class="container-fluid py-4">
     <h5 class="fw-bold mb-4">User Management</h5>
 
-    <!-- Filter Bar -->
-    <form method="get" asp-action="Users" class="d-flex gap-2 mb-4 flex-wrap">
+    <form method="get" asp-action="Users" class="d-flex gap-2 mb-4 flex-wrap align-items-center">
 
-        <!-- Search -->
         <input type="text"
                name="search"
                value="@Model.SearchQuery"
@@ -18,19 +16,41 @@
                style="max-width:280px"
                placeholder="Search name, email, phone..." />
 
-        <!-- Role Filter Buttons -->
+        <input type="hidden" name="sortOrder" value="@Model.SortOrder" />
+        <input type="hidden" name="roleFilter" value="@Model.RoleFilter" />
+
         <button type="submit" class="btn btn-outline-secondary">Search</button>
 
-       <div class="ms-auto d-flex gap-2">
-            <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter=""
+        <div class="d-flex gap-1 align-items-center ms-2">
+            <span class="text-muted small me-1"><i class="bi bi-sort-down"></i> Joined Date:</span>
+
+            <a asp-action="Users"
+               asp-route-search="@Model.SearchQuery"
+               asp-route-roleFilter="@Model.RoleFilter"
+               asp-route-sortOrder="date_desc"
+               class="btn btn-sm @(Model.SortOrder == "date_desc" ? "btn-primary" : "btn-outline-primary")">
+                <i class="bi bi-arrow-down"></i> Newest
+            </a>
+
+            <a asp-action="Users"
+               asp-route-search="@Model.SearchQuery"
+               asp-route-roleFilter="@Model.RoleFilter"
+               asp-route-sortOrder="date_asc"
+               class="btn btn-sm @(Model.SortOrder == "date_asc" ? "btn-primary" : "btn-outline-primary")">
+                <i class="bi bi-arrow-up"></i> Oldest
+            </a>
+        </div>
+
+        <div class="ms-auto d-flex gap-2">
+            <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="" asp-route-sortOrder="@Model.SortOrder"
                class="btn @(string.IsNullOrEmpty(Model.RoleFilter) ? "btn-dark" : "btn-outline-dark")">
                 All
             </a>
-            <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Worker"
+            <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Worker" asp-route-sortOrder="@Model.SortOrder"
                class="btn @(Model.RoleFilter == "Worker" ? "btn-dark" : "btn-outline-dark")">
                 Workers
             </a>
-            <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Customer"
+            <a asp-action="Users" asp-route-search="@Model.SearchQuery" asp-route-roleFilter="Customer" asp-route-sortOrder="@Model.SortOrder"
                class="btn @(Model.RoleFilter == "Customer" ? "btn-dark" : "btn-outline-dark")">
                 Customers
             </a>
@@ -38,7 +58,6 @@
     </form>
 
 
-    <!-- Table -->
     <div class="card shadow-sm">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -91,7 +110,6 @@
                             <td>
                                 <div class="d-flex gap-1 flex-wrap">
 
-                                    <!-- View Profile (Workers only) -->
                                     @if (user.Role == "Worker")
                                     {
                                         <a asp-action="WorkerProfile" asp-route-id="@user.UserId"
@@ -99,7 +117,6 @@
                                             View
                                         </a>
 
-                                        <!-- Verify (unverified workers only) -->
                                         @if (!user.IsVerified)
                                         {
                                             <form asp-action="VerifyWorker" method="post">
@@ -113,7 +130,6 @@
                                         }
                                     }
 
-                                    <!-- Activate / Deactivate -->
                                     <form asp-action="ToggleActive" method="post">
                                         <input type="hidden" name="userId" value="@user.UserId" />
                                         <input type="hidden" name="isActive" value="@(!user.IsActive ? 1 : 0)" />
@@ -127,7 +143,6 @@
                                 </div>
                             </td>
                         </tr>
-
                     }
 
                     @if (!Model.Users.Items.Any())
@@ -140,7 +155,7 @@
             </table>
         </div>
     </div>
-    <div class="px-3 pb-3">
+    <div class="px-3 pb-3 mt-3">
         <partial name="_Pagination" model="Model.Users" />
     </div>
 </div>

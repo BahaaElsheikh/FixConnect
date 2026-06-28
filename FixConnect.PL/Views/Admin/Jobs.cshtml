@@ -1,0 +1,211 @@
+﻿@model FixConnect.PL.ViewModels.AdminJobsListViewModel
+@{
+    ViewData["Title"] = "All Jobs";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid py-4">
+    <h5 class="fw-bold mb-4">All Jobs Management</h5>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th># Job ID</th>
+                        <th>Request Title</th>
+                        <th>Proposal ID</th> @* ← العمود الجديد *@
+                        <th>Worker</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th>Total Invoice</th>
+                        <th>Invoice Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var j in Model.Jobs.Items)
+                    {
+                        <tr>
+                            <td class="small fw-bold">#@j.JobId</td>
+                            <td>
+                                <a href="javascript:void(0)" class="fw-semibold text-decoration-none view-request-details"
+                                   data-id="@j.RequestId" data-title="@j.RequestTitle"
+                                   data-region="@j.RegionName" data-type="@j.RequestType">
+                                    @j.RequestTitle
+                                </a>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" class="fw-bold text-decoration-none text-success view-proposal-details"
+                                   data-id="@j.ProposalId" data-worker="@j.WorkerName"
+                                   data-labor="@(j.LaborCost?.ToString("0.00") ?? "0.00")"
+                                   data-material="@(j.MaterialCost?.ToString("0.00") ?? "0.00")"
+                                   data-duration="@(j.DurationEstimate.HasValue ? $"{j.DurationEstimate} Days" : "—")">
+                                    #@j.ProposalId
+                                </a>
+                            </td>
+                            <td>
+                                <a asp-action="WorkerProfile" asp-controller="Admin" asp-route-id="@j.WorkerId" class=" fw-semibold text-success text-dark">
+                                    <i class="bi bi-person text-secondary me-1"></i>@j.WorkerName
+                                </a>
+                            </td>
+                            <td>@j.CustomerName</td>
+                            <td>
+                                @{
+                                    var statusText = j.Status;
+                                    var badgeClass = statusText == "Pending" ? "bg-warning text-dark" :
+                                    statusText == "InProgress" ? "bg-info text-dark" :
+                                    statusText == "Completed" ? "bg-success" :
+                                    statusText == "Disputed" ? "bg-danger" : "bg-secondary";
+                                }
+                                <span class="badge @badgeClass">@statusText</span>
+                            </td>
+                            <td class="fw-bold text-dark">@j.TotalInvoice.ToString("0.00") EGP</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-dark view-invoice-details"
+                                        data-id="@j.JobId" data-phone="@j.CustomerPhone" data-address="@j.CustomerAddress"
+                                        data-total="@j.TotalInvoice.ToString("0.00")"
+                                        data-items='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(j.InvoiceItems))'>
+                                    <i class="bi bi-receipt"></i> Invoice
+                                </button>
+                            </td>
+                        </tr>
+                    }
+
+                    @if (!Model.Jobs.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">No jobs found in the system.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="px-3 pb-3 mt-3">
+        <partial name="_Pagination" model="Model.Jobs" />
+    </div>
+</div>
+
+<div class="modal fade" id="requestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold">Linked Request Details (#<span id="modal-req-id"></span>)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered m-0">
+                    <tr><th width="35%">Title</th><td id="modal-req-title" class="fw-semibold text-primary"></td></tr>
+                    <tr><th>Region</th><td id="modal-req-region"></td></tr>
+                    <tr><th>Type</th><td><span id="modal-req-type" class="badge bg-light text-dark border"></span></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="proposalModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold">Winning Proposal Details (#<span id="modal-prop-id"></span>)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered m-0">
+                    <tr><th width="45%">Worker Name</th><td id="modal-prop-worker" class="fw-semibold text-success"></td></tr>
+                    <tr><th>Labor Cost</th><td><span id="modal-prop-labor"></span> EGP</td></tr>
+                    <tr><th>Initial Material Cost</th><td><span id="modal-prop-material"></span> EGP</td></tr>
+                    <tr><th>Estimated Duration</th><td id="modal-prop-duration"></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title fw-bold">Live Invoice & Execution Info</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="fw-bold mb-2 text-secondary">Execution Address & Contact</h6>
+                <p class="mb-1 small"><strong>Phone:</strong> <span id="modal-inv-phone"></span></p>
+                <p class="mb-3 small"><strong>Exact Address:</strong> <span id="modal-inv-address"></span></p>
+
+                <h6 class="fw-bold mb-2 text-secondary">Invoice Materials & Items</h6>
+                <div class="border rounded mb-3">
+                    <table class="table table-sm table-striped m-0" id="invoiceItemsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item Description</th>
+                                <th class="text-end" width="30%">Cost (EGP)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center fw-bold fs-5 bg-light p-2 rounded">
+                    <span>Total Invoice:</span>
+                    <span class="text-danger"><span id="modal-inv-total"></span> EGP</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Request Details Script
+        document.querySelectorAll('.view-request-details').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('modal-req-id').innerText = this.getAttribute('data-id');
+                document.getElementById('modal-req-title').innerText = this.getAttribute('data-title');
+                document.getElementById('modal-req-region').innerText = this.getAttribute('data-region');
+                document.getElementById('modal-req-type').innerText = this.getAttribute('data-type');
+                new bootstrap.Modal(document.getElementById('requestModal')).show();
+            });
+        });
+
+        // 2. Proposal Details Script
+        document.querySelectorAll('.view-proposal-details').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('modal-prop-id').innerText = this.getAttribute('data-id');
+                document.getElementById('modal-prop-worker').innerText = this.getAttribute('data-worker');
+                document.getElementById('modal-prop-labor').innerText = this.getAttribute('data-labor');
+                document.getElementById('modal-prop-material').innerText = this.getAttribute('data-material');
+                document.getElementById('modal-prop-duration').innerText = this.getAttribute('data-duration');
+                new bootstrap.Modal(document.getElementById('proposalModal')).show();
+            });
+        });
+
+        // 3. Invoice Details Script
+        document.querySelectorAll('.view-invoice-details').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('modal-inv-phone').innerText = this.getAttribute('data-phone');
+                document.getElementById('modal-inv-address').innerText = this.getAttribute('data-address');
+                document.getElementById('modal-inv-total').innerText = this.getAttribute('data-total');
+
+                const items = JSON.parse(this.getAttribute('data-items') || "[]");
+                const tbody = document.querySelector('#invoiceItemsTable tbody');
+                tbody.innerHTML = "";
+
+                if(items.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="2" class="text-center text-muted small py-2">No extra items added yet.</td></tr>`;
+                } else {
+                    items.forEach(item => {
+                        tbody.innerHTML += `<tr>
+                            <td class="small">${item.Description}</td>
+                            <td class="text-end small fw-semibold">${item.Cost.toFixed(2)}</td>
+                        </tr>`;
+                    });
+                }
+                new bootstrap.Modal(document.getElementById('invoiceModal')).show();
+            });
+        });
+    });
+</script>

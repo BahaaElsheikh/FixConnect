@@ -1,0 +1,46 @@
+﻿@model FixConnect.PL.ViewModels.SubmitReportViewModel
+@{
+    ViewData["Title"] = "Submit an Official Report";
+
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4><i class="fa fa-warning"></i> Submit a Report to Platform</h4>
+                </div>
+                <div class="card-body text-left" dir="ltr">
+                    <div class="alert alert-secondary">
+                        <strong>You are submitting a report regarding:</strong> @Model.ContextTitle (@Model.Category)
+                    </div>
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <input type="hidden" asp-for="CustomerId" />
+                        <input type="hidden" asp-for="WorkerId" />
+                        <input type="hidden" asp-for="JobId" />
+                        <input type="hidden" asp-for="RequestId" />
+                        <input type="hidden" asp-for="ProposalId" />
+                        <input type="hidden" asp-for="ReviewId" />
+                        <input type="hidden" asp-for="Category" />
+
+                        <div class="form-group mb-4">
+                            <label class="form-label font-weight-bold">Please describe the issue in detail:</label>
+                            <textarea asp-for="Description" class="form-control" rows="6" placeholder="Write here what happened details..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-danger px-5">Submit Report</button>
+                            <a href="javascript:history.back()" class="btn btn-secondary">Cancel & Go Back</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
